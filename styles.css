@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
   font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
-  background: #0d0e0e;
+  background: #101010;
   color: #efefef;
 }
 
@@ -11,10 +11,19 @@ html {
   min-height: 100%;
   overflow-y: scroll;
   scrollbar-gutter: stable;
-  background: #0d0e0e;
+  /* The page scrollbar shows as a light vertical line on the black boards;
+     keep scrolling but remove the visible track. */
+  scrollbar-width: none;
+  background: #101010;
 }
 
-body { margin: 0; min-height: 100%; background: #0d0e0e; }
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+body { margin: 0; min-height: 100%; background: #101010; }
 
 body { overflow-x: clip; }
 
@@ -28,7 +37,7 @@ a { color: inherit; text-decoration: none; }
   isolation: isolate;
   background:
     radial-gradient(circle at 52% 68%, rgba(255,255,255,.006), transparent 39%),
-    #0d0e0e;
+    #101010;
 }
 
 .stage {
@@ -1182,9 +1191,11 @@ a { color: inherit; text-decoration: none; }
   z-index: 6;
 }
 
-/* Rebuild both UX title brackets as one consistent four-stroke system. The
-   opaque host masks the source-board copies underneath, preventing the
-   stitched-looking seams caused by the mosaic cleanup layer. */
+/* Rebuild both UX title brackets to match the source board: three thin bars
+   (dark -> gray -> white toward the title on the left; white -> gray -> dark
+   on the right) with short top/bottom stubs, framing the full title and
+   description block. The opaque host uses the same tone as the board so it
+   masks the baked copies underneath without adding visible seams. */
 .class-variable-brackets {
   --brace-stroke: max(1px, .14cqw);
   position: absolute;
@@ -1193,6 +1204,7 @@ a { color: inherit; text-decoration: none; }
   width: 3.9cqw;
   height: 12.58cqw;
   background: #202020;
+  display: none;
   pointer-events: none;
   user-select: none;
 }
@@ -1242,19 +1254,16 @@ a { color: inherit; text-decoration: none; }
   --brace-cap: .35cqw;
   color: #f2f3f3;
 }
-
 .class-variable-brackets i:nth-child(2) {
   --brace-index: 1;
   --brace-cap: .55cqw;
   color: rgba(166, 168, 171, .72);
 }
-
 .class-variable-brackets i:nth-child(3) {
   --brace-index: 2;
   --brace-cap: .9cqw;
   color: rgba(105, 107, 110, .56);
 }
-
 .class-variable-brackets i:nth-child(4) {
   --brace-index: 3;
   --brace-cap: 1.45cqw;
@@ -1268,7 +1277,7 @@ a { color: inherit; text-decoration: none; }
   --mosaic-shift-y: 2.1cqw;
   position: absolute;
   z-index: 7;
-  left: 81.9cqw;
+  left: 84.4cqw;
   right: auto;
   top: 27.05cqw;
   display: block;
@@ -2514,6 +2523,16 @@ a { color: inherit; text-decoration: none; }
 .landing[data-page="works"] .works-gallery-page,
 .landing[data-page="works"] .works-ux-page { display: block; }
 
+/* Keep the fixed site navigation above all Works content while scrolling.
+   Same one-stacking-context pattern as the Class route: Works pages stay
+   below the locked header mask (stage::before, z4), so local high z-indices
+   (phone cards, stickers) can no longer cover the navigation surface. */
+.landing[data-page^="works"] .works-flow {
+  position: relative;
+  z-index: 3;
+  isolation: isolate;
+}
+
 .works-flow > section {
   position: relative;
   width: 100cqw;
@@ -2522,11 +2541,24 @@ a { color: inherit; text-decoration: none; }
   scroll-margin-top: 0;
 }
 
+/* The mode mark sits exactly on the UI/UX section boundary. Its confirmed UX
+   offset extends slightly below the UI section, so the parent must not clip
+   either state at that edge. */
+.works-flow > .works-gallery-page {
+  overflow: visible;
+}
+
 .works-flow > .works-ux-page {
   /* UX now closes at the project board. Long project pages keep scrolling
      inside their existing viewport rather than extending the Works page. */
   min-height: 56.25cqw;
   overflow: hidden;
+}
+
+/* The smile needs to cross the section edge as it enters so the disc is never
+   sliced mid-roll. The normal clip returns at the settled position. */
+.works-flow > .works-ux-page.is-smile-entering {
+  overflow: visible;
 }
 
 /* UI/UX source boards include a header of their own. Cover that baked copy so
@@ -2547,7 +2579,7 @@ a { color: inherit; text-decoration: none; }
    the object can roll in independently while the sticky header clips it. */
 .works-ux-smile-cleaner {
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   top: 0;
   right: 0;
   width: 58cqw;
@@ -2557,11 +2589,26 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
+/* The source board carries one isolated bright vertical stroke on the far
+   right. Cover only that stroke while keeping the surrounding gray artwork. */
+.works-ux-smile-cleaner::after {
+  content: "";
+  position: absolute;
+  right: 4cqw;
+  top: 0;
+  width: 10cqw;
+  height: 35cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
 .works-ux-smile {
   position: absolute;
-  /* Above the source-board cleaner, but below the fixed header mask (z4), so
-     the rolling disc disappears cleanly beneath navigation while scrolling. */
-  z-index: 3;
+  /* Above the source-board cleaner and the board-header mask (z4), so the
+     rolling disc is never hidden behind the black bar while entering; still
+     below the star badge (z6) so the approved settle-behind-badge overlap
+     holds. */
+  z-index: 5;
   /* Match the approved composition: the complete smile settles behind and
      overlaps the star badge by roughly 10cqw without touching the mosaic. */
   /* Keep the whole scaled disc below the board-header cleaner on entry.
@@ -2573,15 +2620,17 @@ a { color: inherit; text-decoration: none; }
   max-width: none;
   display: block;
   opacity: var(--ux-smile-opacity, 1);
-  transform: translate3d(var(--ux-smile-x, 0), var(--ux-smile-y, 0), 0)
+  transform: translate3d(var(--ux-smile-x, 0), calc(var(--ux-smile-y, 0) + var(--ux-header-safe-shift, 0px)), 0)
     rotate(var(--ux-smile-rotate, 0deg)) scale(var(--ux-smile-scale, 1));
   transform-origin: 50% 50%;
   will-change: transform, opacity;
   filter: blur(var(--ux-smile-blur, 0px)) brightness(1.06);
   mix-blend-mode: screen;
-  /* The transparent PNG carries one bright terminal pixel column on its
-     extreme right edge; remove only that asset artifact. */
-  clip-path: inset(0 1px 0 0);
+  /* Hide the PNG's anti-aliased outer rim while it rotates during entry. A
+     radial mask follows the disc at every transform angle, unlike a fixed
+     rectangular crop that can expose a bright edge at the corners. */
+  -webkit-mask-image: radial-gradient(circle at center, #000 96%, transparent 100%);
+  mask-image: radial-gradient(circle at center, #000 96%, transparent 100%);
   pointer-events: none;
   user-select: none;
 }
@@ -2670,6 +2719,19 @@ a { color: inherit; text-decoration: none; }
 
 .works-ux-page::before { z-index: 4; }
 
+/* Remove both baked bracket groups from the UX reference board. The masks
+   cover only the two bracket areas; live copy, smile and mosaic remain intact. */
+.works-ux-page::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(#101010, #101010) 24.7cqw 10cqw / 8.6cqw 22.5cqw no-repeat,
+    linear-gradient(#101010, #101010) 86.2cqw 10cqw / 10cqw 22.5cqw no-repeat;
+}
+
 .works-gallery-page__reference,
 .works-ux-page__reference {
   position: static;
@@ -2702,6 +2764,138 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ui-phone-gallery.is-dragging { cursor: grabbing; }
+
+.ui-phone-copy {
+  position: absolute;
+  /* Keep the complete title/description/source stack above the decorative
+     UI/UX mode mark at the section boundary. The copy remains pointer-free,
+     so the mode tabs underneath keep their original hit area and behavior. */
+  z-index: 8;
+  top: 34.6cqw;
+  left: 50%;
+  width: min(92cqw, 1600px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #efefef;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+  transform: translateX(-50%);
+}
+
+.ui-phone-copy__title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.15cqw;
+  max-width: 100%;
+  margin: 0;
+  color: #f4f4f4;
+  font-family: inherit;
+  font-size: clamp(20px, 2.2cqw, 42px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+.ui-phone-copy__title-text { display: inline-block; }
+
+.ui-phone-copy__bracket {
+  display: inline-block;
+  flex: 0 0 auto;
+  width: 3.6cqw;
+  height: 3.02cqw;
+  font-size: 0;
+  line-height: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 100% 100%;
+}
+
+.ui-phone-copy__bracket--outer {
+  background-image: url('./assets/class-motion/works-bracket-left.png');
+}
+
+.ui-phone-copy__bracket--inner {
+  display: none;
+}
+
+.ui-phone-copy__bracket--outer:last-child {
+  background-image: url('./assets/class-motion/works-bracket-right.png');
+}
+
+.ui-phone-copy[data-phone-index="3"] .ui-phone-copy__title {
+  font-size: clamp(20px, 1.76cqw, 34px);
+}
+
+.ui-phone-copy__description {
+  max-width: 82cqw;
+  margin: 1.2cqw 0 0;
+  color: rgba(225, 225, 225, .88);
+  font-family: inherit;
+  font-size: clamp(16px, 1.16cqw, 23px);
+  font-weight: 300;
+  line-height: 1.45;
+  letter-spacing: .01em;
+  white-space: pre-line;
+}
+
+.ui-phone-copy__meta {
+  min-width: 17cqw;
+  min-height: 2.35cqw;
+  margin-top: 1.05cqw;
+  padding: .28cqw 1.8cqw .34cqw;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .62em;
+  border-radius: 999px;
+  background: rgba(38, 38, 38, .78);
+  color: rgba(220, 220, 220, .82);
+  font-family: inherit;
+  font-size: clamp(14px, 1.03cqw, 20px);
+  font-weight: 300;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.ui-phone-copy__from { color: rgba(220, 220, 220, .82); }
+
+.ui-phone-copy__student { color: #20f34f; }
+.ui-phone-copy__student::before { content: "["; }
+.ui-phone-copy__student::after { content: "]"; }
+
+@media (max-width: 700px) {
+  .ui-phone-copy {
+    top: 35.6cqw;
+    width: calc(100% - 24px);
+  }
+
+  .ui-phone-copy__title {
+    gap: .24em;
+    font-size: clamp(18px, 5.2cqw, 30px);
+  }
+
+  .ui-phone-copy[data-phone-index="3"] .ui-phone-copy__title {
+    font-size: clamp(17px, 4.2cqw, 26px);
+  }
+
+  .ui-phone-copy__description {
+    max-width: 100%;
+    margin-top: 2.6cqw;
+    font-size: clamp(13px, 3.45cqw, 18px);
+  }
+
+  .ui-phone-copy__meta {
+    min-width: 42cqw;
+    min-height: 7.5cqw;
+    margin-top: 2.6cqw;
+    padding: 1.2cqw 4.5cqw 1.35cqw;
+    font-size: clamp(12px, 3.2cqw, 16px);
+  }
+}
 
 .ui-phone-track {
   position: absolute;
@@ -3127,13 +3321,13 @@ a { color: inherit; text-decoration: none; }
 
 .works-mode-tabs {
   position: absolute;
-  z-index: 3;
+  z-index: 7;
   left: 31.771cqw;
   top: 44.792cqw;
   width: 36.458cqw;
   height: 11.458cqw;
   display: block;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
 }
 
@@ -3154,6 +3348,12 @@ a { color: inherit; text-decoration: none; }
 
 .works-mode-tabs[data-active-mode="ux"] .works-mode-tabs__image--ui { opacity: 0; }
 .works-mode-tabs[data-active-mode="ux"] .works-mode-tabs__image--ux { opacity: 1; }
+
+/* Give the UX mark a little more breathing room below the project copy while
+   keeping the UI state and the shared tab geometry unchanged. */
+.works-mode-tabs[data-active-mode="ux"] {
+  transform: translate3d(0, 1.6cqw, 0);
+}
 
 .works-mode-tabs__tab {
   position: absolute;

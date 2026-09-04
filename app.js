@@ -67,6 +67,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   const uiPhoneTrack = document.querySelector('.ui-phone-track');
   const uiPhoneSequence = document.querySelector('.ui-phone-sequence');
   const uiPhoneCards = [...document.querySelectorAll('.ui-phone-card')];
+  const uiPhoneCopy = document.querySelector('.ui-phone-copy');
+  const uiPhoneCopyTitle = document.querySelector('.ui-phone-copy__title-text');
+  const uiPhoneCopyDescription = document.querySelector('.ui-phone-copy__description');
+  const uiPhoneCopyFrom = document.querySelector('.ui-phone-copy__from');
+  const uiPhoneCopyStudent = document.querySelector('.ui-phone-copy__student');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   let wineScrollFrame = 0;
   let classCounterTimer = 0;
@@ -83,6 +88,57 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       : `第 ${String(index + 1).padStart(2, '0')} 节课程内容`,
     body: '课程内容待补充'
   }));
+
+  const uiPhoneCopyData = [
+    {
+      title: '手作奇遇',
+      description: '基于社区记忆与材料供应链驱动，致力于打造精品教程、工具选购、成品分享一体化创意手作闭环服务。',
+      from: '7期',
+      student: 'Klio'
+    },
+    {
+      title: '搭星球',
+      description: '基于AIGC技术、覆盖多场景的智能穿搭推荐平台。',
+      from: '9期',
+      student: '用户已注销'
+    },
+    {
+      title: '衣搭',
+      description: '基于AIGC智能算法驱动，致力于打造穿搭种草、虚拟穿搭、\n灵感选购一体化时尚穿搭shopping台。',
+      from: '录播',
+      student: 'Nadya'
+    },
+    {
+      title: 'B站·创作中心荣誉徽章体系',
+      description: '通过将分享成功打造成有价值的社交货币。',
+      from: '录播',
+      student: 'XBF'
+    },
+    {
+      title: '物次方',
+      description: '基于校园垂直场景，提供闲置物品交易的校园二手交易电商平台。',
+      from: '录播',
+      student: 'zyf'
+    },
+    {
+      title: '遛弯',
+      description: '基于本地生活地图数据和AIGC能力，为用户提供AI规划路线，打造沉浸式CityWalk体验的一站式生活平台。',
+      from: '9期',
+      student: '饺子'
+    },
+    {
+      title: '小憩星球',
+      description: '基于本地生活地图数据和AIGC能力，为用户提供AI规划路线，打造沉浸式CityWalk体验的一站式生活平台。',
+      from: '8期',
+      student: '西西弗斯'
+    },
+    {
+      title: '恋语键盘',
+      description: '恋语键盘是一款基于AIGC能力提供多场景、高智商表达、优化与人设对话的智能社交通讯工具。',
+      from: '录播',
+      student: '锤子'
+    }
+  ];
 
   const prepareClassCounters = () => {
     if (!classStats || !classCounters.length) return;
@@ -207,10 +263,20 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   };
 
   const updateWorksModeTabs = () => {
-    if (!worksModeTabs || !worksUxPage || landing.dataset.page !== 'works') return;
+    if (!worksModeTabs || !worksUxPage || !worksUxSmile || landing.dataset.page !== 'works') return;
     const viewportHeight = Math.max(window.innerHeight, 1);
-    const uxSectionTop = worksUxPage.getBoundingClientRect().top;
-    setWorksMode(uxSectionTop <= viewportHeight * 0.92 ? 'ux' : 'ui');
+    const smileRect = worksUxSmile.getBoundingClientRect();
+    const visibleTop = Math.max(smileRect.top, 0);
+    const visibleBottom = Math.min(smileRect.bottom, viewportHeight);
+    const visibleHeight = Math.max(visibleBottom - visibleTop, 0);
+    const visibleRatio = visibleHeight / Math.max(smileRect.height, 1);
+    const revealOpacity = Number.parseFloat(
+      worksUxPage.style.getPropertyValue('--ux-smile-opacity')
+    ) || 0;
+
+    /* Switch only once the rolling smile is recognisably inside the viewport,
+       rather than when the UX section merely touches its lower edge. */
+    setWorksMode(visibleRatio >= 0.32 && revealOpacity >= 0.5 ? 'ux' : 'ui');
   };
 
   const updateWorksUxSmile = () => {
@@ -220,7 +286,16 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const sectionTop = worksUxPage.getBoundingClientRect().top;
     const stickyTravel = Math.max(worksUxPage.offsetHeight - viewportHeight, 0);
     const headerSafeShift = clamp(-sectionTop, 0, stickyTravel);
-    const rawProgress = (viewportHeight - sectionTop) / (viewportHeight * 0.92);
+    /* Progress must be able to reach 1 by the end of the page's scroll travel.
+       The old fixed 0.92vh window never completes when the UX board is shorter
+       than the viewport (windows narrower than 16:9), which left the smile
+       stuck mid-roll and covered. Measure the travel the section can actually
+       cover, so the roll always finishes at the bottom of the scroll. */
+    const sectionDocTop = sectionTop + window.scrollY;
+    const maxScroll = Math.max(document.documentElement.scrollHeight - viewportHeight, 0);
+    const sectionTopAtMax = Math.max(sectionDocTop - maxScroll, 0);
+    const settleTravel = Math.max(viewportHeight - sectionTopAtMax, 1);
+    const rawProgress = (viewportHeight - sectionTop) / settleTravel;
     const progress = clamp(rawProgress, 0, 1);
     const eased = reduceMotion.matches ? (progress > 0 ? 1 : 0) : progress * progress * (3 - 2 * progress);
     const remaining = 1 - eased;
@@ -228,6 +303,14 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const revealOpacity = revealProgress * revealProgress * (3 - 2 * revealProgress);
     const foregroundProgress = clamp((eased - 0.94) / 0.06, 0, 1);
     const foregroundOpacity = foregroundProgress * foregroundProgress * (3 - 2 * foregroundProgress);
+
+    /* Let the rolling disc remain whole while it crosses the UX section edge;
+       restore the section clip as soon as the approved resting position is
+       reached. */
+    worksUxPage.classList.toggle(
+      'is-smile-entering',
+      !reduceMotion.matches && progress < 1
+    );
 
     /* Roll the complete disc in from the upper-right with a clearly readable
        arc. The approved settled scale and final CSS position remain unchanged. */
@@ -302,8 +385,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     wineScrollFrame = requestAnimationFrame(() => {
       wineScrollFrame = 0;
       updateWorksWine();
-      updateWorksModeTabs();
       updateWorksUxSmile();
+      updateWorksModeTabs();
       updateClassLessons();
     });
   };
@@ -1498,6 +1581,19 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     return difference;
   };
 
+  const renderPhoneCopy = () => {
+    if (!uiPhoneCopy || !uiPhoneCopyData.length) return;
+    const projectIndex = wrapPhoneIndex(stageActivePhone ?? stageRestingPhone);
+    const project = uiPhoneCopyData[projectIndex];
+    if (!project) return;
+
+    uiPhoneCopyTitle && (uiPhoneCopyTitle.textContent = project.title);
+    uiPhoneCopyDescription && (uiPhoneCopyDescription.textContent = project.description);
+    uiPhoneCopyFrom && (uiPhoneCopyFrom.textContent = project.from);
+    uiPhoneCopyStudent && (uiPhoneCopyStudent.textContent = project.student);
+    uiPhoneCopy.dataset.phoneIndex = String(projectIndex);
+  };
+
   const renderPhoneStage = (previousAnchor) => {
     uiPhoneTrack?.style.removeProperty('transform');
     window.cancelAnimationFrame(stageWrapFrame);
@@ -1506,6 +1602,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const stageAnchor = stageActivePhone ?? stageRestingPhone;
     const priorAnchor = previousAnchor ?? stageAnchor;
     const hasActivePhone = stageActivePhone !== null;
+
+    renderPhoneCopy();
 
     uiPhoneCards.forEach((card, index) => {
       const difference = getPhoneIndexDifference(index, stageAnchor);
@@ -1766,8 +1864,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       if (route === 'works') replayWorksTileDrop();
       requestAnimationFrame(() => {
         updateWorksWine();
-        updateWorksModeTabs();
         updateWorksUxSmile();
+        updateWorksModeTabs();
         renderPhoneStage();
       });
     } else {
