@@ -1,0 +1,3443 @@
+:root {
+  color-scheme: dark;
+  font-family: "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: #0d0e0e;
+  color: #efefef;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  min-height: 100%;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+  background: #0d0e0e;
+}
+
+body { margin: 0; min-height: 100%; background: #0d0e0e; }
+
+body { overflow-x: clip; }
+
+a { color: inherit; text-decoration: none; }
+
+.landing {
+  position: relative;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 52% 68%, rgba(255,255,255,.006), transparent 39%),
+    #0d0e0e;
+}
+
+.stage {
+  position: relative;
+  width: min(100%, 177.7778vh);
+  min-height: 100svh;
+  margin-inline: auto;
+  container-type: inline-size;
+}
+
+.top-subject {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  top: 0;
+  width: 68.04cqw;
+  aspect-ratio: 1.29422;
+  overflow: hidden;
+  transform: translate(-50%, -33.333%);
+  pointer-events: none;
+}
+
+.top-subject video {
+  position: absolute;
+  inset-block: 0;
+  left: -18.681%;
+  display: block;
+  width: 137.363%;
+  height: 100%;
+  object-fit: fill;
+  mix-blend-mode: screen;
+  opacity: 1;
+}
+
+.top-subject canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+
+.top-subject.is-webgl-ready video { opacity: 0; }
+.top-subject.is-webgl-ready canvas { opacity: 1; }
+.top-subject.is-alpha-video video {
+  opacity: 1;
+  mix-blend-mode: normal;
+}
+.top-subject.is-alpha-video canvas { display: none; }
+.top-subject.is-video-fallback canvas { display: none; }
+
+.hero { position: relative; min-height: 100svh; }
+
+.studio-title {
+  position: absolute;
+  left: 11.6cqw;
+  top: 48.5vh;
+  z-index: 2;
+  margin: 0;
+  width: 44cqw;
+}
+
+.studio-title img { display: block; width: 100%; height: auto; }
+
+.brackets {
+  position: absolute;
+  top: 39.8vh;
+  z-index: 1;
+  width: 6.8cqw;
+  height: 22.7vh;
+}
+
+.brackets--left { left: 6.4cqw; }
+.brackets--right { right: 6.4cqw; transform: scaleX(-1); }
+
+.brackets i {
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 100%;
+  border-left: max(2px, .14cqw) solid #393b3c;
+  opacity: .34;
+}
+
+.brackets i::before,
+.brackets i::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 1.45cqw;
+  height: max(2px, .14cqw);
+  background: #393b3c;
+}
+
+.brackets i::before { top: 0; }
+.brackets i::after { bottom: 0; }
+.brackets i:nth-child(2) { left: 2.7cqw; border-color: #686a6b; opacity: .54; }
+.brackets i:nth-child(2)::before,
+.brackets i:nth-child(2)::after { width: .9cqw; background: #686a6b; }
+.brackets i:nth-child(3) { left: 4.65cqw; border-color: #a7a9aa; opacity: .72; }
+.brackets i:nth-child(3)::before,
+.brackets i:nth-child(3)::after { width: .55cqw; background: #a7a9aa; }
+.brackets i:nth-child(4) { left: 6.15cqw; border-color: #f2f3f3; opacity: .94; }
+.brackets i:nth-child(4)::before,
+.brackets i:nth-child(4)::after { width: .35cqw; background: #f2f3f3; }
+
+.pixel-cloud {
+  --cell: 1.08cqw;
+  --drift-x: .075cqw;
+  --drift-y: .055cqw;
+  position: absolute;
+  z-index: 1;
+  width: calc(var(--cell) * 11);
+  height: calc(var(--cell) * 10);
+}
+
+.pixel-cloud--left {
+  left: 12.12cqw;
+  top: calc(46.65vh - var(--cell) * 3.94);
+}
+
+.pixel-cloud--right {
+  right: 9.78cqw;
+  top: calc(51.15vh - var(--cell) * 4.45);
+  --drift-x: -.075cqw;
+}
+
+.pixel-cloud i {
+  --base-opacity: var(--o, .18);
+  position: absolute;
+  left: calc(var(--x) * var(--cell));
+  top: calc(var(--y) * var(--cell));
+  width: calc(var(--cell) * .83);
+  aspect-ratio: 1;
+  border-radius: 18%;
+  background: #8f9293;
+  opacity: var(--base-opacity);
+  transform: translate3d(0, 0, 0);
+  transform-origin: center;
+  will-change: transform, opacity, filter;
+  animation: pixel-breathe 4.8s ease-in-out infinite;
+}
+
+.pixel-cloud i.pixel--outline {
+  --base-opacity: .74;
+  background: rgba(119,121,121,.26);
+  border: max(1px, .10cqw) solid rgba(218,220,220,.66);
+  box-shadow: inset 0 0 .2cqw rgba(255,255,255,.34), 0 0 .15cqw rgba(255,255,255,.2);
+  opacity: var(--base-opacity);
+}
+
+.pixel-cloud i:nth-child(6n + 1) { animation-delay: -4.1s; animation-duration: 5.4s; }
+.pixel-cloud i:nth-child(6n + 2) { animation-delay: -2.7s; animation-duration: 4.35s; }
+.pixel-cloud i:nth-child(6n + 3) { animation-delay: -1.2s; animation-duration: 5.8s; }
+.pixel-cloud i:nth-child(6n + 4) { animation-delay: -3.45s; animation-duration: 4.65s; }
+.pixel-cloud i:nth-child(6n + 5) { animation-delay: -.55s; animation-duration: 5.15s; }
+.pixel-cloud i:nth-child(6n + 6) { animation-delay: -2.05s; animation-duration: 4.1s; }
+
+.pixel-cloud--right i { animation-direction: reverse; }
+
+@keyframes pixel-breathe {
+  0%, 100% {
+    opacity: var(--base-opacity);
+    filter: brightness(1);
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  28% {
+    opacity: calc(var(--base-opacity) * .48);
+    filter: brightness(.82);
+    transform: translate3d(var(--drift-x), calc(var(--drift-y) * -1), 0) scale(.96);
+  }
+  61% {
+    opacity: min(1, calc(var(--base-opacity) * 1.72));
+    filter: brightness(1.22);
+    transform: translate3d(calc(var(--drift-x) * -.55), var(--drift-y), 0) scale(1.035);
+  }
+  82% {
+    opacity: calc(var(--base-opacity) * .78);
+    filter: brightness(.94);
+    transform: translate3d(calc(var(--drift-x) * .25), 0, 0) scale(.985);
+  }
+}
+
+.wine-word {
+  position: absolute;
+  left: 3cqw;
+  top: 65.7vh;
+  z-index: 0;
+  width: 36.7cqw;
+}
+
+.wine-word__base { display: block; width: 100%; height: auto; }
+
+.wine-word__dot {
+  position: absolute;
+  z-index: 2;
+  left: 36.785%;
+  top: 15.815%;
+  width: 9.537%;
+  height: auto;
+  transform-origin: 50% 55%;
+  will-change: transform, filter, opacity;
+  animation: wine-dot-float 2.85s cubic-bezier(.45, 0, .25, 1) infinite;
+}
+
+.wine-word__dot--trail {
+  z-index: 1;
+  opacity: 0;
+  filter: blur(3px) brightness(1.55);
+  animation-name: wine-dot-trail;
+}
+
+@keyframes wine-dot-float {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: brightness(1) drop-shadow(0 0 0 rgba(34,255,81,0));
+  }
+  34% {
+    transform: translate3d(.44cqw, -.3cqw, 0) scale(.96);
+    filter: brightness(1.22) drop-shadow(-.12cqw .1cqw .18cqw rgba(34,255,81,.42));
+  }
+  58% {
+    transform: translate3d(.16cqw, -.11cqw, 0) scale(1.035);
+    filter: brightness(1.08) drop-shadow(0 0 .14cqw rgba(34,255,81,.3));
+  }
+  78% {
+    transform: translate3d(-.07cqw, .055cqw, 0) scale(.99);
+    filter: brightness(.96) drop-shadow(0 0 0 rgba(34,255,81,0));
+  }
+}
+
+@keyframes wine-dot-trail {
+  0%, 100% {
+    opacity: 0;
+    transform: translate3d(-.08cqw, .06cqw, 0) scale(.9);
+  }
+  25% {
+    opacity: .42;
+    transform: translate3d(.16cqw, -.1cqw, 0) scaleX(1.18) scaleY(.92);
+  }
+  48% {
+    opacity: .12;
+    transform: translate3d(.02cqw, 0, 0) scale(1.02);
+  }
+  68% { opacity: 0; }
+}
+
+.motto {
+  position: absolute;
+  z-index: 2;
+  left: 64.4cqw;
+  top: 66.6vh;
+  margin: 0;
+  width: 39.5cqw;
+}
+
+.motto img { display: block; width: 100%; height: auto; }
+
+.motto__base { position: relative; z-index: 1; }
+
+/* Works page — composition inferred from the supplied 3840×2160 reference. */
+.works-page {
+  position: relative;
+  display: none;
+  min-height: 100svh;
+  overflow: hidden;
+}
+
+.landing[data-page="works"] .top-subject,
+.landing[data-page="works"] .hero-home { display: none; }
+.landing[data-page="works"] .works-page { display: block; }
+
+/* Works gallery — reconstructed from the supplied 3840×2160 frame. */
+.works-gallery-page {
+  position: relative;
+  display: none;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #101010;
+}
+
+.landing[data-page="works-gallery"] .top-subject,
+.landing[data-page="works-gallery"] .hero-home,
+.landing[data-page="works-gallery"] .works-page { display: none; }
+.landing[data-page="works-gallery"] .works-gallery-page { display: block; }
+
+.works-gallery-page__row {
+  position: absolute;
+  display: block;
+  height: auto;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+.works-gallery-page__row {
+  left: 0;
+  top: 16.667vh;
+  width: 100cqw;
+}
+
+/* UX default state — exact static baseline from the supplied 3840×2160 frame. */
+.works-ux-page {
+  position: relative;
+  display: none;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #101010;
+}
+
+.landing[data-page="works-ux"] .top-subject,
+.landing[data-page="works-ux"] .hero-home,
+.landing[data-page="works-ux"] .works-page,
+.landing[data-page="works-ux"] .works-gallery-page { display: none; }
+.landing[data-page="works-ux"] .works-ux-page { display: block; }
+
+.works-ux-page__reference {
+  position: absolute;
+  inset: 0 auto auto 0;
+  display: block;
+  width: 100cqw;
+  height: auto;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Class — long static baseline split into browser-safe source slices. */
+.class-page {
+  position: relative;
+  display: none;
+  width: 100cqw;
+  min-height: 100svh;
+  overflow: hidden;
+  background: #101010;
+}
+
+.landing[data-page="class"] {
+  /* A non-visible overflow value becomes the sticky containing block in some
+     Chromium builds. Body already clips horizontal overflow, so keep the Class
+     route ancestors visible and let the lesson board stick to the viewport. */
+  overflow: visible;
+}
+
+.landing[data-page="class"] .class-page {
+  /* Keep the complete Class story in one stacking context below the locked
+     header mask (stage::before, z4). Local effects may use high z-indices for
+     card overlap, but none of them can now pierce the navigation surface. */
+  z-index: 3;
+  isolation: isolate;
+  overflow: visible;
+}
+
+.class-page img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  margin: 0;
+  user-select: none;
+  pointer-events: none;
+}
+
+.class-panel {
+  position: relative;
+  width: 100cqw;
+  height: var(--panel-height);
+  overflow: hidden;
+  background: #101010;
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+  transition: opacity 520ms ease;
+}
+
+.class-page.is-reveal-ready .class-panel:not(.is-visible) {
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+}
+
+.class-panel > img {
+  position: absolute;
+  left: 0;
+  top: calc(0cqw - var(--panel-offset));
+  width: 100cqw;
+  height: auto;
+  transform: none;
+  will-change: auto;
+}
+
+.class-panel--static > img {
+  transform: none;
+  will-change: auto;
+}
+
+/* Module 04 authored entrance: the approved board remains the source of truth,
+   while these two clipped replicas let the smile and portfolio copy arrive
+   independently without changing their final artwork or position. */
+.class-panel--portfolio-reveal {
+  z-index: 2;
+  /* Keep this source slice joined to the next slice without letting its
+     animated replicas paint a second copy over the following module. */
+  overflow: hidden;
+}
+
+.class-portfolio-reveal {
+  position: absolute;
+  z-index: 2;
+  left: 6.7cqw;
+  top: 32.1cqw;
+  width: 86.7cqw;
+  height: 28.8cqw;
+  overflow: hidden;
+  /* The approved source board already supplies this surface. Keeping another
+     opaque fill here produced a darker rectangle behind the live title. */
+  background: transparent;
+  pointer-events: none;
+}
+
+.class-portfolio-piece {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  background-image: url("./assets/class-page-02.jpg");
+  background-repeat: no-repeat;
+  background-size: 100cqw auto;
+  transform: translate3d(0, 0, 0);
+  transition: transform 480ms cubic-bezier(.16, 1, .3, 1);
+  will-change: transform;
+}
+
+.class-portfolio-piece--smile {
+  left: 0;
+  top: 0;
+  width: 29.2cqw;
+  height: 28.8cqw;
+  background-position: -6.7cqw -136.266cqw;
+}
+
+.class-portfolio-piece--copy {
+  left: 28cqw;
+  top: 4.75cqw;
+  width: 58.7cqw;
+  height: 24.05cqw;
+  background-position: -34.7cqw -141.016cqw;
+  /* This crop also contains the title baked into the approved board. Remove
+     that band so the single live heading below is the only rendered title. */
+  clip-path: inset(18cqw 0 0 0);
+}
+
+.class-portfolio-reveal.is-motion-ready:not(.is-entered) .class-portfolio-piece--smile {
+  transform: translate3d(-31cqw, 0, 0);
+}
+
+.class-portfolio-reveal.is-motion-ready:not(.is-entered) .class-portfolio-piece--copy {
+  transform: translate3d(60cqw, 0, 0);
+}
+
+/* Sixteen-lesson scroll narrative on the approved 04 / course schedule board.
+   Scrolling advances the vertical lesson stack, then releases into module 05. */
+.class-lessons {
+  position: relative;
+  z-index: 1;
+  width: 100cqw;
+  /* This is the one retained scroll narrative on the Class route. It begins
+     only after the preceding capability board has left normal document flow. */
+  height: 925svh;
+  margin-top: 0;
+  background: #101010;
+}
+
+.class-lessons__sticky {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  width: 100cqw;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #101010;
+}
+
+.class-lessons__board {
+  position: absolute;
+  top: 8.3cqw;
+  left: 50%;
+  width: min(100cqw, calc((100svh - 8.3cqw) * 1.54919));
+  aspect-ratio: 2110 / 1362;
+  transform: translateX(-50%);
+  container-type: inline-size;
+}
+
+.class-lessons__reference {
+  position: absolute;
+  z-index: 0;
+  inset: 0 auto auto 0;
+  width: 100cqw;
+  height: auto;
+  max-width: none;
+}
+
+.class-lessons__board::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 4.45cqw;
+  top: 27.25cqw;
+  /* Extend just far enough to remove the baked first-lesson colon. The live
+     title now owns its punctuation, so every lesson keeps the correct baseline. */
+  width: 42.35cqw;
+  height: 32.5cqw;
+  background: #101010;
+  /* Follow the green frame's descending left edge instead of covering it
+     with a rectangular shadow. This keeps the full lower-left corner intact
+     while still removing the baked lesson copy beneath the live content. */
+  clip-path: polygon(0 0, 92.5% 0, 83.7% 77.5%, 83.7% 100%, 0 100%);
+  pointer-events: none;
+}
+
+.class-lessons__board::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  right: 3.25cqw;
+  top: 6.05cqw;
+  width: 19cqw;
+  height: 58.1cqw;
+  background: #101010;
+  /* Preserve the complete stepped green notch beside the rail while still
+     removing the baked lesson cards underneath the live scrolling track. */
+  clip-path: polygon(24% 0, 100% 0, 86% 100%, 0 100%, 0 52%, 24% 52%);
+  pointer-events: none;
+}
+
+.class-lessons__glow-feather {
+  position: absolute;
+  z-index: 2;
+  /* Match the source board's diagonal at both ends of the removed phone/glow
+     area so the large gray form remains one continuous surface. */
+  left: 38.05cqw;
+  top: 27.45cqw;
+  width: 14.8cqw;
+  height: 10.2cqw;
+  overflow: hidden;
+  /* The phone and its green glow are baked into the source board. Rebuild the
+     two flat surfaces across that small area, then restore the frame edge. */
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-lessons__glow-feather::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #202020;
+  clip-path: polygon(55% 0, 100% 0, 100% 100%, 42% 100%);
+}
+
+.class-lessons__glow-feather::after {
+  content: "";
+  position: absolute;
+  left: 48.5%;
+  top: -1cqw;
+  width: max(1px, .055cqw);
+  height: 12.2cqw;
+  background: #28c84d;
+  transform: rotate(9.7deg);
+  transform-origin: 50% 50%;
+}
+
+.class-lessons__content {
+  position: absolute;
+  z-index: 2;
+  left: 5.15cqw;
+  top: 28.65cqw;
+  display: block;
+  width: 38.5cqw;
+  min-height: 23cqw;
+  color: #f0f0f0;
+  pointer-events: none;
+}
+
+.class-lessons__index {
+  display: block;
+  color: #c8c9cb;
+  font-size: 1.62cqw;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: .015em;
+}
+
+.class-lessons__content h2,
+.class-lessons__content p {
+  margin: 0;
+}
+
+.class-lessons__content h2 {
+  max-width: 38cqw;
+  margin-top: 1.9cqw;
+  color: #f0f0f0;
+  font-size: 5.05cqw;
+  font-weight: 250;
+  line-height: 1.08;
+  letter-spacing: -.04em;
+}
+
+.class-lessons__content p {
+  margin-top: 1.05cqw;
+  color: #67686b;
+  font-size: 1.05cqw;
+  font-weight: 300;
+  line-height: 1.3;
+}
+
+.class-lessons__rail {
+  position: absolute;
+  z-index: 3;
+  /* Keep the complete rail outside the green frame's notched right edge. */
+  right: 3.7cqw;
+  top: 5.35cqw;
+  /* The wider clipping corridor gives the diagonal track room to travel. */
+  width: 20.5cqw;
+  height: 51.2cqw;
+  overflow: hidden;
+  background: transparent;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+}
+
+.class-lessons__rail::-webkit-scrollbar { display: none; }
+
+.class-lessons__track {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 10.45cqw;
+  height: max-content;
+  margin-left: 9cqw;
+  padding-top: .8cqw;
+  /* Give the final lesson enough travel to settle fully inside the viewport. */
+  padding-bottom: 20.4cqw;
+  gap: 1.08cqw;
+  /* One shared skew keeps every left edge on the same diagonal. The matching
+     horizontal shift is updated from rail scrollTop so cards travel along
+     that diagonal instead of moving vertically through a tilted shape. */
+  transform: translate3d(var(--lesson-rail-shift-x, 0px), 0, 0) skewX(-9.4deg);
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.class-lesson {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: .28cqw;
+  flex: 0 0 10.55cqw;
+  width: 10.45cqw;
+  height: 10.55cqw;
+  margin: 0;
+  padding: 1.15cqw .6cqw .8cqw;
+  appearance: none;
+  border: max(1px, .052cqw) solid rgba(105, 107, 110, .34);
+  background: #171819;
+  color: #55575a;
+  font-family: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    color 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+.class-lesson::after {
+  content: none;
+}
+
+.class-lesson span {
+  order: 2;
+  color: inherit;
+  font-size: 5.05cqw;
+  font-weight: 300;
+  line-height: .88;
+  font-variant-numeric: tabular-nums;
+  transform: skewX(9.4deg);
+}
+
+.class-lesson:not(.is-active) span {
+  opacity: .52;
+}
+
+.class-lesson strong {
+  order: 1;
+  display: flex;
+  justify-content: center;
+  gap: 2.1cqw;
+  width: 100%;
+  font-size: 1.2cqw;
+  font-weight: 300;
+  letter-spacing: 0;
+  transform: skewX(9.4deg);
+}
+
+.class-lesson strong i {
+  font-style: normal;
+}
+
+.class-lesson.is-active {
+  color: #f2f2f2;
+  border-color: rgba(166, 168, 171, .62);
+  background: #202122;
+}
+
+.class-lesson.is-active strong { color: #dadbdd; }
+
+.class-lesson:hover:not(.is-active),
+.class-lesson:focus-visible:not(.is-active) {
+  color: #77797c;
+  border-color: rgba(145, 147, 150, .5);
+  background: #1b1c1d;
+}
+
+.class-lesson:focus-visible {
+  outline: none;
+}
+
+/* The first class-detail board places its star disc against the source image's
+   top edge, where the fixed header would crop it. Cover that baked instance
+   and restore the same complete crop just below the header. */
+.class-panel--star::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto auto;
+  width: 18.23cqw;
+  height: 19.8cqw;
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-panel--star::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 26.5cqw;
+  height: 3.2cqw;
+  /* The second source board still contains the previous can's bottom edge.
+     Remove that baked remnant so the live can crossing the seam is the only
+     object rendered at the join. */
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-panel--star {
+  /* Let the interactive star travel beyond its original slice. The source
+     image itself remains clipped to this board so later slices cannot leak. */
+  overflow: visible;
+}
+
+.class-panel--star > img {
+  clip-path: inset(0 0 156.25cqw 0);
+}
+
+.class-star-cleaner,
+.class-star-sticker {
+  position: absolute;
+  top: 11.33cqw;
+  right: 1.08cqw;
+  width: 15.68cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.class-star-cleaner {
+  z-index: 2;
+  display: block;
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-star-sticker {
+  --drag-x: 0px;
+  --drag-y: 0px;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transform: translate3d(var(--drag-x), var(--drag-y), 0);
+  transition: filter 180ms ease;
+  will-change: transform;
+}
+
+.class-star-sticker.is-dragging {
+  z-index: 6;
+  cursor: grabbing;
+}
+
+/* Keep a released star above the preceding can-animation layer whenever it
+   has been moved away from its designed position. Without this persistent
+   stacking state, the star looks clipped as soon as the pointer is released
+   over the upper board. */
+.class-star-sticker.is-displaced {
+  z-index: 6;
+}
+
+.class-star-sticker:focus-visible {
+  outline: max(2px, .12cqw) solid rgba(255, 255, 255, .82);
+  outline-offset: .34cqw;
+}
+
+.class-star-sticker__art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: 50%;
+  background: url("./assets/class-motion/class-star-sticker.png") 50% 50% / 100% 100% no-repeat;
+  transition: opacity 120ms linear;
+}
+
+.class-star-sticker__canvas {
+  position: absolute;
+  z-index: 2;
+  left: -150%;
+  top: -150%;
+  display: block;
+  width: 400%;
+  height: 400%;
+  opacity: 0;
+  filter: drop-shadow(-1.05cqw .62cqw 1.08cqw rgba(0, 0, 0, .42));
+  transition: opacity 120ms linear;
+  pointer-events: none;
+}
+
+.class-star-sticker.is-dragging .class-star-sticker__canvas { filter: none; }
+.class-star-sticker.is-peel-ready .class-star-sticker__art { opacity: 0; }
+.class-star-sticker.is-peel-ready .class-star-sticker__canvas { opacity: 1; }
+
+.class-panel--star > img {
+  will-change: transform;
+}
+
+/* The can board and all four gray source slices remain one continuous page.
+   They now follow ordinary document flow; only local component motion remains. */
+.class-capability-reveal {
+  position: relative;
+  display: block;
+  width: 100cqw;
+  padding-bottom: 0;
+}
+
+.class-capability-reveal > .class-gray-stage {
+  position: relative;
+  z-index: auto;
+  width: 100cqw;
+  margin-top: 0;
+}
+
+.class-gray-pin {
+  position: relative;
+  width: 100cqw;
+}
+
+.class-gray-master {
+  position: relative;
+  width: 100cqw;
+  background: #202020;
+  transform: none;
+  will-change: auto;
+}
+
+.class-gray-story {
+  position: relative;
+  width: 100cqw;
+  background: #202020;
+}
+
+.class-capability-slot {
+  position: relative;
+  z-index: auto;
+  width: 100cqw;
+  height: 65cqw;
+}
+
+.class-panel--sticker {
+  /* The approved 05 board crosses the former 52.083cqw source slice: its
+     second card row lives below that cut. Keep both rows and lower spacing. */
+  --panel-height: 65cqw !important;
+  isolation: isolate;
+  /* Dragging is bounded to the visible canvas in JS. Do not let this source
+     slice clip the sticker when it travels above its original 4.55cqw top. */
+  overflow: visible;
+}
+
+.class-capability-slot .class-panel--sticker {
+  opacity: 1 !important;
+  visibility: visible;
+}
+
+.class-capability-title-cleaner,
+.class-capability-title-layer {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.class-capability-title-cleaner {
+  z-index: 2;
+  background: #101010;
+}
+
+.class-capability-title-cleaner--left {
+  left: 5.45cqw;
+  top: 21.05cqw;
+  width: 51.5cqw;
+  height: 7.2cqw;
+}
+
+.class-capability-title-cleaner--right {
+  left: 34.55cqw;
+  top: 27.45cqw;
+  width: 63.9cqw;
+  height: 7.15cqw;
+}
+
+.class-capability-title-layer {
+  z-index: 3;
+  inset: 0;
+  background: url("./assets/class-page-03.jpg") 0 -52.083cqw / 100cqw auto no-repeat;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+.class-capability-title-layer--left {
+  clip-path: inset(21.05cqw 43.05cqw 36.75cqw 5.45cqw);
+}
+
+.class-capability-title-layer--right {
+  clip-path: inset(27.45cqw 1.55cqw 30.4cqw 34.55cqw);
+}
+
+.class-panel--sticker.is-capability-motion-ready:not(.is-capability-entered) .class-capability-title-layer--left,
+.class-panel--sticker.is-capability-motion-ready:not(.is-capability-entered) .class-capability-warp-cleaner,
+.class-panel--sticker.is-capability-motion-ready:not(.is-capability-entered) .class-capability-warp,
+.class-panel--sticker.is-capability-motion-ready:not(.is-capability-entered) .class-capability-title-layer--right {
+  opacity: 0;
+}
+
+.class-panel--sticker.is-capability-entered .class-capability-title-layer--left,
+.class-panel--sticker.is-capability-entered .class-capability-warp-cleaner,
+.class-panel--sticker.is-capability-entered .class-capability-warp {
+  animation: class-capability-enter-left 820ms linear both;
+}
+
+.class-panel--sticker.is-capability-entered .class-capability-title-layer--right {
+  animation: class-capability-enter-right 820ms linear both;
+}
+
+@keyframes class-capability-enter-left {
+  0% { opacity: 0; transform: translate3d(-64cqw, 0, 0); }
+  58% { opacity: 1; transform: translate3d(1.15cqw, 0, 0); }
+  76% { opacity: 1; transform: translate3d(-.48cqw, 0, 0); }
+  89% { opacity: 1; transform: translate3d(.14cqw, 0, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes class-capability-enter-right {
+  0% { opacity: 0; transform: translate3d(64cqw, 0, 0); }
+  58% { opacity: 1; transform: translate3d(-1.15cqw, 0, 0); }
+  76% { opacity: 1; transform: translate3d(.48cqw, 0, 0); }
+  89% { opacity: 1; transform: translate3d(-.14cqw, 0, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* The source artwork continues into a baked, non-interactive course board.
+   Keep the panel overflow available for the draggable sticker, but clip the
+   background image itself to the approved capability-board crop. */
+.class-panel--sticker > img {
+  clip-path: inset(52.083cqw 0 91.25cqw 0);
+}
+
+.class-smile-cleaner {
+  position: absolute;
+  z-index: 1;
+  left: 63.5cqw;
+  top: 4.8cqw;
+  width: 15cqw;
+  height: 15.2cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-smile-sticker {
+  --drag-x: 0px;
+  --drag-y: 0px;
+  position: absolute;
+  z-index: 2;
+  left: 63.65cqw;
+  top: 4.55cqw;
+  width: min(15.9cqw, 200px);
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transform: translate3d(var(--drag-x), var(--drag-y), 0) rotate(30deg);
+  transform-origin: 50% 50%;
+  transition: filter 180ms ease;
+  will-change: transform;
+}
+
+.class-smile-sticker.is-dragging {
+  z-index: 5;
+  cursor: grabbing;
+}
+
+.class-smile-sticker.is-dragging .class-smile-sticker__canvas {
+  filter: none;
+}
+
+.class-smile-sticker:focus-visible {
+  outline: max(2px, .12cqw) solid rgba(255, 255, 255, .82);
+  outline-offset: .34cqw;
+}
+
+.class-smile-sticker__art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: 50%;
+  background-image: url("./assets/class-page-03.jpg");
+  background-repeat: no-repeat;
+  background-size: 142cqw auto;
+  background-position: -93.72cqw -84.49cqw;
+  box-shadow: 0 1.2cqw 2.2cqw rgba(0, 0, 0, .6);
+  transition: opacity 120ms linear;
+}
+
+.class-smile-sticker__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(125deg, rgba(255, 255, 255, .1), transparent 42%);
+  pointer-events: none;
+}
+
+.class-smile-sticker__canvas {
+  position: absolute;
+  z-index: 2;
+  left: -150%;
+  top: -150%;
+  display: block;
+  width: 400%;
+  height: 400%;
+  opacity: 0;
+  filter: drop-shadow(-1.05cqw .62cqw 1.08cqw rgba(0, 0, 0, .42));
+  transition: opacity 120ms linear;
+  pointer-events: none;
+}
+
+.class-smile-sticker.is-peel-ready .class-smile-sticker__art { opacity: 0; }
+.class-smile-sticker.is-peel-ready .class-smile-sticker__canvas { opacity: 1; }
+
+.class-sticker-mosaic {
+  --cell: 1.08cqw;
+  --drift-x: -.075cqw;
+  position: absolute;
+  z-index: 1;
+  left: 79.15cqw;
+  right: auto;
+  top: 6.45cqw;
+  width: 13.6cqw;
+  height: 12.2cqw;
+  background: #101010;
+  box-shadow: 0 0 0 1cqw #101010;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-sticker-mosaic i.pixel--green,
+.class-sticker-mosaic i.pixel--violet {
+  --base-opacity: .78;
+  opacity: var(--base-opacity);
+  box-shadow: 0 0 .52cqw currentColor;
+}
+
+.class-sticker-mosaic i.pixel--green {
+  color: #2ae384;
+  background: #2ae384;
+}
+
+.class-sticker-mosaic i.pixel--violet {
+  color: #ad55be;
+  background: #ad55be;
+}
+
+.class-variable-title-cleaner {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-variable-title-cleaner--can {
+  left: 42.8cqw;
+  top: 18.7cqw;
+  width: 52.6cqw;
+  height: 8.4cqw;
+}
+
+.class-variable-title-cleaner--ux {
+  /* Start after the source board's inner white bracket. The former cleaner
+     edge crossed that stroke and made its middle look broken and thinner. */
+  left: 32.25cqw;
+  top: 21cqw;
+  width: 57.55cqw;
+  height: 6.2cqw;
+}
+
+.class-panel--variable-ux {
+  isolation: isolate;
+}
+
+.class-panel--variable-ux > img {
+  z-index: 0;
+}
+
+.class-panel--variable-ux .class-variable-title-cleaner--ux {
+  z-index: 5;
+}
+
+.class-panel--variable-ux .class-variable-title--ux {
+  z-index: 6;
+}
+
+/* Rebuild both UX title brackets as one consistent four-stroke system. The
+   opaque host masks the source-board copies underneath, preventing the
+   stitched-looking seams caused by the mosaic cleanup layer. */
+.class-variable-brackets {
+  --brace-stroke: max(1px, .14cqw);
+  position: absolute;
+  z-index: 7;
+  top: 19.43cqw;
+  width: 3.9cqw;
+  height: 12.58cqw;
+  background: #202020;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-variable-brackets--left { left: 27.15cqw; }
+.class-variable-brackets--right { right: 5.95cqw; }
+
+.class-variable-brackets i {
+  position: absolute;
+  top: 0;
+  left: calc(var(--brace-index) * .78cqw);
+  display: block;
+  width: var(--brace-stroke);
+  height: 100%;
+  background: currentColor;
+}
+
+.class-variable-brackets i::before,
+.class-variable-brackets i::after {
+  content: "";
+  position: absolute;
+  width: var(--brace-cap);
+  height: var(--brace-stroke);
+  background: currentColor;
+}
+
+.class-variable-brackets--left i {
+  left: auto;
+  right: calc(var(--brace-index) * .78cqw);
+}
+
+.class-variable-brackets--left i::before,
+.class-variable-brackets--left i::after {
+  left: 0;
+}
+
+.class-variable-brackets--right i::before,
+.class-variable-brackets--right i::after {
+  right: 0;
+}
+
+.class-variable-brackets i::before { top: 0; }
+.class-variable-brackets i::after { bottom: 0; }
+
+.class-variable-brackets i:nth-child(1) {
+  --brace-index: 0;
+  --brace-cap: .35cqw;
+  color: #f2f3f3;
+}
+
+.class-variable-brackets i:nth-child(2) {
+  --brace-index: 1;
+  --brace-cap: .55cqw;
+  color: rgba(166, 168, 171, .72);
+}
+
+.class-variable-brackets i:nth-child(3) {
+  --brace-index: 2;
+  --brace-cap: .9cqw;
+  color: rgba(105, 107, 110, .56);
+}
+
+.class-variable-brackets i:nth-child(4) {
+  --brace-index: 3;
+  --brace-cap: 1.45cqw;
+  color: rgba(57, 59, 60, .42);
+}
+
+.class-variable-ux-mosaic {
+  --cell: 1.12cqw;
+  --drift-x: -.075cqw;
+  --mosaic-shift-x: 3.5cqw;
+  --mosaic-shift-y: 2.1cqw;
+  position: absolute;
+  z-index: 7;
+  left: 81.9cqw;
+  right: auto;
+  top: 27.05cqw;
+  display: block;
+  width: 8.6cqw;
+  height: 8.7cqw;
+  /* Replace the pixels baked into the source board with the same animated
+     cloud used on the home and Works screens. */
+  background: #202020;
+  box-shadow: 0 0 0 .85cqw #202020;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Keep the host mask over the source artwork's original pixel cluster while
+   placing the live replacement cloud a little higher and farther left. */
+.class-variable-ux-mosaic i {
+  left: calc(var(--x) * var(--cell) - var(--mosaic-shift-x));
+  top: calc(var(--y) * var(--cell) - var(--mosaic-shift-y));
+}
+
+/* The curriculum summary's source board contains a static pixel cluster that
+   straddles two 2000px source slices. Keep one continuous replacement above
+   both slices, and reuse the exact breathing motion shared by Home/Works. */
+.class-panel--curriculum-mosaic {
+  z-index: 2;
+  overflow: visible;
+  isolation: isolate;
+}
+
+/* The two compact capability lists are part of the source artwork. Matching
+   covers reveal those original pixels line by line as each list scrolls in. */
+.class-value-list-mask {
+  --line-step: 1.42cqw;
+  position: absolute;
+  z-index: 4;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-value-list-mask--right {
+  left: 84.15cqw;
+  top: 40.45cqw;
+  width: 10.2cqw;
+  height: 11.45cqw;
+}
+
+.class-value-list-mask--left {
+  left: 15.9cqw;
+  top: 8.45cqw;
+  width: 27.2cqw;
+  height: 10cqw;
+}
+
+.class-value-list-mask > i {
+  position: absolute;
+  left: 0;
+  top: calc(var(--line) * var(--line-step));
+  display: block;
+  width: 100%;
+  height: 1.48cqw;
+  background: #101010;
+  transform: scaleX(0);
+  transform-origin: right center;
+  will-change: transform;
+}
+
+.class-value-list-mask.is-motion-ready > i {
+  transform: scaleX(1);
+}
+
+.class-value-list-mask.is-motion-ready.is-revealed > i {
+  transform: scaleX(0);
+  transition: transform 340ms cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--line) * 75ms);
+}
+
+/* Reveal the eleven curriculum lines in place. The covers match the source
+   board, so the completed state remains the untouched artwork underneath. */
+.class-curriculum-copy-mask {
+  position: absolute;
+  z-index: 4;
+  left: 20.2cqw;
+  top: 50.45cqw;
+  width: 39cqw;
+  height: 38.5cqw;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-curriculum-copy-mask > i {
+  position: absolute;
+  left: 0;
+  top: calc(var(--line) * 3.42cqw);
+  display: block;
+  width: 100%;
+  height: 3.42cqw;
+  background: #101010;
+  transform: scaleX(0);
+  transform-origin: right center;
+  will-change: transform;
+}
+
+.class-curriculum-copy-mask.is-motion-ready > i {
+  transform: scaleX(1);
+}
+
+.class-curriculum-copy-mask.is-motion-ready.is-revealed > i {
+  transform: scaleX(0);
+  transition: transform 420ms cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--line) * 90ms);
+}
+
+.class-curriculum-mosaic {
+  --cell: 1.95cqw;
+  --drift-x: -.075cqw;
+  position: absolute;
+  z-index: 3;
+  left: 62.2cqw;
+  right: auto;
+  top: 50.55cqw;
+  width: 18.1cqw;
+  height: 16.2cqw;
+  background: #101010;
+  box-shadow: 0 0 0 .8cqw #101010;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-variable-title {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: inherit;
+  font-size: 4.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.class-variable-title--can {
+  left: 45cqw;
+  top: 19.55cqw;
+}
+
+/* Native WarpText adaptation for selected title phrases. The original text is
+   the zero-cost, pixel-perfect resting state; JS crossfades only that phrase to
+   its own canvas while the pointer bends/refraction-splits the lettering. */
+.class-variable-title--warp {
+  --warp-progress: 0;
+  position: relative;
+  display: inline-block;
+  isolation: isolate;
+  cursor: default;
+}
+
+.class-variable-title--warp > .class-warp-text__source {
+  opacity: calc(1 - var(--warp-progress));
+}
+
+.class-warp-text__canvas {
+  position: absolute;
+  z-index: 2;
+  left: -.7em;
+  top: -.35em;
+  display: block;
+  width: calc(100% + 1.4em);
+  height: 1.7em;
+  opacity: var(--warp-progress);
+  pointer-events: none;
+}
+
+.class-figma-warp-cleaner {
+  position: absolute;
+  z-index: 3;
+  left: 11.75cqw;
+  top: 11.8cqw;
+  width: 34.5cqw;
+  /* Only erase the baked Figma/Codex line. The former patch extended into
+     “完成线上作品集” and read as a second dark layer over that line. */
+  height: 5.25cqw;
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-figma-warp {
+  position: absolute;
+  z-index: 4;
+  left: 11.95cqw;
+  top: 11.45cqw;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: inherit;
+  font-size: 4.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.class-figma-warp__figma { color: #69d98b; }
+.class-figma-warp__codex { color: #dfa1d7; }
+.class-figma-warp__comma {
+  display: inline-block;
+  margin-left: 0;
+  color: #dfa1d7;
+}
+
+.class-portfolio-title-cleaner,
+.class-capability-warp-cleaner,
+.class-audience-summary-cleaner {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+.class-portfolio-title-cleaner {
+  z-index: 3;
+  left: 27.55cqw;
+  top: 12.55cqw;
+  width: 52.1cqw;
+  height: 5.05cqw;
+  background: #2f2f2f;
+}
+
+.class-portfolio-title-warp {
+  position: absolute;
+  z-index: 4;
+  left: 28.05cqw;
+  top: 12.55cqw;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: inherit;
+  font-size: 3.72cqw;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.class-portfolio-title-warp__green { color: #24ef59; }
+
+.class-panel--recruiting-scene {
+  isolation: isolate;
+}
+
+.class-recruiting-scene-cleaner {
+  position: absolute;
+  z-index: 3;
+  left: 12.4cqw;
+  top: 37.45cqw;
+  /* Erase only the baked green phrase. The previous patch was tall enough
+     to cover the second line below it. */
+  width: 19cqw;
+  height: 3.35cqw;
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-recruiting-scene-warp {
+  position: absolute;
+  z-index: 4;
+  left: 12.65cqw;
+  top: 37.05cqw;
+  margin: 0;
+  color: #28F54D;
+  font-family: inherit;
+  font-size: 3.16cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.class-portfolio-reveal.is-motion-ready:not(.is-entered) .class-portfolio-title-cleaner,
+.class-portfolio-reveal.is-motion-ready:not(.is-entered) .class-portfolio-title-warp {
+  transform: translate3d(60cqw, 0, 0);
+}
+
+.class-portfolio-title-cleaner,
+.class-portfolio-title-warp {
+  transition: transform 480ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.class-capability-warp-cleaner {
+  z-index: 3;
+  left: 26.75cqw;
+  top: 22.75cqw;
+  width: 28.7cqw;
+  height: 5.45cqw;
+  background: #101010;
+}
+
+.class-panel--sticker {
+  /* Foreground sheet for the capability-to-lessons reveal. The next module is
+     sticky underneath it from the start rather than arriving after a pin gap. */
+  z-index: 3;
+}
+
+.class-audience-summary-cleaner::after {
+  content: "";
+  position: absolute;
+  right: -8.2cqw;
+  top: -1.05cqw;
+  width: 15.25cqw;
+  height: 7.45cqw;
+  /* Remove the baked emoji together with its complete green glow footprint. */
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-capability-warp {
+  position: absolute;
+  z-index: 4;
+  left: 27.15cqw;
+  top: 23.05cqw;
+  margin: 0;
+  color: #24ef59;
+  font-family: inherit;
+  font-size: 4.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.class-audience-highlight-fix {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 3.85cqw;
+  color: #28F54D;
+  background: #123d1d;
+  border: 0;
+  /* The source artwork already contains the highlight. This narrow cleanup
+     halo removes its residual end-caps without adding another pair of lines. */
+  box-shadow: 0 0 0 .55cqw #101010;
+  font-size: 3.05cqw;
+  font-weight: 350;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.class-audience-highlight-fix--zero {
+  left: 26.85cqw;
+  top: 36.8cqw;
+  width: 11.25cqw;
+  border-inline: max(1px, .08cqw) solid #28F54D;
+}
+
+.class-audience-highlight-fix--recruit {
+  /* Rebuild this one highlight as a single movable unit so its text,
+     background and rules share the same optical spacing on both sides. */
+  left: 45.25cqw;
+  top: 28.28cqw;
+  width: 14.5cqw;
+  color: #28F54D;
+  background: #123d1d;
+  border-inline: max(1px, .08cqw) solid #28F54D;
+  box-shadow: none;
+}
+
+/* Remove only the baked highlight at its former position. The live unit above
+   replaces it slightly to the left without disturbing the surrounding copy. */
+/* Remove the whole baked highlight (source x1789-2336, y3070-3250) including its
+   vertical-line stubs above/below the live overlay span, so the stubs can never
+   leak out at any viewport width. The live span (z3) paints on top of this patch. */
+.class-panel--audience-recruit::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  left: 46.59cqw;
+  top: 27.87cqw;
+  width: 14.25cqw;
+  height: 4.69cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-panel--audience-recruit::after {
+  content: none;
+}
+
+.class-audience-highlight-fix--recruit::before,
+.class-audience-highlight-fix--recruit::after {
+  content: none;
+}
+
+.class-audience-growth-comma-fix {
+  position: absolute;
+  z-index: 3;
+  left: 31.42cqw;
+  top: 7.75cqw;
+  display: block;
+  width: 3.1cqw;
+  height: 4.15cqw;
+  color: #28F54D;
+  background: transparent;
+  font-family: inherit;
+  font-size: 4.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  pointer-events: none;
+  user-select: none;
+  isolation: isolate;
+}
+
+/* The source bitmap's comma is white. Cover only that glyph with the native
+   highlight color; the live green comma above remains aligned with the title. */
+.class-audience-growth-comma-fix::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  /* Pixel-aligned to the baked comma in class-page-04.jpg. This covers the
+     complete white glyph without leaving a visible block below the title. */
+  left: .34cqw;
+  top: 3.08cqw;
+  width: .58cqw;
+  height: 1.12cqw;
+  background: #123d1d;
+  pointer-events: none;
+}
+
+.class-audience-summary-cleaner {
+  z-index: 3;
+  /* Erase the baked title; the live warp title is rendered above this patch. */
+  left: 60.75cqw;
+  top: 40.55cqw;
+  width: 19.35cqw;
+  height: 5.35cqw;
+  background: #101010;
+}
+
+.class-audience-summary-warp {
+  position: absolute;
+  z-index: 4;
+  left: 61.2cqw;
+  top: 41.05cqw;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: inherit;
+  font-size: 4.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) and (hover: hover) {
+  .class-variable-title--warp:not(.class-portfolio-title-warp):hover > .class-warp-text__source {
+    text-shadow: -.038em 0 0 #28F54D, .038em 0 0 #FF62E6;
+  }
+}
+
+.class-variable-title--ux {
+  left: 32.9cqw;
+  top: 21.65cqw;
+  font-size: 4.05cqw;
+}
+
+.class-variable-title__strong { font-weight: 650; }
+.class-variable-title__green { color: #24ef59; }
+.class-variable-title [data-proximity-text] { font-weight: 400; }
+.class-variable-title .class-variable-title__strong { font-weight: 650; }
+
+.class-variable-title [data-proximity-letter] {
+  display: inline-block;
+  font-weight: inherit;
+  text-shadow:
+    calc(var(--letter-bold, 0px) * -1) 0 currentColor,
+    var(--letter-bold, 0px) 0 currentColor,
+    0 calc(var(--letter-bold, 0px) * -.55) currentColor,
+    0 calc(var(--letter-bold, 0px) * .55) currentColor;
+  transition: text-shadow 90ms linear;
+}
+
+/* The can sequence is an independent foreground layer. Its artwork may cross
+   the first gray-board seam without being clipped by either source slice. */
+.class-can-stage {
+  position: absolute;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  width: 100cqw;
+  height: 52.083cqw;
+  overflow: visible;
+  pointer-events: none;
+  transform: none;
+  will-change: auto;
+}
+
+.class-can-parallax-layer {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.class-can-stage > i,
+.class-can-parallax-layer > i {
+  position: absolute;
+  display: block;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: 100% 100%;
+}
+
+.class-can-cleaner {
+  left: 0;
+  top: 26.042cqw;
+  width: 100%;
+  height: 26.041cqw;
+  background: #202020;
+}
+
+/* Structural rules restored from the approved board. They sit behind every
+   animated can layer, with the long rule meeting the base of the green pour. */
+.class-can-guide {
+  position: absolute;
+  display: block;
+  background: rgba(128, 128, 128, .48);
+}
+
+.class-can-guide--title {
+  z-index: 3;
+  left: 43.45cqw;
+  top: 24.3cqw;
+  width: 25.45cqw;
+  height: max(1px, .065cqw);
+  background: #aaa;
+}
+
+.class-can-guide--pour {
+  left: 0;
+  top: 51.95cqw;
+  width: 100cqw;
+  height: max(1px, .065cqw);
+}
+
+.class-can-guide--vertical {
+  left: 41.2cqw;
+  top: 51.95cqw;
+  width: max(1px, .065cqw);
+  height: 12cqw;
+}
+
+.class-can-object {
+  left: 3.906cqw;
+  top: 30.946cqw;
+  width: 22.396cqw;
+  height: 25.214cqw;
+  opacity: 0;
+  background-image: url("./assets/class-motion/can-only-clean.png");
+  transform-origin: 48% 45%;
+  will-change: opacity, transform;
+}
+
+.class-can-pour {
+  left: 21.615cqw;
+  top: 31.988cqw;
+  width: 15.234cqw;
+  height: 22.396cqw;
+  opacity: 0;
+  background-image: url("./assets/class-motion/pour-transparent.png");
+  clip-path: inset(0 0 100% 0);
+  filter: drop-shadow(0 .25cqw .75cqw rgba(36, 243, 82, .12));
+  will-change: opacity, clip-path, transform;
+}
+
+.class-can-copy {
+  left: 38.021cqw;
+  top: 37.760cqw;
+  width: 58.854cqw;
+  height: 9.635cqw;
+  opacity: 0;
+  background-image: url("./assets/class-motion/copy.png");
+  will-change: opacity, transform, filter;
+}
+
+.class-can-stage.is-playing .class-can-object {
+  animation: class-can-enter 4.8s cubic-bezier(.16, 1, .3, 1) 1 both;
+}
+
+.class-can-stage.is-playing .class-can-pour {
+  animation: class-pour-reveal 3.4s cubic-bezier(.22, 1, .36, 1) 1 both;
+}
+
+.class-can-stage.is-playing .class-can-copy {
+  animation: class-copy-reveal 4.8s cubic-bezier(.16, 1, .3, 1) 1 both;
+}
+
+.class-can-stage.is-complete .class-can-object,
+.class-can-stage.is-complete .class-can-pour,
+.class-can-stage.is-complete .class-can-copy {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.class-can-stage.is-complete .class-can-pour {
+  clip-path: inset(0);
+}
+
+@keyframes class-can-enter {
+  0%, 5% {
+    opacity: 0;
+    transform: translate3d(-30cqw, 1.2cqw, 0) rotate(-8deg);
+  }
+  32% {
+    opacity: 1;
+    transform: translate3d(.55cqw, 0, 0) rotate(1deg);
+  }
+  42%, 100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0);
+  }
+}
+
+@keyframes class-pour-reveal {
+  0%, 32% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0, -.45cqw, 0) scaleY(.94);
+  }
+  38% { opacity: 1; }
+  68%, 100% {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translate3d(0, 0, 0) scaleY(1);
+  }
+}
+
+@keyframes class-copy-reveal {
+  0%, 18% {
+    opacity: 0;
+    filter: blur(.22cqw);
+    transform: translate3d(11cqw, 0, 0);
+  }
+  52%, 100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.class-feedback-avatar {
+  position: absolute;
+  z-index: 3;
+  left: var(--avatar-left);
+  top: var(--avatar-top);
+  display: block;
+  width: 2.292cqw;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background-color: #292929;
+  background-image: var(--avatar-image);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 max(1px, .052cqw) rgba(255, 255, 255, .16);
+  filter: brightness(.78) saturate(.86);
+  overflow: hidden;
+  pointer-events: none;
+  transform: translateZ(3px);
+}
+
+.class-hover-layer {
+  position: absolute;
+  z-index: 3;
+  inset: 0 auto auto 0;
+  width: 100cqw;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+/* The animated mosaic is a later sibling and normally sits above this layer.
+   Lift the whole card stacking context only while a feedback card is hovered,
+   so the final card can scale over the mosaic cleaner without being clipped. */
+.class-hover-layer:has(.class-feedback-hover:hover) {
+  z-index: 5;
+}
+
+.class-hover-layer:has(.class-feedback-hover:hover) .class-feedback-hover:not(:hover) {
+  z-index: 0;
+}
+
+.class-feedback-hover {
+  position: absolute;
+  left: var(--hover-x);
+  top: var(--hover-y);
+  width: var(--hover-w);
+  height: var(--hover-h);
+  border-radius: .78cqw;
+  background-image: url("./assets/class-page-01.jpg");
+  background-repeat: no-repeat;
+  background-size: 100cqw auto;
+  background-position: calc(0cqw - var(--hover-x)) calc(0cqw - var(--hover-y));
+  opacity: 0;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    opacity 180ms ease,
+    transform 300ms cubic-bezier(.16, 1, .3, 1),
+    filter 220ms ease,
+    box-shadow 220ms ease;
+  transform-origin: 50% 50%;
+}
+
+.class-feedback-hover {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --shine-x: 50%;
+  --shine-y: 50%;
+  opacity: 1;
+  background-image: none;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.class-feedback-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-image: var(--card-image);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: 0 0;
+  /* The source crops include a few pixels of the board background around
+     several cards. Keep the original artwork aligned, but expose only each
+     card's measured silhouette so the lifted object has no black slab. */
+  clip-path: inset(var(--card-trim, 0) round .78cqw);
+  opacity: 1;
+  pointer-events: none;
+  transform: translate3d(0, 0, 1px);
+  transform-origin: 50% 50%;
+  transition:
+    filter 180ms ease,
+    box-shadow 260ms ease;
+}
+
+/* Card 2 originally stopped 52 source pixels before its rounded bottom.
+   Crop this one directly from the full approved board so every final text row
+   and the complete lower edge lift together. */
+.class-feedback-hover--source-crop::before {
+  background-size: 100cqw auto;
+  background-position: calc(0cqw - var(--hover-x)) calc(0cqw - var(--hover-y));
+}
+
+.class-feedback-hover::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--shine-x) var(--shine-y),
+    rgba(255, 255, 255, .2) 0,
+    rgba(255, 255, 255, .07) 18%,
+    transparent 52%
+  );
+  clip-path: inset(var(--card-trim, 0) round .78cqw);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(0, 0, 2px);
+  transition: opacity 180ms ease;
+}
+
+.class-feedback-hover:hover {
+  z-index: 20;
+  isolation: isolate;
+  transform:
+    perspective(58cqw)
+    rotateX(var(--tilt-x))
+    rotateY(var(--tilt-y))
+    scale(1.2);
+}
+
+.class-feedback-hover:hover::before {
+  filter: brightness(1.06) saturate(1.03);
+  box-shadow: 0 1.15cqw 2.1cqw rgba(0, 0, 0, .38);
+}
+
+.class-feedback-hover:hover::after {
+  opacity: 1;
+}
+
+.class-stats {
+  position: absolute;
+  z-index: 3;
+  left: 41.5cqw;
+  top: 48.75cqw;
+  width: 43.5cqw;
+  height: 6.3cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-stats::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -4cqw;
+  width: 100%;
+  height: 4.1cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-stat {
+  position: absolute;
+  top: 1.35cqw;
+  white-space: nowrap;
+}
+
+.class-stat--students { left: 1.5cqw; }
+.class-stat--rates { left: 10.25cqw; }
+.class-stat--salary { left: 24.25cqw; }
+
+.class-stat__value {
+  display: flex;
+  align-items: baseline;
+  height: 2.45cqw;
+  color: #24ef59;
+  font-size: 2.28cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: -.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.class-stat__label {
+  margin-top: .14cqw;
+  color: #333438;
+  font-size: 1.55cqw;
+  font-weight: 300;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+}
+
+.class-count {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.class-count__digit {
+  display: block;
+  width: .57em;
+  height: 1em;
+  overflow: hidden;
+}
+
+.class-count__track {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  transform: translate3d(0, 0, 0);
+  transition-property: transform;
+  transition-duration: var(--count-duration, 1200ms);
+  transition-delay: var(--count-delay, 0ms);
+  transition-timing-function: cubic-bezier(.16, 1, .3, 1);
+  will-change: transform;
+}
+
+.class-count__track > span {
+  display: block;
+  flex: 0 0 1em;
+  width: 100%;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+.class-stats.is-counting .class-count__track,
+.class-stats.is-count-complete .class-count__track {
+  transform: translate3d(0, calc(var(--count-steps) * -1em), 0);
+}
+
+.class-mosaic {
+  --cell: 1.08cqw;
+  --drift-x: -.075cqw;
+  position: absolute;
+  z-index: 4;
+  left: 85.9cqw;
+  right: auto;
+  /* Clear the final feedback card's full lower edge, including its 1.2x
+     perspective hover footprint and the cleaner's own 1.05cqw bleed. */
+  top: 44.1cqw;
+  width: calc(var(--cell) * 9);
+  height: calc(var(--cell) * 11);
+  /* Hide the static pixels baked into the reference image so the page keeps
+     one clean mosaic layer. The cells themselves reuse the home animation. */
+  background: #101010;
+  box-shadow: 0 0 0 1.05cqw #101010;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-mosaic::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--cell) * 2);
+  top: calc(var(--cell) * -3.1);
+  width: calc(var(--cell) * 5);
+  height: calc(var(--cell) * 2.25);
+  background: #101010;
+  box-shadow: 0 0 0 .24cqw #101010;
+}
+
+.class-ring-stage {
+  --ring-center-x: 50cqw;
+  --ring-center-y: 25.69cqw;
+  --ring-radius-x: 36.3cqw;
+  --ring-radius-y: 21.4cqw;
+  position: absolute;
+  /* Keep the complete moving ring in one stacking context below the locked
+     public header (z-index: 5), including while cards are hovered. */
+  z-index: 2;
+  isolation: isolate;
+  left: 0;
+  /* Align the live orbit with the approved source ring's former crown. */
+  top: 68.5cqw;
+  width: 100cqw;
+  height: 60cqw;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.class-ring-scroll-trigger {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  /* Travel with the stage so pinning begins at the ring's new visual origin. */
+  top: 68.5cqw;
+  width: 100cqw;
+  height: 60cqw;
+  pointer-events: none;
+}
+
+.class-ring-scroll-layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 48%;
+  /* The orbit owns its own continuous clock. Keeping this wrapper static
+     prevents scroll direction from scaling or replacing the live ring. */
+  transform: none;
+  will-change: auto;
+}
+
+.class-ring-cleaner,
+.class-ring-orbit {
+  position: absolute;
+  inset: 0;
+}
+
+.class-ring-cleaner {
+  z-index: 0;
+  /* Reach slightly above the stage to erase the old crown in every rotation
+     phase. This layer remains behind the live orbit and below the heading. */
+  top: -2cqw;
+  background: #101010;
+}
+
+.class-ring-cleaner::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -12cqw;
+  width: 20cqw;
+  height: 14cqw;
+  /* The source board's final static card extends below the main cleaner at
+     the right edge. Mask only that remnant; the live orbit remains above it. */
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-ring-orbit {
+  z-index: 1;
+  transform: none;
+  will-change: auto;
+}
+
+.class-ring-card {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: block;
+  width: 13.02cqw;
+  aspect-ratio: 495 / 488;
+  pointer-events: auto;
+  offset-path: ellipse(
+    var(--ring-radius-x) var(--ring-radius-y)
+    at var(--ring-center-x) var(--ring-center-y)
+  );
+  /* Every card shares one clock and a fixed 1/16 phase offset. The path never
+     rotates, so the surrounding ellipse remains horizontal at every frame. */
+  offset-distance: 75%;
+  offset-rotate: 0deg;
+  transform: none;
+  animation: class-ring-card-orbit 78s linear infinite;
+  animation-delay: calc(var(--ring-index) * -4.875s);
+  will-change: offset-distance;
+}
+
+.class-ring-card:nth-child(1)  { --ring-index: 0; }
+.class-ring-card:nth-child(2)  { --ring-index: 1; }
+.class-ring-card:nth-child(3)  { --ring-index: 2; }
+.class-ring-card:nth-child(4)  { --ring-index: 3; }
+.class-ring-card:nth-child(5)  { --ring-index: 4; }
+.class-ring-card:nth-child(6)  { --ring-index: 5; }
+.class-ring-card:nth-child(7)  { --ring-index: 6; }
+.class-ring-card:nth-child(8)  { --ring-index: 7; }
+.class-ring-card:nth-child(9)  { --ring-index: 8; }
+.class-ring-card:nth-child(10) { --ring-index: 9; }
+.class-ring-card:nth-child(11) { --ring-index: 10; }
+.class-ring-card:nth-child(12) { --ring-index: 11; }
+.class-ring-card:nth-child(13) { --ring-index: 12; }
+.class-ring-card:nth-child(14) { --ring-index: 13; }
+.class-ring-card:nth-child(15) { --ring-index: 14; }
+.class-ring-card:nth-child(16) { --ring-index: 15; }
+
+.class-ring-card > span,
+.class-ring-card img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+
+.class-ring-card img {
+  object-fit: contain;
+  opacity: 1;
+  transform: scale(1);
+  filter: none;
+  transition: transform 220ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.class-panel--can {
+  z-index: 2;
+  /* The live can intentionally crosses the source-board seam. The baked
+     duplicate below is removed on `.class-panel--star::before`. */
+  overflow: visible;
+  clip-path: none;
+}
+
+/* Ring gray-placeholder leak fix moved to ./ring-gray-fix.css — do not
+   duplicate or remove; keep that file linked after this one in index.html. */
+
+.class-can-story {
+  position: relative;
+  z-index: auto;
+  width: 100cqw;
+  overflow: hidden;
+}
+
+.class-can-story.is-layer-active {
+  z-index: 3;
+  overflow: visible;
+}
+
+.class-ring-card:hover {
+  z-index: 3;
+}
+
+.class-ring-card:hover img,
+.class-ring-stage.is-hover-mode .class-ring-card img {
+  transform: scale(1.06);
+}
+
+.class-ring-more {
+  --glass-x: 50%;
+  --glass-y: 50%;
+  --glass-radius: 0px;
+  --glass-spill-radius: 0px;
+  --glass-light-opacity: 0;
+  --glass-stroke-opacity: 0;
+  --glass-stroke: clamp(3px, .32cqw, 6px);
+  --glass-start: 0deg;
+  --glass-peak: 30deg;
+  --glass-end: 60deg;
+  position: absolute;
+  z-index: 2;
+  left: var(--ring-center-x);
+  top: var(--ring-center-y);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 16.15cqw;
+  height: 5.05cqw;
+  padding: 0 2.25cqw;
+  appearance: none;
+  isolation: isolate;
+  overflow: visible;
+  pointer-events: auto;
+  cursor: pointer;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: 0 .42cqw 1.25cqw rgba(0, 0, 0, .18);
+  color: #f0f0f0;
+  font-family: inherit;
+  font-size: 2.05cqw;
+  font-weight: 400;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  transition: transform 240ms cubic-bezier(.16, 1, .3, 1);
+}
+
+/* Keep the deferred Mode control in the codebase while its HTML `hidden`
+   switch is active. The component's flex display would otherwise override it. */
+.class-ring-more[hidden] {
+  display: none !important;
+}
+
+.class-ring-more__face {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .16);
+  -webkit-backdrop-filter: blur(20px) saturate(180%) brightness(108%);
+  backdrop-filter: blur(20px) saturate(180%) brightness(108%);
+  pointer-events: none;
+}
+
+.class-ring-more__light {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: var(--glass-light-opacity);
+  background:
+    radial-gradient(circle var(--glass-radius) at var(--glass-x) var(--glass-y),
+      rgba(255,255,255,.45) 0%, rgba(255,255,255,.43) 8%, rgba(255,255,255,.38) 18%,
+      rgba(255,255,255,.315) 30%, rgba(255,255,255,.243) 42%, rgba(255,255,255,.171) 55%,
+      rgba(255,255,255,.108) 68%, rgba(255,255,255,.059) 80%, rgba(255,255,255,.027) 90%,
+      rgba(255,255,255,.009) 96%, transparent 100%),
+    radial-gradient(circle var(--glass-spill-radius) at var(--glass-x) var(--glass-y),
+      rgba(255,255,255,.153) 0%, rgba(255,255,255,.13) 18%, rgba(255,255,255,.083) 42%,
+      rgba(255,255,255,.037) 68%, rgba(255,255,255,.009) 90%, transparent 100%);
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.class-ring-more__stroke,
+.class-ring-more__stroke-light {
+  position: absolute;
+  inset: calc(0px - var(--glass-stroke));
+  z-index: 3;
+  padding: var(--glass-stroke);
+  border-radius: 999px;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  -webkit-mask-clip: border-box, content-box;
+  -webkit-mask-composite: xor;
+  mask-image: linear-gradient(#000 0 0), linear-gradient(#000 0 0);
+  mask-clip: border-box, content-box;
+  mask-composite: exclude;
+}
+
+.class-ring-more__stroke {
+  background: linear-gradient(180deg, rgba(255,255,255,.55), rgba(255,255,255,.25));
+  -webkit-backdrop-filter: saturate(220%) brightness(140%);
+  backdrop-filter: saturate(220%) brightness(140%);
+}
+
+.class-ring-more__stroke-light {
+  z-index: 4;
+  opacity: var(--glass-stroke-opacity);
+  background: conic-gradient(from var(--glass-start), transparent 0deg, #fff var(--glass-peak), transparent var(--glass-end));
+  mix-blend-mode: screen;
+}
+
+.class-ring-more:focus-visible {
+  outline: max(2px, .1cqw) solid rgba(245, 245, 240, .86);
+  outline-offset: calc(var(--glass-stroke) + .22cqw);
+}
+
+.class-ring-more:active {
+  transform: translate(-50%, -50%) scale(.97);
+}
+
+.class-ring-more__label,
+.class-ring-more i {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.class-ring-more i {
+  width: 1.15cqw;
+  height: .92cqw;
+  opacity: .28;
+}
+
+.class-ring-more i::before,
+.class-ring-more i::after {
+  content: "";
+  position: absolute;
+  background: #d7d7d7;
+}
+
+.class-ring-more i::before { left: 0; top: .34cqw; width: 100%; height: .22cqw; }
+.class-ring-more i::after { left: .46cqw; top: 0; width: .22cqw; height: 100%; }
+
+@keyframes class-ring-card-orbit {
+  to { offset-distance: 175%; }
+}
+
+.landing[data-page="class"] .top-subject,
+.landing[data-page="class"] .hero-home,
+.landing[data-page="class"] .works-page,
+.landing[data-page="class"] .works-gallery-page,
+.landing[data-page="class"] .works-ux-page { display: none; }
+.landing[data-page="class"] .class-page { display: block; }
+/* Works is one continuous vertical story: intro -> UI -> UX. */
+.works-flow {
+  display: none;
+  width: 100cqw;
+  background: #101010;
+}
+
+.landing[data-page="works"] .works-flow { display: block; }
+.landing[data-page="works"] .works-page,
+.landing[data-page="works"] .works-gallery-page,
+.landing[data-page="works"] .works-ux-page { display: block; }
+
+.works-flow > section {
+  position: relative;
+  width: 100cqw;
+  min-height: 100svh;
+  overflow: hidden;
+  scroll-margin-top: 0;
+}
+
+.works-flow > .works-ux-page {
+  /* UX now closes at the project board. Long project pages keep scrolling
+     inside their existing viewport rather than extending the Works page. */
+  min-height: 56.25cqw;
+  overflow: hidden;
+}
+
+/* UI/UX source boards include a header of their own. Cover that baked copy so
+   the fixed site header is the only navigation visible while scrolling. */
+.works-gallery-page::before,
+.works-ux-page::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 auto;
+  height: 15.5vh;
+  background: #101010;
+  pointer-events: none;
+}
+
+/* The supplied UX board contains a cropped smile baked into the pixels. Mask
+   that circular area, then place the complete transparent source above it so
+   the object can roll in independently while the sticky header clips it. */
+.works-ux-smile-cleaner {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  width: 58cqw;
+  height: 46cqw;
+  background: #101010;
+  display: block;
+  pointer-events: none;
+}
+
+.works-ux-smile {
+  position: absolute;
+  /* Above the source-board cleaner, but below the fixed header mask (z4), so
+     the rolling disc disappears cleanly beneath navigation while scrolling. */
+  z-index: 3;
+  /* Match the approved composition: the complete smile settles behind and
+     overlaps the star badge by roughly 10cqw without touching the mosaic. */
+  /* Keep the whole scaled disc below the board-header cleaner on entry.
+     It can still travel beneath the real sticky header as the section scrolls. */
+  top: calc(15.5vh + 3.2cqw);
+  right: 9.3cqw;
+  width: 28cqw;
+  height: auto;
+  max-width: none;
+  display: block;
+  opacity: var(--ux-smile-opacity, 1);
+  transform: translate3d(var(--ux-smile-x, 0), var(--ux-smile-y, 0), 0)
+    rotate(var(--ux-smile-rotate, 0deg)) scale(var(--ux-smile-scale, 1));
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  filter: blur(var(--ux-smile-blur, 0px)) brightness(1.06);
+  mix-blend-mode: screen;
+  /* The transparent PNG carries one bright terminal pixel column on its
+     extreme right edge; remove only that asset artifact. */
+  clip-path: inset(0 1px 0 0);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* These are exact crops of the approved source board. They preserve the
+   original glass, typography and IUX mark while the complete smile rolls
+   behind them. No foreground artwork is redrawn in CSS. */
+.works-ux-foreground {
+  position: absolute;
+  z-index: 3;
+  inset: 0 auto auto 0;
+  display: block;
+  width: 100cqw;
+  height: auto;
+  max-width: none;
+  opacity: var(--ux-smile-foreground-opacity, 0);
+  will-change: opacity;
+  pointer-events: none;
+  user-select: none;
+}
+
+.works-ux-foreground { display: none; }
+
+/* Remove the obsolete bottom IUX mark and pixel cluster baked into the UX
+   source board. The shared UI/UX switch now lives at the section boundary. */
+.works-ux-footer-cleaner {
+  position: absolute;
+  z-index: 2;
+  left: 34cqw;
+  top: 38.5cqw;
+  width: 63cqw;
+  height: 17.75cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.works-ux-badge {
+  position: absolute;
+  z-index: 6;
+  left: 53.9cqw;
+  top: 15.6cqw;
+  width: 17.5cqw;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: max(1px, .052cqw) solid rgba(220, 220, 220, .48);
+  border-radius: 50%;
+  opacity: var(--ux-smile-foreground-opacity, 0);
+  background:
+    radial-gradient(circle at 73% 26%, rgba(202, 210, 207, .34), transparent 45%),
+    linear-gradient(118deg, #111213 10%, #1d3027 48%, #71827a 100%);
+  box-shadow: inset 0 0 2.2cqw rgba(0, 0, 0, .3);
+  pointer-events: none;
+  will-change: opacity;
+  transform: translate3d(0, var(--ux-header-safe-shift, 0px), 0);
+}
+
+.works-ux-badge img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  width: 10.25cqw;
+  height: auto;
+  max-width: none;
+  transform: translate(-50%, -50%);
+}
+
+.works-ux-copy-layer {
+  position: absolute;
+  z-index: 6;
+  left: 42.75cqw;
+  top: 27.15cqw;
+  display: grid;
+  gap: .72cqw;
+  color: rgba(190, 190, 190, .76);
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-size: 3.9cqw;
+  font-weight: 200;
+  line-height: 1.18;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  text-shadow: 0 .12cqw .55cqw rgba(0, 0, 0, .38);
+  pointer-events: none;
+  user-select: none;
+}
+
+.works-ux-page::before { z-index: 4; }
+
+.works-gallery-page__reference,
+.works-ux-page__reference {
+  position: static;
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* UI work carousel. The approved bitmap board stays underneath; this solid
+   interaction band replaces only the baked phone row with the supplied
+   default/hover/click assets. */
+.ui-phone-gallery {
+  position: absolute;
+  z-index: 3;
+  inset: 15.5% 0 22.5%;
+  /* Keep the endless row clipped at the left/right edges, while allowing the
+     enlarged, bottom-aligned phone to use its full height. `hidden` on both
+     axes previously shaved the selected phone at the gallery's top edge. */
+  overflow: clip visible;
+  background: #101010;
+  isolation: isolate;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  perspective: 90cqw;
+  --phone-drag-x: 0px;
+}
+
+.ui-phone-gallery.is-dragging { cursor: grabbing; }
+
+.ui-phone-track {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, -100px, 0);
+}
+
+.ui-phone-sequence {
+  position: absolute;
+  inset: 0;
+}
+
+.ui-phone-card {
+  position: absolute;
+  left: 50%;
+  top: 65%;
+  z-index: var(--phone-z, 1);
+  width: 15cqw;
+  height: 13.2cqw;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  transform:
+    translate3d(-50%, -50%, 0)
+    translate3d(var(--phone-x, 0cqw), var(--phone-y, 0cqw), 0)
+    translate3d(var(--phone-drag-x), 0, 0)
+    scale(var(--phone-scale, 1));
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+  opacity: var(--phone-opacity, 1);
+  transition:
+    transform 360ms cubic-bezier(.16, 1, .3, 1),
+    opacity 180ms ease;
+  will-change: transform;
+}
+
+.ui-phone-gallery.is-dragging .ui-phone-card { transition: none; }
+
+.ui-phone-card.is-wrapping {
+  opacity: 0 !important;
+  transition: none;
+}
+
+.ui-phone-card:focus-visible {
+  outline: none;
+}
+
+.ui-phone-card__image {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: block;
+  width: auto;
+  height: 13.2cqw;
+  max-width: 15cqw;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+  transition:
+    transform 320ms cubic-bezier(.16, 1, .3, 1),
+    opacity 120ms ease;
+}
+
+.ui-phone-card__image--default { opacity: 1; }
+.ui-phone-card__image--hover { opacity: 0; }
+.ui-phone-card__image--selected {
+  z-index: 2;
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) rotateY(180deg);
+  transition:
+    transform 320ms cubic-bezier(.16, 1, .3, 1),
+    opacity 140ms ease;
+}
+
+.ui-phone-card__image--selected.is-current { opacity: 1; }
+
+.ui-phone-card:hover .ui-phone-card__image--default,
+.ui-phone-card:focus-visible .ui-phone-card__image--default { opacity: 0; }
+
+.ui-phone-card:hover .ui-phone-card__image--hover,
+.ui-phone-card:focus-visible .ui-phone-card__image--hover { opacity: 1; }
+
+.ui-phone-card.is-flipped .ui-phone-card__image--default,
+.ui-phone-card.is-flipped .ui-phone-card__image--hover {
+  transform: translate3d(-50%, -50%, 0) rotateY(-180deg);
+}
+
+.ui-phone-card.is-flipped .ui-phone-card__image--selected {
+  transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-phone-card,
+  .ui-phone-card__image { transition-duration: 1ms; }
+
+  .class-ring-scroll-layer,
+  .class-can-parallax-layer,
+  .class-panel--star,
+  .class-panel--star > img {
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .class-portfolio-piece { transition: none !important; }
+
+  .class-ring-stage .class-ring-card,
+  .class-ring-stage .class-ring-card > span,
+  .class-ring-stage .class-ring-card img { animation: none !important; }
+
+  .class-ring-stage .class-ring-card img { opacity: 1; transform: none; }
+
+  .class-ring-more {
+    transition-duration: 1ms;
+  }
+
+  .class-feedback-hover,
+  .class-feedback-hover::before,
+  .class-feedback-hover::after {
+    transition-duration: 1ms;
+  }
+
+  .class-feedback-hover:hover {
+    transform: translate3d(0, 0, 0);
+  }
+
+  .class-count__track {
+    transition: none !important;
+    transform: translate3d(0, calc(var(--count-steps) * -1em), 0);
+  }
+
+  .class-panel,
+  .class-panel > img {
+    transition: none !important;
+    transform: none !important;
+    clip-path: none !important;
+    opacity: 1 !important;
+  }
+
+  .class-panel--sticker.is-capability-motion-ready .class-capability-title-layer,
+  .class-panel--sticker.is-capability-motion-ready .class-capability-warp-cleaner,
+  .class-panel--sticker.is-capability-motion-ready .class-capability-warp {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.works-ux-page__reference {
+  opacity: var(--ux-board-opacity, 1);
+  filter: blur(var(--ux-board-blur, 0px));
+  transform: translate3d(var(--ux-board-x, 0), 0, 0);
+  transform-origin: 50% 50%;
+  will-change: transform, filter, opacity;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ux-type-switcher {
+  position: absolute;
+  left: 5.8cqw;
+  top: 12.2cqw;
+  width: 15.7cqw;
+  height: 46.8cqw;
+  z-index: 5;
+  pointer-events: auto;
+  transform: translate3d(0, var(--ux-header-safe-shift, 0px), 0);
+  will-change: transform;
+}
+
+/* The reference board contains five baked slots. Replace that column with a
+   clean four-slot surface while preserving its original top and bottom edge. */
+.ux-type-switcher::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: #101010;
+  pointer-events: none;
+}
+
+.ux-type {
+  position: absolute;
+  z-index: 1;
+  left: .45cqw;
+  width: 14.79cqw;
+  height: 8.3334cqw;
+  margin: 0;
+  padding: 0;
+  border: max(1px, .055cqw) solid transparent;
+  border-radius: 0;
+  appearance: none;
+  background: #171717;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto;
+  isolation: isolate;
+  overflow: hidden;
+  transition: border-color 180ms ease, box-shadow 220ms ease, transform 220ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.ux-type:nth-child(1) { top: .4563cqw; }
+.ux-type:nth-child(2) { top: 10.8729cqw; }
+.ux-type:nth-child(3) { top: 21.2895cqw; }
+.ux-type:nth-child(4) { top: 31.7061cqw; }
+
+.ux-type__thumb {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  opacity: .28;
+  filter: brightness(.62) saturate(.68);
+  transform: scale(1.002);
+  transition: transform 260ms cubic-bezier(.16, 1, .3, 1), opacity 180ms ease, filter 180ms ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ux-type::before {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 118% 105% at 50% 0%,
+    rgba(255, 255, 255, .22) 0%,
+    rgba(237, 237, 237, .1) 34%,
+    rgba(210, 210, 210, .035) 68%,
+    transparent 100%
+  );
+  filter: blur(.18cqw);
+  transform: none;
+  transition: opacity 190ms ease;
+}
+
+.ux-type::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.48) 0%,
+    rgba(255,255,255,.2) 8%,
+    rgba(255,255,255,.08) 28%,
+    rgba(255,255,255,.025) 58%,
+    transparent 100%
+  );
+  filter: blur(.12cqw);
+  mix-blend-mode: screen;
+  transition: opacity 170ms ease;
+}
+
+.ux-type:hover,
+.ux-type:focus-visible {
+  outline: none;
+  border-color: rgba(255, 255, 255, .98);
+  outline: max(2px, .11cqw) solid rgba(255, 255, 255, .98);
+  outline-offset: calc(max(2px, .11cqw) * -1);
+  box-shadow:
+    0 0 .8cqw rgba(255,255,255,.34),
+    0 0 2.25cqw rgba(255,255,255,.22),
+    inset 0 .16cqw .5cqw rgba(255,255,255,.54);
+  transform: translate3d(0, -.08cqw, 0);
+}
+
+.ux-type.is-active {
+  outline: none;
+  border-color: rgba(255, 255, 255, .92);
+  box-shadow:
+    0 0 .65cqw rgba(255,255,255,.22),
+    inset 0 0 .75cqw rgba(255,255,255,.18);
+}
+
+.ux-type:hover::before,
+.ux-type:focus-visible::before,
+.ux-type.is-active::before {
+  opacity: 1;
+}
+
+.ux-type:hover::after,
+.ux-type:focus-visible::after,
+.ux-type.is-active::after {
+  opacity: 1;
+}
+
+.ux-type:hover .ux-type__thumb,
+.ux-type:focus-visible .ux-type__thumb,
+.ux-type.is-active .ux-type__thumb {
+  opacity: 1;
+  filter: none;
+  transform: scale(1.025);
+}
+
+.ux-project-stage {
+  position: absolute;
+  z-index: 3;
+  left: 22.92cqw;
+  top: 12.6563cqw;
+  width: 69.3cqw;
+  height: 39.5832cqw;
+  overflow: hidden;
+  background: #101010;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 260ms cubic-bezier(.16, 1, .3, 1), visibility 0s linear 260ms;
+}
+
+.ux-project-stage.is-preview,
+.ux-project-stage.is-detail {
+  opacity: 1;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.ux-project-preview,
+.ux-project-detail,
+.ux-project-detail__image {
+  filter: none;
+  box-shadow: none;
+}
+
+.ux-project-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transform: scale(1.008);
+  transition: opacity 240ms ease, transform 360ms cubic-bezier(.16, 1, .3, 1);
+  pointer-events: none;
+  user-select: none;
+}
+
+.ux-project-stage.is-preview .ux-project-preview,
+.ux-project-stage.is-detail:not(.is-detail-ready) .ux-project-preview {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.ux-project-detail {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: rgba(255,255,255,.36) #101010;
+  scrollbar-width: thin;
+  opacity: 0;
+  background: #101010;
+  pointer-events: none;
+  transition: opacity 220ms ease;
+}
+
+.ux-project-stage.is-detail {
+  pointer-events: auto;
+}
+
+.ux-project-stage.is-detail .ux-project-detail {
+  pointer-events: auto;
+}
+
+.ux-project-stage.is-detail.is-detail-ready .ux-project-detail {
+  opacity: 1;
+}
+
+.ux-project-detail::-webkit-scrollbar { width: .42cqw; }
+.ux-project-detail::-webkit-scrollbar-track { background: #101010; }
+.ux-project-detail::-webkit-scrollbar-thumb { background: rgba(255,255,255,.32); }
+
+.ux-project-detail__image {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+}
+
+.works-ux-page.is-project-active .works-ux-smile,
+.works-ux-page.is-project-active .works-ux-badge,
+.works-ux-page.is-project-active .works-ux-copy-layer {
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ux-type,
+  .ux-type__thumb,
+  .ux-type::before,
+  .ux-type::after,
+  .ux-project-stage,
+  .ux-project-preview,
+  .ux-project-detail {
+    transition-duration: 1ms !important;
+  }
+}
+
+.works-mode-tabs {
+  position: absolute;
+  z-index: 3;
+  left: 31.771cqw;
+  top: 44.792cqw;
+  width: 36.458cqw;
+  height: 11.458cqw;
+  display: block;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.works-mode-tabs__image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 180ms cubic-bezier(.16, 1, .3, 1);
+}
+
+.works-mode-tabs__image--ui { opacity: 1; }
+.works-mode-tabs__image--ux { opacity: 0; }
+
+.works-mode-tabs[data-active-mode="ux"] .works-mode-tabs__image--ui { opacity: 0; }
+.works-mode-tabs[data-active-mode="ux"] .works-mode-tabs__image--ux { opacity: 1; }
+
+.works-mode-tabs__tab {
+  position: absolute;
+  z-index: 2;
+  inset-block: 0;
+  width: 54%;
+  border-radius: .35cqw;
+  outline: none;
+}
+
+.works-mode-tabs__tab--ui { left: 0; }
+.works-mode-tabs__tab--ux { right: 0; }
+
+.works-mode-tabs__tab:focus-visible {
+  outline: max(2px, .1cqw) solid rgba(245, 245, 240, .88);
+  outline-offset: calc(max(2px, .1cqw) * -1);
+}
+
+.works-brackets {
+  position: absolute;
+  top: 29.85vh;
+  width: 1.8cqw;
+  height: 32.5vh;
+}
+
+.works-brackets--left { left: 6.42cqw; }
+.works-brackets--right { right: 6.42cqw; transform: scaleX(-1); }
+
+.works-brackets i {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 0;
+  color: #363839;
+  border-left: max(2px, .11cqw) solid currentColor;
+  opacity: .31;
+}
+
+.works-brackets i::before,
+.works-brackets i::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 1.8cqw;
+  height: max(2px, .11cqw);
+  background: currentColor;
+}
+
+.works-brackets i::before { top: 0; }
+.works-brackets i::after { bottom: 0; }
+.works-tiles {
+  --tile: min(5.35cqw, 9.5vh);
+  position: absolute;
+  left: 15.75cqw;
+  top: 29.9vh;
+  width: 68cqw;
+  height: 34vh;
+}
+
+.works-tiles i {
+  position: absolute;
+  left: calc(var(--x) * var(--tile));
+  top: calc(var(--y) * var(--tile));
+  width: calc(var(--w) * var(--tile));
+  height: calc(var(--h) * var(--tile));
+  border-radius: .26cqw;
+  background-color: #242525;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  opacity: 1;
+  filter: none;
+  animation: none;
+}
+
+.works-tiles.is-dropping i {
+  animation: works-tile-flip 560ms cubic-bezier(.16, 1, .3, 1) calc(var(--drop-index) * 65ms) both;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+.works-tiles i:nth-child(1) { background-image: url("./assets/works-tiles/1.jpg"); }
+.works-tiles i:nth-child(2) { background-image: url("./assets/works-tiles/2.jpg"); }
+.works-tiles i:nth-child(3) { background-image: url("./assets/works-tiles/3.jpg"); }
+.works-tiles i:nth-child(4) { background-image: url("./assets/works-tiles/4.jpg"); }
+.works-tiles i:nth-child(5) { background-image: url("./assets/works-tiles/5.jpg"); }
+.works-tiles i:nth-child(6) { background-image: url("./assets/works-tiles/6.jpg"); }
+.works-tiles i:nth-child(7) { background-image: url("./assets/works-tiles/7.jpg"); }
+.works-tiles i:nth-child(8) { background-image: url("./assets/works-tiles/8.jpg"); }
+.works-tiles i:nth-child(9) { background-image: url("./assets/works-tiles/9.jpg"); }
+.works-tiles i:nth-child(10) { background-image: url("./assets/works-tiles/10.jpg"); }
+
+.works-tiles i:nth-child(1)  { --drop-index: 0; --drop-rotate: -4deg; }
+.works-tiles i:nth-child(2)  { --drop-index: 1; --drop-rotate: 3deg; }
+.works-tiles i:nth-child(3)  { --drop-index: 2; --drop-rotate: -2deg; }
+.works-tiles i:nth-child(4)  { --drop-index: 3; --drop-rotate: 4deg; }
+.works-tiles i:nth-child(5)  { --drop-index: 4; --drop-rotate: -3deg; }
+.works-tiles i:nth-child(6)  { --drop-index: 5; --drop-rotate: 2deg; }
+.works-tiles i:nth-child(7)  { --drop-index: 6; --drop-rotate: -4deg; }
+.works-tiles i:nth-child(8)  { --drop-index: 7; --drop-rotate: 3deg; }
+.works-tiles i:nth-child(9)  { --drop-index: 8; --drop-rotate: -2deg; }
+.works-tiles i:nth-child(10) { --drop-index: 9; --drop-rotate: 4deg; }
+
+@keyframes works-tile-flip {
+  0% {
+    opacity: 0;
+    transform: perspective(38cqw) rotateY(var(--drop-rotate)) scale(.94);
+  }
+  54% {
+    opacity: 1;
+    transform: perspective(38cqw) rotateY(calc(var(--drop-rotate) * -.55)) scaleX(1.02) scaleY(.98);
+  }
+  76% {
+    opacity: 1;
+    transform: perspective(38cqw) rotateY(calc(var(--drop-rotate) * .18)) scaleX(1.005) scaleY(.995);
+  }
+  100% {
+    opacity: 1;
+    transform: perspective(38cqw) rotateY(0deg) scale(1);
+  }
+}
+
+.works-pixels { --cell: 1.06cqw; }
+.works-pixels--left { left: 12.14cqw; top: 45.45vh; }
+.works-pixels--right { right: 8.85cqw; top: 39.8vh; --drift-x: -.075cqw; }
+
+.works-copy {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  font-weight: 200;
+  color: rgba(224,225,225,.86);
+}
+
+.works-copy p {
+  position: absolute;
+  margin: 0;
+  line-height: 1.12;
+  white-space: nowrap;
+  letter-spacing: -.05em;
+}
+
+.works-copy a {
+  color: #20f34f;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: .12em;
+}
+
+.works-copy u { text-underline-offset: .12em; text-decoration-thickness: 1px; }
+.works-copy__headline { left: 40.2cqw; top: 30.55vh; font-size: clamp(24px, 1.92cqw, 74px); }
+.works-copy__headline .eyes { display: inline-block; margin-inline: .05em; font-size: .76em; transform: translateY(-.04em); }
+.works-copy__many { left: 27.6cqw; top: 40.25vh; font-size: clamp(21px, 1.72cqw, 66px); color: rgba(126,128,129,.36); }
+.works-copy__plain { left: 40.2cqw; top: 40.25vh; font-size: clamp(22px, 1.78cqw, 68px); }
+.works-copy__more { left: 31.9cqw; top: 44.85vh; font-size: clamp(20px, 1.65cqw, 63px); color: rgba(121,123,124,.32); }
+.works-copy__better { left: 21.45cqw; top: 50.05vh; font-size: clamp(22px, 1.8cqw, 69px); }
+.works-copy__professional { left: 54.6cqw; top: calc(29.9vh + min(11.77cqw, 20.9vh)); font-size: clamp(20px, 1.63cqw, 63px); color: rgba(121,123,124,.34); }
+.works-copy__professional a { margin-left: .28em; }
+
+.works-wine {
+  position: absolute;
+  z-index: 2;
+  left: 34.2cqw;
+  top: auto;
+  bottom: 2.2vh;
+  width: 31.9cqw;
+  opacity: var(--works-wine-whole-opacity, 1);
+  transform: scale(var(--works-wine-whole-scale, 1));
+  transform-origin: 50% 60%;
+  filter: blur(var(--works-wine-whole-blur, 0px));
+  will-change: transform, filter, opacity;
+}
+
+.works-wine__base { display: block; width: 100%; height: auto; }
+.works-wine__dot {
+  position: absolute;
+  z-index: 2;
+  left: 36.785%;
+  top: 15.815%;
+  width: 9.537%;
+  height: auto;
+  transform-origin: 50% 55%;
+  will-change: transform, filter, opacity;
+  animation: wine-dot-float 2.85s cubic-bezier(.45, 0, .25, 1) infinite;
+}
+.works-wine__dot--trail {
+  z-index: 1;
+  opacity: 0;
+  filter: blur(3px) brightness(1.55);
+  animation-name: wine-dot-trail;
+}
+
+/* The bottom word is a single object at rest. While leaving the Works intro,
+   two clipped copies briefly take over and peel toward opposite corners. The
+   scroll script then dissolves both copies before the UI board arrives. */
+.works-wine-fragment {
+  position: absolute;
+  z-index: 2;
+  left: 34.2cqw;
+  bottom: 2.2vh;
+  width: 31.9cqw;
+  aspect-ratio: 734 / 411;
+  overflow: hidden;
+  opacity: var(--works-wine-fragment-opacity, 0);
+  filter: blur(var(--works-wine-fragment-blur, 0px));
+  will-change: transform, filter, opacity;
+  pointer-events: none;
+}
+
+.works-wine-fragment--left {
+  clip-path: inset(0 49.8% 0 0);
+  transform: translate3d(var(--works-wine-left-x, 0cqw), var(--works-wine-fragment-y, 0vh), 0)
+    rotate(var(--works-wine-left-rotate, 0deg)) scale(var(--works-wine-fragment-scale, 1));
+  transform-origin: 25% 60%;
+}
+
+.works-wine-fragment--right {
+  clip-path: inset(0 0 0 49.8%);
+  transform: translate3d(var(--works-wine-right-x, 0cqw), var(--works-wine-fragment-y, 0vh), 0)
+    rotate(var(--works-wine-right-rotate, 0deg)) scale(var(--works-wine-fragment-scale, 1));
+  transform-origin: 75% 60%;
+}
+
+.works-wine-fragment__art,
+.works-wine-fragment__base {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.works-wine-fragment__dot {
+  position: absolute;
+  z-index: 1;
+  left: 36.785%;
+  top: 15.815%;
+  width: 9.537%;
+  height: auto;
+  filter: brightness(1.08);
+}
+
+@media (max-aspect-ratio: 4/3) {
+  .works-brackets { top: 35vh; height: 26vh; }
+  .works-tiles { left: 18cqw; top: 36vh; transform: scale(.78); transform-origin: left top; }
+  .works-copy { transform: translate(-15cqw, 8vh) scale(.72); transform-origin: center top; }
+  .works-pixels--left { left: 20cqw; top: 42vh; }
+  .works-pixels--right { right: 12cqw; top: 49vh; }
+  .works-wine,
+  .works-wine-fragment { left: 20cqw; top: auto; bottom: 2vh; width: 60cqw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .works-wine-fragment { display: none; }
+  .works-wine { filter: none; transform: none; }
+  .works-mode-tabs__image { transition-duration: 1ms !important; }
+  .works-tiles.is-dropping i { animation: none !important; opacity: 1; transform: none; }
+}
+
+@media (max-aspect-ratio: 4/3) {
+  .top-subject { width: 103.68cqw; }
+  .brackets { top: 34vh; height: 19vh; }
+  .pixel-cloud { --cell: 1.75cqw; }
+  .pixel-cloud--left { left: 20cqw; top: 34vh; }
+  .pixel-cloud--right { right: 14cqw; top: 58vh; }
+  .studio-title { left: 7cqw; top: 45vh; width: 72cqw; }
+  .wine-word { left: 0; top: 57vh; width: 72cqw; }
+  .motto { left: 35cqw; top: 74vh; width: 66cqw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; }
+  .class-curriculum-copy-mask > i {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+  .class-value-list-mask > i {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+  }
+  .pixel-cloud i { animation: none !important; transform: none !important; filter: none !important; }
+  .wine-word__dot { animation: none !important; transform: none !important; filter: none !important; }
+  .wine-word__dot--trail { opacity: 0 !important; }
+  .class-can-stage > i { animation: none !important; }
+  .class-can-object,
+  .class-can-pour,
+  .class-can-copy { opacity: 1; transform: none; filter: none; clip-path: inset(0); }
+}

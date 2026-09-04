@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0d0e0e" />
+    <title>Wine Joy Studio</title>
+    <link rel="stylesheet" href="./styles.css?v=portfolio-title-hover-off-1" />
+    <link rel="stylesheet" href="./ring-gray-fix.css?v=1" />
+    <link rel="stylesheet" href="./components/site-header.css?v=signature-down-10px-1" />
+    <script src="./components/site-header.js?v=about-visibility-toggle-2"></script>
+  </head>
+  <body>
+    <main class="landing" data-page="home" aria-label="Wine Joy Studio">
+      <div class="stage">
+      <div class="top-subject" aria-hidden="true">
+        <video class="top-subject-source" muted autoplay loop playsinline preload="auto">
+          <source src="./assets/top-subject-alpha-hq.webm" type='video/webm; codecs="vp9"' />
+          <source src="./assets/top-subject-continuous-loop.mp4" type="video/mp4" />
+        </video>
+        <canvas class="top-subject-canvas"></canvas>
+      </div>
+
+      <wine-site-header></wine-site-header>
+
+      <section class="hero hero-home" aria-labelledby="studio-title">
+        <div class="brackets brackets--left" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="pixel-cloud pixel-cloud--left" aria-hidden="true">
+          <i style="--x:4;--y:0;--o:.05"></i>
+          <i style="--x:2;--y:2;--o:.12"></i><i style="--x:4;--y:1;--o:.20"></i><i class="pixel--outline" style="--x:6;--y:2"></i>
+          <i style="--x:2;--y:3;--o:.18"></i><i style="--x:3;--y:3;--o:.16"></i><i style="--x:4;--y:3;--o:.19"></i><i style="--x:5;--y:3;--o:.30"></i><i style="--x:7;--y:4;--o:.05"></i><i style="--x:9;--y:3;--o:.025"></i>
+          <i style="--x:2;--y:4;--o:.18"></i><i style="--x:3;--y:4;--o:.15"></i><i style="--x:4;--y:4;--o:.14"></i><i style="--x:8;--y:5;--o:.18"></i>
+          <i style="--x:2;--y:5;--o:.20"></i><i class="pixel--outline" style="--x:3;--y:5"></i><i style="--x:4;--y:5;--o:.13"></i><i style="--x:7;--y:6;--o:.10"></i><i style="--x:8;--y:6;--o:.28"></i>
+          <i style="--x:2;--y:6;--o:.18"></i><i style="--x:3;--y:6;--o:.18"></i><i style="--x:5;--y:7;--o:.15"></i><i style="--x:6;--y:7;--o:.16"></i>
+          <i style="--x:2;--y:7;--o:.52"></i><i style="--x:5;--y:8;--o:.18"></i><i style="--x:6;--y:8;--o:.20"></i>
+        </div>
+
+        <h1 id="studio-title" class="studio-title"><img src="./assets/studio-title.png" alt="WINE JOY Studio." /></h1>
+
+        <div class="pixel-cloud pixel-cloud--right" aria-hidden="true">
+          <i style="--x:3;--y:0;--o:.16"></i><i style="--x:4;--y:0;--o:.18"></i><i style="--x:5;--y:0;--o:.19"></i><i style="--x:6;--y:0;--o:.36"></i>
+          <i style="--x:3;--y:1;--o:.16"></i><i style="--x:4;--y:1;--o:.20"></i><i style="--x:5;--y:1;--o:.22"></i><i style="--x:6;--y:1;--o:.24"></i>
+          <i class="pixel--outline" style="--x:3;--y:2"></i><i style="--x:4;--y:2;--o:.18"></i><i style="--x:5;--y:2;--o:.36"></i><i style="--x:6;--y:2;--o:.22"></i><i style="--x:0;--y:2;--o:.20"></i>
+          <i style="--x:3;--y:3;--o:.16"></i><i style="--x:4;--y:3;--o:.18"></i><i style="--x:5;--y:3;--o:.20"></i><i style="--x:6;--y:3;--o:.18"></i><i style="--x:1;--y:3;--o:.16"></i>
+          <i style="--x:3;--y:4;--o:.22"></i><i style="--x:4;--y:4;--o:.16"></i><i style="--x:5;--y:4;--o:.17"></i><i style="--x:6;--y:4;--o:.16"></i><i style="--x:-1;--y:4;--o:.025"></i>
+          <i style="--x:3;--y:5;--o:.26"></i><i style="--x:4;--y:5;--o:.17"></i><i style="--x:5;--y:5;--o:.17"></i><i style="--x:6;--y:5;--o:.17"></i>
+          <i class="pixel--outline" style="--x:2;--y:6"></i><i style="--x:4;--y:7;--o:.14"></i><i style="--x:6;--y:6;--o:.12"></i><i style="--x:6;--y:9;--o:.14"></i>
+        </div>
+
+        <div class="brackets brackets--right" aria-hidden="true">
+          <i></i><i></i><i></i><i></i>
+        </div>
+
+        <div class="wine-word" aria-hidden="true">
+          <img class="wine-word__base" src="./assets/wine-word-base.png" alt="" />
+          <img class="wine-word__dot wine-word__dot--trail" src="./assets/wine-dot.png" alt="" />
+          <img class="wine-word__dot" src="./assets/wine-dot.png" alt="" />
+        </div>
+
+        <p class="motto">
+          <img class="motto__base" src="./assets/motto.png" alt="设计有瘾，保持清醒。" />
+        </p>
+      </section>
+
+      <div class="works-flow" aria-label="Works 作品浏览" aria-hidden="true">
+      <section id="works" class="works-page" aria-label="Works 作品页面" aria-hidden="true">
+        <div class="works-brackets works-brackets--left" aria-hidden="true"><i></i></div>
+
+        <div class="works-tiles" aria-hidden="true">
+          <i style="--x:0;--y:0;--w:1;--h:1"></i>
+          <i style="--x:1.12;--y:0;--w:1;--h:1"></i>
+          <i style="--x:2.24;--y:0;--w:1;--h:1"></i>
+          <i style="--x:1.12;--y:1.12;--w:1;--h:1"></i>
+          <i style="--x:5.8;--y:2.2;--w:1.35;--h:1.35"></i>
+          <i style="--x:9.12;--y:0;--w:1;--h:1"></i>
+          <i style="--x:10.24;--y:0;--w:1;--h:1"></i>
+          <i style="--x:8;--y:1.12;--w:1;--h:1"></i>
+          <i style="--x:9.12;--y:1.12;--w:1;--h:1"></i>
+          <i style="--x:10.24;--y:1.12;--w:1;--h:1"></i>
+        </div>
+
+        <div class="pixel-cloud works-pixels works-pixels--left" aria-hidden="true">
+          <i style="--x:1;--y:0;--o:.07"></i><i style="--x:3;--y:2;--o:.18"></i>
+          <i style="--x:2;--y:3;--o:.22"></i><i style="--x:3;--y:3;--o:.18"></i><i style="--x:4;--y:3;--o:.20"></i><i style="--x:5;--y:3;--o:.34"></i>
+          <i style="--x:2;--y:4;--o:.20"></i><i style="--x:3;--y:4;--o:.18"></i><i style="--x:4;--y:4;--o:.15"></i><i style="--x:7;--y:4;--o:.10"></i>
+          <i style="--x:2;--y:5;--o:.22"></i><i class="pixel--outline" style="--x:3;--y:5"></i><i style="--x:4;--y:5;--o:.17"></i><i style="--x:8;--y:6;--o:.22"></i>
+          <i style="--x:2;--y:6;--o:.52"></i><i style="--x:3;--y:6;--o:.18"></i><i style="--x:5;--y:7;--o:.17"></i><i style="--x:6;--y:7;--o:.19"></i>
+          <i style="--x:2;--y:7;--o:.18"></i><i style="--x:5;--y:8;--o:.16"></i><i style="--x:6;--y:8;--o:.20"></i>
+        </div>
+
+        <div class="works-copy" aria-label="作品页介绍文字">
+          <p class="works-copy__headline">视觉不够看看什么<span class="eyes">👀</span><u>看你吗</u></p>
+          <p class="works-copy__many">很多很多...</p>
+          <p class="works-copy__plain">我说白了 <u>@#$%/</u></p>
+          <p class="works-copy__more">看不完了 <a href="#works-more">随便</a>放点儿呗</p>
+          <p class="works-copy__better"><a href="#works-better">ber,</a> 比我做得还好?</p>
+          <p class="works-copy__professional">都整挺专业的u1s1<a href="#works-gallery">看图说话</a></p>
+        </div>
+
+        <div class="pixel-cloud works-pixels works-pixels--right" aria-hidden="true">
+          <i style="--x:3;--y:0;--o:.18"></i><i style="--x:4;--y:0;--o:.20"></i><i style="--x:5;--y:0;--o:.20"></i><i style="--x:6;--y:0;--o:.38"></i>
+          <i style="--x:3;--y:1;--o:.17"></i><i style="--x:4;--y:1;--o:.21"></i><i style="--x:5;--y:1;--o:.23"></i><i style="--x:6;--y:1;--o:.25"></i>
+          <i class="pixel--outline" style="--x:3;--y:2"></i><i style="--x:4;--y:2;--o:.18"></i><i style="--x:5;--y:2;--o:.38"></i><i style="--x:6;--y:2;--o:.22"></i><i style="--x:0;--y:2;--o:.20"></i>
+          <i style="--x:3;--y:3;--o:.18"></i><i style="--x:4;--y:3;--o:.19"></i><i style="--x:5;--y:3;--o:.21"></i><i style="--x:6;--y:3;--o:.18"></i><i style="--x:1;--y:3;--o:.17"></i>
+          <i style="--x:3;--y:4;--o:.24"></i><i style="--x:4;--y:4;--o:.17"></i><i style="--x:5;--y:4;--o:.18"></i><i style="--x:6;--y:4;--o:.17"></i>
+          <i class="pixel--outline" style="--x:2;--y:6"></i><i style="--x:4;--y:7;--o:.15"></i><i style="--x:6;--y:6;--o:.13"></i><i style="--x:6;--y:9;--o:.15"></i>
+        </div>
+
+        <div class="works-brackets works-brackets--right" aria-hidden="true"><i></i></div>
+
+        <div class="works-wine" aria-hidden="true">
+          <img class="works-wine__base" src="./assets/wine-word-base.png" alt="" />
+          <img class="works-wine__dot works-wine__dot--trail" src="./assets/wine-dot.png" alt="" />
+          <img class="works-wine__dot" src="./assets/wine-dot.png" alt="" />
+        </div>
+
+        <div class="works-wine-fragment works-wine-fragment--left" aria-hidden="true">
+          <div class="works-wine-fragment__art">
+            <img class="works-wine-fragment__base" src="./assets/wine-word-base.png" alt="" />
+            <img class="works-wine-fragment__dot" src="./assets/wine-dot.png" alt="" />
+          </div>
+        </div>
+        <div class="works-wine-fragment works-wine-fragment--right" aria-hidden="true">
+          <div class="works-wine-fragment__art">
+            <img class="works-wine-fragment__base" src="./assets/wine-word-base.png" alt="" />
+            <img class="works-wine-fragment__dot" src="./assets/wine-dot.png" alt="" />
+          </div>
+        </div>
+      </section>
+
+      <section id="works-gallery" class="works-gallery-page" aria-label="Works UI 项目展示" aria-hidden="true">
+        <img
+          class="works-gallery-page__reference"
+          src="./assets/works-gallery-reference.jpg"
+          alt="手机壳与交互界面作品展示"
+        />
+        <div class="ui-phone-gallery" role="group" aria-label="可循环浏览的 UI 手机作品">
+          <div class="ui-phone-track">
+          <div class="ui-phone-sequence">
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 1" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/1/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/1/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/1/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/1/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/1/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 2" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/2/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/2/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/2/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/2/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/2/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 3" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/3/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/3/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/3/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/3/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/3/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 4" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/4/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/4/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/4/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/4/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/4/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 5" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/5/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/5/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/5/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/5/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/5/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 6" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/6/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/6/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/6/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/6/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/6/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 7" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/7/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/7/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/7/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/7/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/7/page-3.png" alt="" />
+          </button>
+          <button class="ui-phone-card" type="button" aria-label="查看 UI 作品 8" aria-pressed="false">
+            <img class="ui-phone-card__image ui-phone-card__image--default" src="./assets/ui-phone-projects/8/default.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--hover" src="./assets/ui-phone-projects/8/hover.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected is-current" data-src="./assets/ui-phone-projects/8/page-1.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/8/page-2.png" alt="" />
+            <img class="ui-phone-card__image ui-phone-card__image--selected" data-src="./assets/ui-phone-projects/8/page-3.png" alt="" />
+          </button>
+          </div>
+          </div>
+        </div>
+        <nav class="works-mode-tabs" aria-label="切换 UI 与 UX 项目" data-active-mode="ui">
+          <img class="works-mode-tabs__image works-mode-tabs__image--ui" src="./assets/works-gallery-iux.jpg" alt="" aria-hidden="true" />
+          <img class="works-mode-tabs__image works-mode-tabs__image--ux" src="./assets/works-mode-ux.jpg" alt="" aria-hidden="true" />
+          <a class="works-mode-tabs__tab works-mode-tabs__tab--ui" href="#works-gallery" aria-label="查看 UI 项目" aria-current="page"></a>
+          <a class="works-mode-tabs__tab works-mode-tabs__tab--ux" href="#works-ux" aria-label="查看 UX 项目"></a>
+        </nav>
+      </section>
+
+      <section id="works-ux" class="works-ux-page" aria-label="Works UX 项目页面" aria-hidden="true">
+        <img
+          class="works-ux-page__reference"
+          src="./assets/works-ux-reference.jpg"
+          alt="用户体验设计全链路项目"
+        />
+        <div class="works-ux-smile-cleaner" aria-hidden="true"></div>
+        <img class="works-ux-smile" src="./assets/ux-smile.png" alt="" aria-hidden="true" />
+        <div class="works-ux-badge" aria-hidden="true">
+          <img src="./assets/works-ux-star.png" alt="" />
+        </div>
+        <div class="works-ux-footer-cleaner" aria-hidden="true"></div>
+        <img class="works-ux-foreground works-ux-foreground--glass" src="./assets/works-ux-reference.jpg" alt="" aria-hidden="true" />
+        <img class="works-ux-foreground works-ux-foreground--copy" src="./assets/works-ux-reference.jpg" alt="" aria-hidden="true" />
+        <div class="works-ux-copy-layer" aria-hidden="true">
+          <span>用户体验设计</span>
+          <span>全链路项目。</span>
+        </div>
+        <div class="ux-project-stage" aria-live="polite" aria-label="UX 项目预览区">
+          <img class="ux-project-preview" src="" alt="" />
+          <div class="ux-project-detail" tabindex="-1" aria-label="UX 项目详情，滚动查看完整项目页">
+            <img class="ux-project-detail__image" src="" alt="" />
+          </div>
+        </div>
+        <div class="ux-type-switcher" role="group" aria-label="UX 项目类型">
+          <button class="ux-type" type="button" data-ux-type="1" data-preview="./assets/works-ux-projects/1/preview.jpg" data-detail="./assets/works-ux-projects/1/detail.jpg" aria-label="查看 UX 项目 1" aria-pressed="false">
+            <img class="ux-type__thumb" src="./assets/works-ux-projects/1/tab.jpg" alt="" />
+            <span class="sr-only">UX 类型 1</span>
+          </button>
+          <button class="ux-type" type="button" data-ux-type="2" data-preview="./assets/works-ux-projects/2/preview.jpg" data-detail="./assets/works-ux-projects/2/detail.jpg" aria-label="查看 UX 项目 2" aria-pressed="false">
+            <img class="ux-type__thumb" src="./assets/works-ux-projects/2/tab.jpg" alt="" />
+            <span class="sr-only">UX 类型 2</span>
+          </button>
+          <button class="ux-type" type="button" data-ux-type="3" data-preview="./assets/works-ux-projects/3/preview.jpg" data-detail="./assets/works-ux-projects/3/detail.jpg" aria-label="查看 UX 项目 3" aria-pressed="false">
+            <img class="ux-type__thumb" src="./assets/works-ux-projects/3/tab.jpg" alt="" />
+            <span class="sr-only">UX 类型 3</span>
+          </button>
+          <button class="ux-type" type="button" data-ux-type="4" data-preview="./assets/works-ux-projects/4/preview.jpg" data-detail="./assets/works-ux-projects/4/detail.jpg" aria-label="查看 UX 项目 4" aria-pressed="false">
+            <img class="ux-type__thumb" src="./assets/works-ux-projects/4/tab.jpg" alt="" />
+            <span class="sr-only">UX 类型 4</span>
+          </button>
+        </div>
+      </section>
+      </div>
+
+      <section class="class-page" aria-label="Class 课程页面" aria-hidden="true">
+        <div class="class-hover-layer" aria-hidden="true">
+          <i class="class-feedback-hover" style="--hover-x:43.177cqw;--hover-y:23.333cqw;--hover-w:12.24cqw;--hover-h:16.72cqw;--card-trim:0.312% 0 0.312% 0.426%;--card-image:url('./assets/class-motion/feedback-card-1.png')">
+            <span class="class-feedback-avatar" style="--avatar-left:.651cqw;--avatar-top:.651cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-runner.png?v=20260904')"></span>
+          </i>
+          <i class="class-feedback-hover class-feedback-hover--source-crop" style="--hover-x:56.016cqw;--hover-y:23.333cqw;--hover-w:12.24cqw;--hover-h:12.55cqw;--card-trim:0.415% 0.213% 0 0;--card-image:url('./assets/class-page-01.jpg')"></i>
+          <i class="class-feedback-hover" style="--hover-x:68.854cqw;--hover-y:23.333cqw;--hover-w:12.24cqw;--hover-h:4.00cqw;--card-trim:1.299% 0.851% 10.39% 0;--card-image:url('./assets/class-motion/feedback-card-3.png')">
+            <span class="class-feedback-avatar" style="--avatar-left:.365cqw;--avatar-top:.651cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-red.png?v=20260904')"></span>
+            <span class="class-feedback-avatar" style="--avatar-left:2.031cqw;--avatar-top:.651cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-leopard.png?v=20260904')"></span>
+            <span class="class-feedback-avatar" style="--avatar-left:3.828cqw;--avatar-top:.651cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-cat-black.png?v=20260904')"></span>
+          </i>
+          <i class="class-feedback-hover" style="--hover-x:81.589cqw;--hover-y:23.333cqw;--hover-w:12.24cqw;--hover-h:16.72cqw;--card-trim:0.312% 0.638% 0.312% 0;--card-image:url('./assets/class-motion/feedback-card-4.png')"></i>
+          <i class="class-feedback-hover" style="--hover-x:68.854cqw;--hover-y:27.448cqw;--hover-w:12.24cqw;--hover-h:12.55cqw;--card-trim:0 0.851% 0 0;--card-image:url('./assets/class-motion/feedback-card-5.png')"></i>
+          <i class="class-feedback-hover" style="--hover-x:56.016cqw;--hover-y:35.573cqw;--hover-w:12.24cqw;--hover-h:4.43cqw;--card-trim:18.824% 0.213% 1.176% 0;--card-image:url('./assets/class-motion/feedback-card-6.png')">
+            <span class="class-feedback-avatar" style="--avatar-left:.442cqw;--avatar-top:1.432cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-statue.png?v=20260904')"></span>
+            <span class="class-feedback-avatar" style="--avatar-left:2.109cqw;--avatar-top:1.432cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-cat-yellow.png?v=20260904')"></span>
+            <span class="class-feedback-avatar" style="--avatar-left:3.906cqw;--avatar-top:1.432cqw;--avatar-image:url('./assets/class-avatars/feedback-avatar-girl.png?v=20260904')"></span>
+          </i>
+
+        </div>
+
+        <div class="pixel-cloud pixel-cloud--right class-mosaic" aria-hidden="true">
+          <i class="pixel--outline" style="--x:3;--y:2"></i><i style="--x:4;--y:2;--o:.18"></i><i style="--x:5;--y:2;--o:.36"></i><i style="--x:6;--y:2;--o:.22"></i><i style="--x:0;--y:2;--o:.20"></i>
+          <i style="--x:3;--y:3;--o:.16"></i><i style="--x:4;--y:3;--o:.18"></i><i style="--x:5;--y:3;--o:.20"></i><i style="--x:6;--y:3;--o:.18"></i><i style="--x:1;--y:3;--o:.16"></i>
+          <i style="--x:3;--y:4;--o:.22"></i><i style="--x:4;--y:4;--o:.16"></i><i style="--x:5;--y:4;--o:.17"></i><i style="--x:6;--y:4;--o:.16"></i><i style="--x:-1;--y:4;--o:.025"></i>
+          <i style="--x:3;--y:5;--o:.26"></i><i style="--x:4;--y:5;--o:.17"></i><i style="--x:5;--y:5;--o:.17"></i><i style="--x:6;--y:5;--o:.17"></i>
+          <i class="pixel--outline" style="--x:2;--y:6"></i><i style="--x:4;--y:7;--o:.14"></i><i style="--x:6;--y:6;--o:.12"></i><i style="--x:6;--y:9;--o:.14"></i>
+        </div>
+
+        <div class="class-stats" role="group" aria-label="课程成果数据">
+          <div class="class-stat class-stat--students">
+            <div class="class-stat__value"><span class="class-count" data-count="800">800</span><span>+</span></div>
+            <div class="class-stat__label">辅导学员</div>
+          </div>
+          <div class="class-stat class-stat--rates">
+            <div class="class-stat__value"><span class="class-count" data-count="85">85</span><span>% · </span><span class="class-count" data-count="100">100</span><span>%</span></div>
+            <div class="class-stat__label">就业率/实习率</div>
+          </div>
+          <div class="class-stat class-stat--salary">
+            <div class="class-stat__value"><span>社</span><span class="class-count" data-count="48">48</span><span>W+ / 校</span><span class="class-count" data-count="45">45</span><span>W+</span></div>
+            <div class="class-stat__label">最高薪资</div>
+          </div>
+        </div>
+
+        <div class="class-ring-scroll-trigger" aria-hidden="true"></div>
+        <div class="class-ring-stage">
+          <div class="class-ring-scroll-layer">
+            <div class="class-ring-cleaner" aria-hidden="true"></div>
+            <div class="class-ring-orbit" aria-hidden="true">
+            <i class="class-ring-card" style="--ring-x:43.490cqw;--ring-y:4.290cqw;--ring-delay:0s"><span><img src="./assets/class-ring-projects/card-01-default.png" data-default="./assets/class-ring-projects/card-01-default.png" data-hover="./assets/class-ring-projects/card-01-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:57.381cqw;--ring-y:5.919cqw;--ring-delay:.09s"><span><img src="./assets/class-ring-projects/card-02-default.png" data-default="./assets/class-ring-projects/card-02-default.png" data-hover="./assets/class-ring-projects/card-02-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:69.158cqw;--ring-y:10.558cqw;--ring-delay:.18s"><span><img src="./assets/class-ring-projects/card-03-default.png" data-default="./assets/class-ring-projects/card-03-default.png" data-hover="./assets/class-ring-projects/card-03-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:77.027cqw;--ring-y:17.501cqw;--ring-delay:.27s"><span><img src="./assets/class-ring-projects/card-04-default.png" data-default="./assets/class-ring-projects/card-04-default.png" data-hover="./assets/class-ring-projects/card-04-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:79.790cqw;--ring-y:25.690cqw;--ring-delay:.36s"><span><img src="./assets/class-ring-projects/card-05-default.png" data-default="./assets/class-ring-projects/card-05-default.png" data-hover="./assets/class-ring-projects/card-05-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:77.027cqw;--ring-y:33.879cqw;--ring-delay:.45s"><span><img src="./assets/class-ring-projects/card-06-default.png" data-default="./assets/class-ring-projects/card-06-default.png" data-hover="./assets/class-ring-projects/card-06-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:69.158cqw;--ring-y:40.822cqw;--ring-delay:.54s"><span><img src="./assets/class-ring-projects/card-07-default.png" data-default="./assets/class-ring-projects/card-07-default.png" data-hover="./assets/class-ring-projects/card-07-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:57.381cqw;--ring-y:45.461cqw;--ring-delay:.63s"><span><img src="./assets/class-ring-projects/card-08-default.png" data-default="./assets/class-ring-projects/card-08-default.png" data-hover="./assets/class-ring-projects/card-08-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:43.490cqw;--ring-y:47.090cqw;--ring-delay:.72s"><span><img src="./assets/class-ring-projects/card-09-default.png" data-default="./assets/class-ring-projects/card-09-default.png" data-hover="./assets/class-ring-projects/card-09-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:29.599cqw;--ring-y:45.461cqw;--ring-delay:.81s"><span><img src="./assets/class-ring-projects/card-10-default.png" data-default="./assets/class-ring-projects/card-10-default.png" data-hover="./assets/class-ring-projects/card-10-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:17.822cqw;--ring-y:40.822cqw;--ring-delay:.90s"><span><img src="./assets/class-ring-projects/card-11-default.png" data-default="./assets/class-ring-projects/card-11-default.png" data-hover="./assets/class-ring-projects/card-11-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:9.953cqw;--ring-y:33.879cqw;--ring-delay:.99s"><span><img src="./assets/class-ring-projects/card-12-default.png" data-default="./assets/class-ring-projects/card-12-default.png" data-hover="./assets/class-ring-projects/card-12-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:7.190cqw;--ring-y:25.690cqw;--ring-delay:1.08s"><span><img src="./assets/class-ring-projects/card-13-default.png" data-default="./assets/class-ring-projects/card-13-default.png" data-hover="./assets/class-ring-projects/card-13-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:9.953cqw;--ring-y:17.501cqw;--ring-delay:1.17s"><span><img src="./assets/class-ring-projects/card-14-default.png" data-default="./assets/class-ring-projects/card-14-default.png" data-hover="./assets/class-ring-projects/card-14-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:17.822cqw;--ring-y:10.558cqw;--ring-delay:1.26s"><span><img src="./assets/class-ring-projects/card-15-default.png" data-default="./assets/class-ring-projects/card-15-default.png" data-hover="./assets/class-ring-projects/card-15-hover.png" alt="" /></span></i>
+            <i class="class-ring-card" style="--ring-x:29.599cqw;--ring-y:5.919cqw;--ring-delay:1.35s"><span><img src="./assets/class-ring-projects/card-16-default.png" data-default="./assets/class-ring-projects/card-16-default.png" data-hover="./assets/class-ring-projects/card-16-hover.png" alt="" /></span></i>
+            </div>
+            <!-- Deferred control: remove `hidden` to restore the existing ring Mode switch. -->
+            <button class="class-ring-more" type="button" aria-label="切换圆环卡片模式" aria-pressed="false" hidden>
+              <span class="class-ring-more__face" aria-hidden="true">
+                <span class="class-ring-more__light"></span>
+              </span>
+              <span class="class-ring-more__label">Mode</span>
+              <i aria-hidden="true"></i>
+              <span class="class-ring-more__stroke" aria-hidden="true"></span>
+              <span class="class-ring-more__stroke-light" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+        <div class="class-panel class-panel--static is-visible" style="--panel-height:52.083cqw;--panel-offset:0cqw"><img src="./assets/class-page-01.jpg" alt="Class 课程页面第一部分" /></div>
+        <!-- Structural spacers for the live orbit. The source-image slices were
+             removed because they contain the obsolete gray placeholder ring. -->
+        <div class="class-panel class-panel--ring-base" style="--panel-height:52.083cqw;--panel-offset:52.083cqw" aria-hidden="true"></div>
+        <div class="class-panel class-panel--ring-tail" style="--panel-height:52.084cqw;--panel-offset:104.166cqw" aria-hidden="true"></div>
+
+        <div class="class-capability-reveal">
+          <div class="class-gray-stage">
+          <div class="class-gray-pin">
+          <div class="class-gray-master class-can-story">
+          <div class="class-panel class-panel--can" style="--panel-height:52.083cqw;--panel-offset:156.250cqw">
+            <img src="./assets/class-page-01.jpg" alt="" />
+          </div>
+          <div class="class-can-stage" aria-hidden="true">
+            <i class="class-can-cleaner"></i>
+            <div class="class-can-parallax-layer class-can-parallax-layer--title">
+              <i class="class-can-guide class-can-guide--title"></i>
+              <i class="class-variable-title-cleaner class-variable-title-cleaner--can"></i>
+              <h2 class="class-variable-title class-variable-title--can" aria-label="双轨定制化陪跑模式">
+                <span class="class-variable-title__strong class-variable-title--warp" data-warp-profile="capability"><span class="class-warp-text__source">双轨定制化</span></span><span>*陪跑模式</span>
+              </h2>
+            </div>
+            <div class="class-can-parallax-layer class-can-parallax-layer--visual">
+              <i class="class-can-guide class-can-guide--pour"></i>
+              <i class="class-can-guide class-can-guide--vertical"></i>
+              <i class="class-can-object"></i>
+              <i class="class-can-pour"></i>
+            </div>
+            <div class="class-can-parallax-layer class-can-parallax-layer--copy">
+              <i class="class-can-copy"></i>
+            </div>
+          </div>
+        <div class="class-gray-story">
+        <div class="class-panel class-panel--star" style="--panel-height:52.083cqw;--panel-offset:0cqw">
+          <img src="./assets/class-page-02.jpg" alt="" />
+          <i class="class-star-cleaner" aria-hidden="true"></i>
+          <button class="class-star-sticker" type="button" data-sticker-source="./assets/class-motion/class-star-sticker.png" aria-label="可拖拽星形贴纸，按 Escape 复位">
+            <span class="class-star-sticker__art" aria-hidden="true"></span>
+            <canvas class="class-star-sticker__canvas" aria-hidden="true"></canvas>
+          </button>
+        </div>
+        <div class="class-panel class-panel--variable-ux" style="--panel-height:52.083cqw;--panel-offset:52.083cqw">
+          <img src="./assets/class-page-02.jpg" alt="" />
+          <div class="class-variable-brackets class-variable-brackets--left" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <div class="class-variable-brackets class-variable-brackets--right" aria-hidden="true">
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <i class="class-variable-title-cleaner class-variable-title-cleaner--ux"></i>
+          <h2 class="class-variable-title class-variable-title--ux" aria-label="UX全链路设计思维全面进阶">
+            <span data-proximity-text>UX</span><span class="class-variable-title__green class-variable-title--warp" data-warp-profile="capability"><span class="class-warp-text__source">全链路设计思维</span></span><span data-proximity-text>全面进阶</span>
+          </h2>
+          <div class="pixel-cloud pixel-cloud--right class-variable-ux-mosaic" aria-hidden="true">
+            <i style="--x:2.5;--y:.5;--o:.04"></i>
+            <i style="--x:4.5;--y:1.3;--o:.48"></i>
+            <i style="--x:3.5;--y:2.3;--o:.36"></i>
+            <i class="pixel--outline" style="--x:1.5;--y:3.3"></i>
+            <i style="--x:2.5;--y:4.2;--o:.36"></i>
+            <i style="--x:3.5;--y:4.2;--o:.25"></i>
+            <i class="pixel--outline" style="--x:4.5;--y:4.2"></i>
+            <i style="--x:5.5;--y:4.2;--o:.26"></i>
+            <i style="--x:6.5;--y:4.2;--o:.24"></i>
+            <i style="--x:.5;--y:5.2;--o:.20"></i>
+            <i style="--x:2.5;--y:5.2;--o:.24"></i>
+            <i style="--x:3.5;--y:5.2;--o:.26"></i>
+            <i style="--x:4.5;--y:5.2;--o:.18"></i>
+            <i style="--x:5.5;--y:5.2;--o:.30"></i>
+            <i style="--x:6.5;--y:5.2;--o:.22"></i>
+            <i style="--x:2.5;--y:6.2;--o:.21"></i>
+            <i style="--x:3.5;--y:6.2;--o:.28"></i>
+            <i style="--x:4.5;--y:6.2;--o:.56"></i>
+            <i style="--x:5.5;--y:6.2;--o:.25"></i>
+            <i style="--x:6.5;--y:6.2;--o:.24"></i>
+            <i style="--x:1.5;--y:7.2;--o:.16"></i>
+            <i style="--x:2.5;--y:7.2;--o:.21"></i>
+            <i style="--x:3.5;--y:7.2;--o:.22"></i>
+            <i style="--x:4.5;--y:7.2;--o:.24"></i>
+            <i style="--x:5.5;--y:7.2;--o:.20"></i>
+            <i style="--x:6.5;--y:7.2;--o:.15"></i>
+          </div>
+        </div>
+        <div class="class-panel class-panel--portfolio-reveal" style="--panel-height:52.084cqw;--panel-offset:104.166cqw">
+          <img src="./assets/class-page-02.jpg" alt="" />
+          <i class="class-figma-warp-cleaner" aria-hidden="true"></i>
+          <h2 class="class-figma-warp class-variable-title--warp" aria-label="Figma 到 Codex，">
+            <span class="class-warp-text__source"><span class="class-figma-warp__figma">Figma</span><span> 到 </span><span class="class-figma-warp__codex">Codex</span><span class="class-figma-warp__comma">，</span></span>
+          </h2>
+          <div class="class-portfolio-reveal" aria-hidden="true">
+            <i class="class-portfolio-piece class-portfolio-piece--smile"></i>
+            <i class="class-portfolio-piece class-portfolio-piece--copy"></i>
+            <i class="class-portfolio-title-cleaner"></i>
+            <h2 class="class-portfolio-title-warp class-variable-title--warp" data-warp-profile="capability">
+              <span class="class-warp-text__source"><span>作品集内容与视觉</span><span class="class-portfolio-title-warp__green">双重</span><span>打磨</span></span>
+            </h2>
+          </div>
+        </div>
+        <div class="class-panel class-panel--recruiting-scene" style="--panel-height:52.083cqw;--panel-offset:156.250cqw">
+          <img src="./assets/class-page-02.jpg" alt="" />
+          <i class="class-recruiting-scene-cleaner" aria-hidden="true"></i>
+          <h2 class="class-recruiting-scene-warp class-variable-title--warp" data-warp-profile="capability" aria-label="真实招聘场景">
+            <span class="class-warp-text__source">真实招聘场景</span>
+          </h2>
+        </div>
+        <div class="class-panel class-panel--recruiting-continuation" style="--panel-height:52.083cqw;--panel-offset:0cqw">
+          <img src="./assets/class-page-03.jpg" alt="" />
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+
+        <div class="class-capability-slot">
+          <div class="class-panel class-panel--sticker" style="--panel-height:52.083cqw;--panel-offset:52.083cqw">
+            <img src="./assets/class-page-03.jpg" alt="" />
+            <i class="class-capability-title-cleaner class-capability-title-cleaner--left" aria-hidden="true"></i>
+            <i class="class-capability-title-cleaner class-capability-title-cleaner--right" aria-hidden="true"></i>
+            <i class="class-capability-title-layer class-capability-title-layer--left" aria-hidden="true"></i>
+            <i class="class-capability-title-layer class-capability-title-layer--right" aria-hidden="true"></i>
+            <i class="class-capability-warp-cleaner" aria-hidden="true"></i>
+            <h2 class="class-capability-warp class-variable-title--warp" data-warp-profile="capability" aria-label="8个断层能力">
+              <span class="class-warp-text__source">8个断层能力</span>
+            </h2>
+            <i class="class-smile-cleaner" aria-hidden="true"></i>
+            <button class="class-smile-sticker" type="button" data-sticker-source="./assets/class-page-03.jpg" aria-label="可拖拽笑脸贴纸，按 Escape 复位">
+              <span class="class-smile-sticker__art" aria-hidden="true"></span>
+              <canvas class="class-smile-sticker__canvas" aria-hidden="true"></canvas>
+            </button>
+            <div class="pixel-cloud pixel-cloud--right class-sticker-mosaic" aria-hidden="true">
+              <i style="--x:3;--y:0;--o:.16"></i><i style="--x:4;--y:0;--o:.18"></i><i style="--x:5;--y:0;--o:.19"></i><i class="pixel--violet" style="--x:6;--y:0"></i>
+              <i style="--x:3;--y:1;--o:.16"></i><i style="--x:4;--y:1;--o:.20"></i><i style="--x:5;--y:1;--o:.22"></i><i style="--x:6;--y:1;--o:.24"></i>
+              <i class="pixel--green" style="--x:3;--y:2"></i><i style="--x:4;--y:2;--o:.18"></i><i style="--x:5;--y:2;--o:.36"></i><i style="--x:6;--y:2;--o:.22"></i><i style="--x:0;--y:2;--o:.20"></i>
+              <i style="--x:3;--y:3;--o:.16"></i><i style="--x:4;--y:3;--o:.18"></i><i style="--x:5;--y:3;--o:.20"></i><i style="--x:6;--y:3;--o:.18"></i><i style="--x:1;--y:3;--o:.16"></i>
+              <i style="--x:3;--y:4;--o:.22"></i><i style="--x:4;--y:4;--o:.16"></i><i style="--x:5;--y:4;--o:.17"></i><i style="--x:6;--y:4;--o:.16"></i><i style="--x:-1;--y:4;--o:.025"></i>
+              <i style="--x:3;--y:5;--o:.26"></i><i style="--x:4;--y:5;--o:.17"></i><i style="--x:5;--y:5;--o:.17"></i><i style="--x:6;--y:5;--o:.17"></i>
+              <i class="pixel--outline" style="--x:2;--y:6"></i><i style="--x:4;--y:7;--o:.14"></i><i style="--x:6;--y:6;--o:.12"></i><i style="--x:6;--y:9;--o:.14"></i>
+              <i style="--x:9;--y:3;--o:.08"></i><i style="--x:10;--y:7;--o:.14"></i>
+            </div>
+          </div>
+        </div>
+        </div>
+
+        <!-- Deferred module: remove `hidden` to restore the complete interactive course section. -->
+        <section class="class-lessons" aria-label="16节课程内容" hidden>
+          <div class="class-lessons__sticky">
+            <div class="class-lessons__board">
+              <img class="class-lessons__reference" src="./assets/class-motion/class-lessons-design.png" alt="课程三个月十六节安排" />
+              <i class="class-lessons__glow-feather" aria-hidden="true"></i>
+              <div class="class-lessons__content" aria-live="polite">
+                <span class="class-lessons__index">CLASS – 01:</span>
+                <h2>从功能到界面：界面初识与原型设计*</h2>
+                <p>课程内容待补充</p>
+              </div>
+              <div class="class-lessons__rail" aria-label="选择课程章节">
+                <div class="class-lessons__track" role="tablist" aria-label="课程章节">
+                  <button type="button" role="tab" aria-label="第1节" aria-selected="true" class="class-lesson is-active" data-lesson="0"><strong><i>第</i><i>节</i></strong><span>1.</span></button>
+                  <button type="button" role="tab" aria-label="第2节" aria-selected="false" class="class-lesson" data-lesson="1"><strong><i>第</i><i>节</i></strong><span>2.</span></button>
+                  <button type="button" role="tab" aria-label="第3节" aria-selected="false" class="class-lesson" data-lesson="2"><strong><i>第</i><i>节</i></strong><span>3.</span></button>
+                  <button type="button" role="tab" aria-label="第4节" aria-selected="false" class="class-lesson" data-lesson="3"><strong><i>第</i><i>节</i></strong><span>4.</span></button>
+                  <button type="button" role="tab" aria-label="第5节" aria-selected="false" class="class-lesson" data-lesson="4"><strong><i>第</i><i>节</i></strong><span>5.</span></button>
+                  <button type="button" role="tab" aria-label="第6节" aria-selected="false" class="class-lesson" data-lesson="5"><strong><i>第</i><i>节</i></strong><span>6.</span></button>
+                  <button type="button" role="tab" aria-label="第7节" aria-selected="false" class="class-lesson" data-lesson="6"><strong><i>第</i><i>节</i></strong><span>7.</span></button>
+                  <button type="button" role="tab" aria-label="第8节" aria-selected="false" class="class-lesson" data-lesson="7"><strong><i>第</i><i>节</i></strong><span>8.</span></button>
+                  <button type="button" role="tab" aria-label="第9节" aria-selected="false" class="class-lesson" data-lesson="8"><strong><i>第</i><i>节</i></strong><span>9.</span></button>
+                  <button type="button" role="tab" aria-label="第10节" aria-selected="false" class="class-lesson" data-lesson="9"><strong><i>第</i><i>节</i></strong><span>10.</span></button>
+                  <button type="button" role="tab" aria-label="第11节" aria-selected="false" class="class-lesson" data-lesson="10"><strong><i>第</i><i>节</i></strong><span>11.</span></button>
+                  <button type="button" role="tab" aria-label="第12节" aria-selected="false" class="class-lesson" data-lesson="11"><strong><i>第</i><i>节</i></strong><span>12.</span></button>
+                  <button type="button" role="tab" aria-label="第13节" aria-selected="false" class="class-lesson" data-lesson="12"><strong><i>第</i><i>节</i></strong><span>13.</span></button>
+                  <button type="button" role="tab" aria-label="第14节" aria-selected="false" class="class-lesson" data-lesson="13"><strong><i>第</i><i>节</i></strong><span>14.</span></button>
+                  <button type="button" role="tab" aria-label="第15节" aria-selected="false" class="class-lesson" data-lesson="14"><strong><i>第</i><i>节</i></strong><span>15.</span></button>
+                  <button type="button" role="tab" aria-label="第16节" aria-selected="false" class="class-lesson" data-lesson="15"><strong><i>第</i><i>节</i></strong><span>16.</span></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="class-panel class-panel--audience-zero" style="--panel-height:52.083cqw;--panel-offset:0cqw">
+          <img src="./assets/class-page-04.jpg" alt="适合人群与课程内容" />
+          <span class="class-audience-highlight-fix class-audience-highlight-fix--zero" aria-hidden="true">零基础</span>
+        </div>
+        <div class="class-panel class-panel--audience-recruit" style="--panel-height:52.083cqw;--panel-offset:52.083cqw">
+          <img src="./assets/class-page-04.jpg" alt="" />
+          <span class="class-audience-highlight-fix class-audience-highlight-fix--recruit" aria-hidden="true">准备校招</span>
+        </div>
+        <div class="class-panel" style="--panel-height:52.084cqw;--panel-offset:104.166cqw"><img src="./assets/class-page-04.jpg" alt="" /></div>
+        <div class="class-panel class-panel--audience-summary" style="--panel-height:52.083cqw;--panel-offset:156.250cqw">
+          <img src="./assets/class-page-04.jpg" alt="" />
+          <span class="class-audience-growth-comma-fix" aria-hidden="true">，</span>
+          <i class="class-audience-summary-cleaner" aria-hidden="true"></i>
+          <h2 class="class-audience-summary-warp class-variable-title--warp" data-warp-profile="capability" aria-label="差异总结">
+            <span class="class-warp-text__source">差异总结</span>
+          </h2>
+        </div>
+
+        <div class="class-panel" style="--panel-height:52.083cqw;--panel-offset:0cqw"><img src="./assets/class-page-05.jpg" alt="" /></div>
+        <div class="class-panel class-panel--value-lists" style="--panel-height:52.083cqw;--panel-offset:52.083cqw">
+          <img src="./assets/class-page-05.jpg" alt="" />
+          <div class="class-value-list-mask class-value-list-mask--right" aria-hidden="true">
+            <i style="--line:0"></i><i style="--line:1"></i><i style="--line:2"></i><i style="--line:3"></i>
+            <i style="--line:4"></i><i style="--line:5"></i><i style="--line:6"></i><i style="--line:7"></i>
+          </div>
+        </div>
+        <div class="class-panel class-panel--curriculum-mosaic" style="--panel-height:52.084cqw;--panel-offset:104.166cqw">
+          <img src="./assets/class-page-05.jpg" alt="" />
+          <div class="class-value-list-mask class-value-list-mask--left" aria-hidden="true">
+            <i style="--line:0"></i><i style="--line:1"></i><i style="--line:2"></i><i style="--line:3"></i>
+            <i style="--line:4"></i><i style="--line:5"></i><i style="--line:6"></i>
+          </div>
+          <div class="class-curriculum-copy-mask" aria-hidden="true">
+            <i style="--line:0"></i><i style="--line:1"></i><i style="--line:2"></i>
+            <i style="--line:3"></i><i style="--line:4"></i><i style="--line:5"></i>
+            <i style="--line:6"></i><i style="--line:7"></i><i style="--line:8"></i>
+            <i style="--line:9"></i><i style="--line:10"></i>
+          </div>
+          <div class="pixel-cloud pixel-cloud--right class-curriculum-mosaic" aria-hidden="true">
+            <i style="--x:0;--y:0;--o:.12"></i>
+            <i style="--x:2.7;--y:0;--o:.12"></i><i style="--x:3.7;--y:0;--o:.16"></i><i style="--x:4.7;--y:0;--o:.18"></i><i style="--x:5.7;--y:0;--o:.19"></i><i style="--x:6.7;--y:0;--o:.20"></i><i style="--x:7.7;--y:0;--o:.42"></i>
+            <i style="--x:3.7;--y:1;--o:.16"></i><i style="--x:4.7;--y:1;--o:.18"></i><i style="--x:5.7;--y:1;--o:.38"></i><i style="--x:6.7;--y:1;--o:.19"></i><i style="--x:7.7;--y:1;--o:.20"></i>
+            <i style="--x:1.8;--y:2;--o:.13"></i><i style="--x:3.7;--y:2;--o:.18"></i><i style="--x:4.7;--y:2;--o:.20"></i><i style="--x:5.7;--y:2;--o:.18"></i><i style="--x:6.7;--y:2;--o:.19"></i><i style="--x:7.7;--y:2;--o:.20"></i>
+            <i style="--x:3.7;--y:3;--o:.30"></i><i style="--x:4.7;--y:3;--o:.18"></i><i class="pixel--outline" style="--x:5.7;--y:3"></i><i style="--x:6.7;--y:3;--o:.18"></i><i style="--x:7.7;--y:3;--o:.18"></i>
+            <i class="pixel--outline" style="--x:2.7;--y:4"></i>
+            <i style="--x:4.7;--y:5;--o:.16"></i><i style="--x:5.7;--y:6;--o:.14"></i><i style="--x:3.7;--y:7;--o:.035"></i>
+          </div>
+        </div>
+        <div class="class-panel" style="--panel-height:52.083cqw;--panel-offset:156.250cqw"><img src="./assets/class-page-05.jpg" alt="" /></div>
+
+        <div class="class-panel" style="--panel-height:32.734cqw;--panel-offset:0cqw"><img src="./assets/class-page-06.jpg" alt="" /></div>
+        <div class="class-panel" style="--panel-height:32.735cqw;--panel-offset:32.734cqw"><img src="./assets/class-page-06.jpg" alt="" /></div>
+      </section>
+      </div>
+    </main>
+    <script src="./app.js?v=portfolio-title-hover-off-1"></script>
+    <script src="./top-subject.js?v=transparent-video-3"></script>
+  </body>
+</html>
