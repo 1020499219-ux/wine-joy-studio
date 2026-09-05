@@ -19,8 +19,16 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   const siteHeader = document.querySelector('wine-site-header');
   const worksFlow = document.querySelector('.works-flow');
   const worksPage = document.querySelector('.works-page');
+  const worksRouteTransition = document.querySelector('.works-route-transition');
   const worksTiles = document.querySelector('.works-tiles');
   const worksGalleryPage = document.querySelector('.works-gallery-page');
+  const worksGalleryModeCleaner = document.querySelector('.works-gallery-mode-cleaner');
+  const worksUxScroll = document.querySelector('.works-ux-scroll');
+  const worksUxScrollScene = document.querySelector('.works-ux-scroll__scene');
+  const worksUxScrollMark = document.querySelector('.works-ux-scroll__mark');
+  const worksUxScrollMarkUi = document.querySelector('.works-ux-scroll__mark-image--ui');
+  const worksUxScrollMarkUx = document.querySelector('.works-ux-scroll__mark-image--ux');
+  const worksUxScrollCards = [...document.querySelectorAll('.works-ux-scroll__card')];
   const worksModeTabs = document.querySelector('.works-mode-tabs');
   const worksModeLinks = [...document.querySelectorAll('.works-mode-tabs__tab')];
   const worksUxPage = document.querySelector('.works-ux-page');
@@ -57,6 +65,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   const classWarpTitles = [...document.querySelectorAll('.class-variable-title--warp')];
   const classPanels = [...document.querySelectorAll('.class-panel')];
   const homePage = document.querySelector('.hero-home');
+  const homeTextCursor = document.querySelector('.home-text-cursor');
   const uxTypeSwitcher = document.querySelector('.ux-type-switcher');
   const uxTypeButtons = [...document.querySelectorAll('.ux-type')];
   const uxProjectStage = document.querySelector('.ux-project-stage');
@@ -79,8 +88,221 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let activeClassLesson = -1;
   let activeUxType = null;
   let uxDetailLoadToken = 0;
+  let worksTileEntrance = null;
+  let worksRingActiveIndex = -1;
+  let worksRouteTransitionTimeline = null;
+  let worksRouteTransitionActive = false;
+
+  const homeCursorSpacing = 46;
+  const homeCursorMaxPoints = 70;
+  const homeCursorExitDuration = 300;
+  const homeCursorRemovalInterval = 20;
+  const homeCursorPoints = [];
+  let homeCursorLastPoint = null;
+  let homeCursorHeading = 0;
+  let homeCursorIdleTimer = 0;
+  let homeCursorDrainTimer = 0;
 
   const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  const retireHomeCursorPoint = (point) => {
+    if (!point?.isConnected || point.classList.contains('is-exiting')) return;
+    point.classList.add('is-exiting');
+    window.setTimeout(() => point.remove(), homeCursorExitDuration + 40);
+  };
+
+  const stopHomeCursorDrain = () => {
+    window.clearTimeout(homeCursorIdleTimer);
+    window.clearInterval(homeCursorDrainTimer);
+    homeCursorIdleTimer = 0;
+    homeCursorDrainTimer = 0;
+  };
+
+  const drainHomeTextCursor = () => {
+    stopHomeCursorDrain();
+    const removeNext = () => {
+      const point = homeCursorPoints.shift();
+      if (!point) {
+        stopHomeCursorDrain();
+        homeCursorLastPoint = null;
+        return;
+      }
+      retireHomeCursorPoint(point);
+    };
+    removeNext();
+    homeCursorDrainTimer = window.setInterval(removeNext, homeCursorRemovalInterval);
+  };
+
+  const queueHomeCursorDrain = (delay = 80) => {
+    window.clearTimeout(homeCursorIdleTimer);
+    homeCursorIdleTimer = window.setTimeout(drainHomeTextCursor, delay);
+  };
+
+  const clearHomeTextCursor = () => {
+    stopHomeCursorDrain();
+    homeCursorPoints.splice(0).forEach((point) => point.remove());
+    homeTextCursor?.replaceChildren();
+    homeCursorLastPoint = null;
+  };
+
+  const addHomeCursorPoint = (x, y, angle) => {
+    if (!homeTextCursor) return;
+    const point = document.createElement('span');
+    point.className = 'home-text-cursor__point';
+    point.textContent = 'WINE JOY STUDIO';
+    point.style.left = `${x}px`;
+    point.style.top = `${y}px`;
+    point.style.setProperty('--cursor-angle', `${angle}deg`);
+    homeTextCursor.append(point);
+    homeCursorPoints.push(point);
+
+    while (homeCursorPoints.length > homeCursorMaxPoints) {
+      retireHomeCursorPoint(homeCursorPoints.shift());
+    }
+  };
+
+  const renderHomeTextCursor = (event) => {
+    if (
+      !homeTextCursor ||
+      landing.dataset.page !== 'home' ||
+      reduceMotion.matches ||
+      event.pointerType === 'touch' ||
+      event.isPrimary === false
+    ) return;
+
+    const headerBottom = siteHeader?.querySelector('.site-header')?.getBoundingClientRect().bottom
+      || window.innerHeight * .152;
+    if (event.clientY <= headerBottom) {
+      homeCursorLastPoint = null;
+      queueHomeCursorDrain();
+      return;
+    }
+
+    stopHomeCursorDrain();
+    const current = { x: event.clientX, y: event.clientY };
+    if (!homeCursorLastPoint) {
+      homeCursorLastPoint = current;
+      addHomeCursorPoint(current.x, current.y, homeCursorHeading);
+      queueHomeCursorDrain();
+      return;
+    }
+
+    const dx = current.x - homeCursorLastPoint.x;
+    const dy = current.y - homeCursorLastPoint.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance < homeCursorSpacing) {
+      queueHomeCursorDrain();
+      return;
+    }
+
+    let readableHeading = Math.atan2(dy, dx) * 180 / Math.PI;
+    if (readableHeading > 90) readableHeading -= 180;
+    if (readableHeading < -90) readableHeading += 180;
+    const headingDelta = ((readableHeading - homeCursorHeading + 540) % 360) - 180;
+    homeCursorHeading += headingDelta * .72;
+    const unitX = dx / distance;
+    const unitY = dy / distance;
+    const count = Math.min(Math.floor(distance / homeCursorSpacing), 16);
+
+    for (let index = 1; index <= count; index += 1) {
+      addHomeCursorPoint(
+        homeCursorLastPoint.x + unitX * homeCursorSpacing * index,
+        homeCursorLastPoint.y + unitY * homeCursorSpacing * index,
+        homeCursorHeading
+      );
+    }
+
+    homeCursorLastPoint = {
+      x: homeCursorLastPoint.x + unitX * homeCursorSpacing * count,
+      y: homeCursorLastPoint.y + unitY * homeCursorSpacing * count
+    };
+    queueHomeCursorDrain();
+  };
+
+  document.addEventListener('pointermove', renderHomeTextCursor, { passive: true });
+  document.addEventListener('pointerleave', () => queueHomeCursorDrain(0), { passive: true });
+  window.addEventListener('blur', () => queueHomeCursorDrain(0));
+
+  const finishWorksRouteTransition = () => {
+    worksRouteTransitionActive = false;
+    worksRouteTransitionTimeline = null;
+    if (!worksRouteTransition || !window.gsap) return;
+    const introContent = worksPage.querySelectorAll(
+      '.works-brackets, .works-pixels, .works-copy p, .works-wine'
+    );
+    worksFlow?.classList.remove('is-route-transitioning');
+    window.gsap.set(worksRouteTransition, { display: 'grid', autoAlpha: 1, zIndex: 0 });
+    window.gsap.set(introContent, { clearProps: 'opacity,visibility,transform' });
+  };
+
+  const stopWorksRouteTransition = () => {
+    worksRouteTransitionTimeline?.kill();
+    worksRouteTransitionTimeline = null;
+    worksRouteTransitionActive = false;
+    worksFlow?.classList.remove('is-route-transitioning');
+    landing.classList.remove('is-works-intro-background');
+    if (!worksRouteTransition || !window.gsap) return;
+    const bars = worksRouteTransition.querySelectorAll('i');
+    const introContent = worksPage.querySelectorAll(
+      '.works-brackets, .works-pixels, .works-copy p, .works-wine'
+    );
+    window.gsap.set(worksRouteTransition, { display: 'none', clearProps: 'opacity,visibility' });
+    window.gsap.set(bars, { clearProps: 'transform,willChange' });
+    window.gsap.set(introContent, { clearProps: 'opacity,visibility,transform' });
+  };
+
+  const playWorksRouteTransition = () => {
+    if (!worksRouteTransition || !worksPage || !window.gsap || reduceMotion.matches) {
+      stopWorksRouteTransition();
+      return;
+    }
+
+    stopWorksRouteTransition();
+    worksRouteTransitionActive = true;
+    worksFlow?.classList.add('is-route-transitioning');
+    landing.classList.add('is-works-intro-background');
+    const gsap = window.gsap;
+    const bars = [...worksRouteTransition.querySelectorAll('i')];
+    const copyLines = [...worksPage.querySelectorAll('.works-copy p')];
+    const supportingVisuals = [...worksPage.querySelectorAll(
+      '.works-brackets, .works-pixels, .works-wine'
+    )];
+
+    gsap.set(worksRouteTransition, { display: 'grid', autoAlpha: 1 });
+    gsap.set(bars, {
+      scaleY: 0,
+      transformOrigin: '50% 100%',
+      willChange: 'transform'
+    });
+    gsap.set(supportingVisuals, { autoAlpha: 0 });
+    gsap.set(copyLines, { autoAlpha: 0, y: 26 });
+
+    worksRouteTransitionTimeline = gsap.timeline({
+      defaults: { ease: 'power3.inOut' },
+      onComplete: finishWorksRouteTransition
+    });
+    worksRouteTransitionTimeline
+      .addLabel('bars', 0)
+      .to(bars, {
+        scaleY: 1,
+        duration: .82,
+        stagger: { each: .095, from: 'start' }
+      }, 'bars')
+      .addLabel('reveal', '+=.16')
+      .set(worksRouteTransition, { zIndex: 0 }, 'reveal')
+      .to(copyLines, {
+        autoAlpha: 1,
+        y: 0,
+        duration: .54,
+        ease: 'power3.out',
+        stagger: { each: .075, from: 'start' }
+      }, 'reveal')
+      .to(supportingVisuals, {
+        autoAlpha: 1,
+        duration: .5,
+        ease: 'power2.out'
+      }, 'reveal+=.2');
+  };
 
   const classLessonData = Array.from({ length: 16 }, (_, index) => ({
     title: index === 0
@@ -224,6 +446,12 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const eased = progress * progress * (3 - 2 * progress);
     const fragmentPhase = Math.min(progress * 1.25, 1);
     const fragmentOpacity = reduceMotion.matches ? 0 : Math.sin(Math.PI * fragmentPhase) * 0.84;
+    /* Let the intro-gray surface yield as soon as the Wine word begins to
+       separate. It now clears before the letter fragments finish dispersing,
+       so the phone scene is revealed without a lingering horizontal block. */
+    const backdropExitProgress = clamp((progress - .12) / .22, 0, 1);
+    const backdropOpacity = 1 - backdropExitProgress * backdropExitProgress
+      * (3 - 2 * backdropExitProgress);
 
     worksPage.style.setProperty('--works-wine-whole-opacity', String(clamp(1 - progress * 2.25, 0, 1)));
     worksPage.style.setProperty('--works-wine-whole-scale', String(1 - eased * 0.035));
@@ -236,18 +464,135 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     worksPage.style.setProperty('--works-wine-right-x', `${(eased * 35).toFixed(2)}cqw`);
     worksPage.style.setProperty('--works-wine-left-rotate', `${(-eased * 4).toFixed(2)}deg`);
     worksPage.style.setProperty('--works-wine-right-rotate', `${(eased * 4).toFixed(2)}deg`);
+    if (worksRouteTransition && !worksRouteTransitionActive) {
+      worksRouteTransition.style.opacity = backdropOpacity.toFixed(3);
+      worksRouteTransition.style.visibility = backdropOpacity <= .002 ? 'hidden' : 'visible';
+    }
   };
 
-  const replayWorksTileDrop = () => {
-    if (!worksTiles) return;
-    worksTiles.classList.remove('is-dropping');
-    if (reduceMotion.matches) return;
-
-    /* Reflow is intentional here: it lets the authored entrance replay after
-       returning to the Works route without changing the tiles' resting layout. */
-    worksTiles.getBoundingClientRect();
-    worksTiles.classList.add('is-dropping');
+  const layoutWorksTileRing = () => {
+    if (!worksTiles) return [];
+    const tiles = [...worksTiles.querySelectorAll('i')];
+    const step = (Math.PI * 2) / Math.max(tiles.length, 1);
+    tiles.forEach((tile, index) => {
+      const angle = -Math.PI / 2 + index * step;
+      const x = 50 + Math.cos(angle) * 34;
+      const y = 53 + Math.sin(angle) * 28;
+      tile.style.left = `${x.toFixed(3)}%`;
+      tile.style.top = `${y.toFixed(3)}%`;
+      tile.style.zIndex = String(20 + Math.round(y));
+    });
+    return tiles;
   };
+
+  const hideWorksRingTile = (tile) => {
+    if (!tile || !window.gsap) return;
+    window.gsap.to(tile, {
+      opacity: 0,
+      scale: .58,
+      duration: reduceMotion.matches ? 0 : .82,
+      ease: 'power2.inOut',
+      overwrite: 'auto'
+    });
+  };
+
+  const revealWorksRingTile = (index) => {
+    if (!worksTiles || !window.gsap) return;
+    const tiles = [...worksTiles.querySelectorAll('i')];
+    if (!tiles.length || index === worksRingActiveIndex) return;
+
+    if (worksRingActiveIndex >= 0) hideWorksRingTile(tiles[worksRingActiveIndex]);
+    const tile = tiles[index];
+    worksRingActiveIndex = index;
+    window.gsap.killTweensOf(tile);
+    window.gsap.fromTo(tile, {
+      opacity: 0,
+      scale: .58,
+      xPercent: -50,
+      yPercent: -50
+    }, {
+      opacity: 1,
+      scale: 1,
+      xPercent: -50,
+      yPercent: -50,
+      duration: reduceMotion.matches ? 0 : .5,
+      ease: 'back.out(1.45)',
+      overwrite: true
+    });
+  };
+
+  const resetWorksTileEntrance = () => {
+    worksTileEntrance?.kill();
+    worksTileEntrance = null;
+    worksRingActiveIndex = -1;
+    if (!worksTiles || !window.gsap) return;
+    const tiles = layoutWorksTileRing();
+    window.gsap.killTweensOf(tiles);
+    window.gsap.set(tiles, {
+      opacity: 0,
+      scale: .58,
+      xPercent: -50,
+      yPercent: -50,
+      visibility: 'visible',
+      willChange: 'transform, opacity'
+    });
+  };
+
+  const hideWorksTileTrail = () => {
+    if (!worksTiles || !window.gsap) return;
+    worksRingActiveIndex = -1;
+    const tiles = [...worksTiles.querySelectorAll('i')];
+    window.gsap.to(tiles, {
+      opacity: 0,
+      scale: .58,
+      duration: reduceMotion.matches ? 0 : .82,
+      ease: 'power2.inOut',
+      stagger: { each: .025, from: 'end' },
+      overwrite: 'auto'
+    });
+  };
+
+  const syncWorksTileTrailBoundary = () => {
+    if (!worksTiles || !worksGalleryPage) return false;
+    /* Once even the leading edge of the phone section enters the viewport,
+       stop the intro-only pointer trail so no image can be clipped against
+       the boundary between the two Works modules. */
+    const blocked = landing.dataset.page !== 'works'
+      || worksGalleryPage.getBoundingClientRect().top < window.innerHeight - 1;
+    const wasBlocked = worksTiles.dataset.pointerTrailBlocked === 'true';
+    worksTiles.dataset.pointerTrailBlocked = blocked ? 'true' : 'false';
+    if (blocked && !wasBlocked) hideWorksTileTrail();
+    return blocked;
+  };
+
+  const updateWorksIntroBackground = () => {
+    const viewportHeight = Math.max(window.innerHeight, 1);
+    const sectionTop = worksPage?.getBoundingClientRect().top ?? viewportHeight;
+    const wineProgress = clamp(
+      (-sectionTop - viewportHeight * .06) / (viewportHeight * .66),
+      0,
+      1
+    );
+    const introVisible = landing.dataset.page === 'works' && worksPage && wineProgress < .34;
+    landing.classList.toggle('is-works-intro-background', Boolean(introVisible));
+  };
+
+  worksPage?.addEventListener('pointermove', (event) => {
+    if (worksRouteTransitionActive || landing.dataset.page !== 'works' || !worksTiles || syncWorksTileTrailBoundary()) return;
+    const tiles = [...worksTiles.querySelectorAll('i')];
+    if (!tiles.length) return;
+    const rect = worksPage.getBoundingClientRect();
+    const centerX = rect.left + rect.width * .5;
+    const centerY = rect.top + rect.height * .53;
+    const normalizedX = (event.clientX - centerX) / Math.max(rect.width * .34, 1);
+    const normalizedY = (event.clientY - centerY) / Math.max(rect.height * .28, 1);
+    const pointerAngle = Math.atan2(normalizedY, normalizedX);
+    const step = (Math.PI * 2) / tiles.length;
+    const index = Math.round((((pointerAngle + Math.PI / 2) + Math.PI * 2) % (Math.PI * 2)) / step) % tiles.length;
+    revealWorksRingTile(index);
+  });
+
+  worksPage?.addEventListener('pointerleave', hideWorksTileTrail);
 
   const setWorksMode = (mode) => {
     if (!worksModeTabs) return;
@@ -387,6 +732,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       updateWorksWine();
       updateWorksUxSmile();
       updateWorksModeTabs();
+      syncWorksTileTrailBoundary();
+      updateWorksIntroBackground();
       updateClassLessons();
     });
   };
@@ -600,9 +947,9 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
   const setupClassWarpTitle = (classWarpTitle) => {
     if (!classWarpTitle || reduceMotion.matches || classWarpTitle.dataset.warpReady === 'true') return;
-    /* The portfolio title stays as a static heading. Its scroll entrance is
-       preserved in CSS, but it should not react to pointer hover. */
-    if (classWarpTitle.classList.contains('class-portfolio-title-warp')) return;
+    /* Class-page headings keep their scroll/entrance motion, but remain static
+       when the pointer passes over them. */
+    if (classWarpTitle.closest('.class-page')) return;
     classWarpTitle.dataset.warpReady = 'true';
 
     const canvas = document.createElement('canvas');
@@ -1414,6 +1761,9 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       classCanStory?.classList.add('is-layer-active');
     }
 
+    /* GSAP ScrollTrigger owns only the playback clock when it is available.
+       The original CSS keyframes remain the visual source of truth. */
+    if (!(window.gsap && window.ScrollTrigger)) {
     const completeClassCanSequence = () => {
       classCanStage.classList.remove('is-playing');
       classCanStage.classList.add('is-complete');
@@ -1456,6 +1806,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     window.addEventListener('scroll', queueClassCanTrigger, { passive: true });
     window.addEventListener('resize', queueClassCanTrigger, { passive: true });
     queueClassCanTrigger();
+    }
   }
 
   if (classPortfolioReveal) {
@@ -1489,7 +1840,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     }
   }
 
-  if (classCapabilityPanel) {
+  if (classCapabilityPanel && !(window.gsap && window.ScrollTrigger)) {
     const revealCapabilityTitles = () => classCapabilityPanel.classList.add('is-capability-entered');
     classCapabilityPanel.classList.add('is-capability-motion-ready');
 
@@ -1505,7 +1856,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     }
   }
 
-  if (classCurriculumCopyMask) {
+  if (classCurriculumCopyMask && !(window.gsap && window.ScrollTrigger)) {
     const revealCurriculumCopy = () => classCurriculumCopyMask.classList.add('is-revealed');
     classCurriculumCopyMask.classList.add('is-motion-ready');
 
@@ -1565,8 +1916,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let stagePointerCard = null;
   let stagePointerStartX = 0;
   let stagePointerDelta = 0;
+  let stageDragOffset = 0;
   let stageSuppressClickUntil = 0;
-  let stageWrapFrame = 0;
 
   const wrapPhoneIndex = (index) => {
     const total = uiPhoneCards.length;
@@ -1579,6 +1930,12 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     if (difference > total / 2) difference -= total;
     if (difference < -total / 2) difference += total;
     return difference;
+  };
+
+  const setPhoneCopyVisibility = (visible) => {
+    if (!uiPhoneCopy) return;
+    uiPhoneCopy.classList.toggle('is-visible', visible);
+    uiPhoneCopy.setAttribute('aria-hidden', visible ? 'false' : 'true');
   };
 
   const renderPhoneCopy = () => {
@@ -1594,76 +1951,222 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     uiPhoneCopy.dataset.phoneIndex = String(projectIndex);
   };
 
-  const renderPhoneStage = (previousAnchor) => {
+  const renderPhoneStage = (previousAnchor, { immediate = false } = {}) => {
     uiPhoneTrack?.style.removeProperty('transform');
-    window.cancelAnimationFrame(stageWrapFrame);
     uiPhoneCards.forEach((card) => card.classList.remove('is-wrapping'));
-    const wrappingCards = [];
-    const stageAnchor = stageActivePhone ?? stageRestingPhone;
-    const priorAnchor = previousAnchor ?? stageAnchor;
+    const baseAnchor = stageActivePhone ?? stageRestingPhone;
+    const stageAnchor = baseAnchor + stageDragOffset;
     const hasActivePhone = stageActivePhone !== null;
+    const stageGsap = window.gsap;
+    const useGsapStageMotion = Boolean(stageGsap && !reduceMotion.matches && uiPhoneGallery);
+    const immediateStageRender = immediate || uiPhoneGallery?.dataset.phoneMotionReady !== 'true';
+    /* Follow the visible lower half of a much larger, off-canvas ring. Five
+       phones remain complete, the next pair is clipped by the side edges,
+       and the final phone stays on the hidden back half of the track. */
+    const ringStepX = 18;
+
+    if (useGsapStageMotion) {
+      uiPhoneGallery.classList.add('ui-phone-gallery--gsap');
+      uiPhoneGallery.dataset.phoneMotionReady = 'true';
+    }
 
     renderPhoneCopy();
 
     uiPhoneCards.forEach((card, index) => {
+      const wasMain = card.classList.contains('is-main');
       const difference = getPhoneIndexDifference(index, stageAnchor);
-      const previousDifference = getPhoneIndexDifference(index, priorAnchor);
       const distance = Math.abs(difference);
-      const scale = hasActivePhone
-        ? distance === 0 ? 1.85 : distance === 1 ? 1 : distance === 2 ? .94 : .88
-        : 1;
-      const opacity = hasActivePhone && distance === 3 ? .78 : 1;
-      const crossesLoopBoundary = Math.abs(difference - previousDifference) > uiPhoneCards.length / 2;
-      if (crossesLoopBoundary) {
-        card.classList.add('is-wrapping');
-        wrappingCards.push(card);
-      }
+      const isMain = hasActivePhone && distance === 0;
+      const previousDifference = Number.isFinite(previousAnchor)
+        ? getPhoneIndexDifference(index, previousAnchor)
+        : difference;
+      const crossesHiddenSeam = !isMain
+        && Math.abs(previousDifference - difference) > uiPhoneCards.length / 2;
+      const phoneX = isMain ? 0 : difference * ringStepX;
+      const phoneY = isMain ? -8 : -8 + distance * distance * 2.67;
+      const scale = isMain ? 1.8 : Math.max(1.06, 1.22 - distance * .04);
+      const baseOpacity = isMain
+        ? 1
+        : distance >= 4 ? 0 : hasActivePhone ? .32 : Math.max(.3, .52 - distance * .065);
+      const baseBrightness = isMain
+        ? 1
+        : hasActivePhone ? .66 : Math.max(.64, .82 - distance * .045);
+      const isHovered = card.matches(':hover') && !isMain
+        && !uiPhoneGallery?.classList.contains('is-dragging');
+      const opacity = isHovered ? 1 : baseOpacity;
+      const brightness = isHovered ? 1.12 : baseBrightness;
       card.dataset.phoneIndex = String(index);
-      card.classList.toggle('is-main', hasActivePhone && distance === 0);
-      card.style.setProperty('--phone-x', `${difference * 17}cqw`);
-      card.style.setProperty('--phone-y', hasActivePhone && distance === 0 ? '-5.61cqw' : '0cqw');
-      card.style.setProperty('--phone-scale', String(scale));
-      card.style.setProperty('--phone-opacity', String(opacity));
-      card.style.setProperty('--phone-z', String(10 - distance));
+      card.dataset.phoneBaseOpacity = String(baseOpacity);
+      card.dataset.phoneBaseBrightness = String(baseBrightness);
+      card.classList.toggle('is-main', isMain);
+      card.style.setProperty('--phone-z', String(isMain ? 30 : 20 - distance));
+
+      const motionState = {
+        '--phone-x': `${phoneX.toFixed(3)}cqw`,
+        '--phone-y': `${phoneY.toFixed(3)}cqw`,
+        '--phone-scale': String(scale),
+        '--phone-opacity': String(opacity),
+        '--phone-brightness': String(brightness)
+      };
+      card._phoneStageTween?.kill();
+      card._phoneStageTween = null;
+      if (useGsapStageMotion && !immediateStageRender && isMain) {
+        const startsAtCenter = Math.abs(previousDifference) < .001;
+        card._phoneStageTween = stageGsap.timeline({
+          onComplete: () => { card._phoneStageTween = null; }
+        })
+          .to(card, {
+            ...motionState,
+            '--phone-hover-scale': 1,
+            duration: startsAtCenter ? .52 : .72,
+            ease: 'power3.inOut',
+            overwrite: 'auto'
+          }, 0);
+      } else if (useGsapStageMotion && !immediateStageRender && wasMain) {
+        card._phoneStageTween = stageGsap.timeline({
+          onComplete: () => { card._phoneStageTween = null; }
+        })
+          .to(card, {
+            ...motionState,
+            '--phone-hover-scale': 1,
+            duration: .72,
+            ease: 'power3.inOut',
+            overwrite: 'auto'
+          }, 0);
+      } else if (useGsapStageMotion && !immediateStageRender && crossesHiddenSeam) {
+        stageGsap.killTweensOf(card);
+        stageGsap.set(card, { ...motionState, '--phone-opacity': 0 });
+        stageGsap.to(card, {
+          '--phone-opacity': opacity,
+          duration: .34,
+          delay: .32,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+      } else if (useGsapStageMotion && !immediateStageRender) {
+        stageGsap.to(card, {
+          ...motionState,
+          duration: .78,
+          delay: Math.min(distance, 4) * .025,
+          ease: 'power3.inOut',
+          overwrite: 'auto'
+        });
+      } else if (useGsapStageMotion) {
+        stageGsap.set(card, motionState);
+      } else {
+        Object.entries(motionState).forEach(([property, value]) => card.style.setProperty(property, value));
+      }
     });
 
-    if (wrappingCards.length) {
-      uiPhoneGallery?.getBoundingClientRect();
-      stageWrapFrame = requestAnimationFrame(() => {
-        wrappingCards.forEach((card) => card.classList.remove('is-wrapping'));
-      });
-    }
   };
 
   const hydratePhoneSlides = (card) => {
-    if (!card) return;
-    card.querySelectorAll('.ui-phone-card__image--selected[data-src]').forEach((image) => {
+    if (!card) return Promise.resolve();
+    const slides = [...card.querySelectorAll('.ui-phone-card__image--selected')];
+    slides.forEach((image) => {
+      if (!image.dataset.src) return;
       image.decoding = 'async';
       image.src = image.dataset.src;
       image.removeAttribute('data-src');
     });
+    return Promise.all(slides.map((image) => image.decode?.().catch(() => undefined)));
   };
 
-  const setPhoneSlide = (card, slideIndex) => {
+  const setPhoneSlide = (card, slideIndex, animate = true) => {
     if (!card) return;
     const slides = [...card.querySelectorAll('.ui-phone-card__image--selected')];
     if (!slides.length) return;
     const normalizedIndex = (slideIndex % slides.length + slides.length) % slides.length;
-    slides.forEach((slide, index) => slide.classList.toggle('is-current', index === normalizedIndex));
+    const currentSlide = slides.find((slide) => slide.classList.contains('is-current'));
+    const nextSlide = slides[normalizedIndex];
+    const usesScreenSlide = card.classList.contains('ui-phone-card--paged');
+    const canAnimate = animate && currentSlide && currentSlide !== nextSlide
+      && !reduceMotion.matches && window.gsap && card.classList.contains('is-flipped');
+
+    card._phoneSlideTween?.kill();
+
+    if (!canAnimate) {
+      slides.forEach((slide, index) => slide.classList.toggle('is-current', index === normalizedIndex));
+      window.gsap?.set(slides, { clearProps: 'opacity,scale,filter,willChange' });
+      card.classList.remove('is-sliding');
+      card.dataset.phoneSlide = String(normalizedIndex);
+      return;
+    }
+
+    card.classList.add('is-sliding');
+    nextSlide.classList.add('is-current');
+    if (usesScreenSlide) {
+      const currentIndex = slides.indexOf(currentSlide);
+      const direction = (currentIndex + 1) % slides.length === normalizedIndex ? 1 : -1;
+      const seamOverlap = Math.max(2.5, (card.querySelector('.ui-phone-card__screen')?.clientWidth || 0) * .02);
+      window.gsap.set(currentSlide, { zIndex: 2 });
+      window.gsap.set(nextSlide, {
+        opacity: 1,
+        xPercent: direction * 100,
+        x: direction * -seamOverlap,
+        zIndex: 1,
+        force3D: true,
+        willChange: 'transform'
+      });
+
+      card._phoneSlideTween = window.gsap.timeline({
+        defaults: { duration: .36, ease: 'power3.inOut', overwrite: 'auto' },
+        onComplete: () => {
+          currentSlide.classList.remove('is-current');
+          window.gsap.set([currentSlide, nextSlide], { clearProps: 'opacity,transform,zIndex,willChange' });
+          card.classList.remove('is-sliding');
+          card._phoneSlideTween = null;
+        }
+      })
+        .to(currentSlide, { xPercent: direction * -100, force3D: true }, 0)
+        .to(nextSlide, { xPercent: 0, x: 0, force3D: true }, 0);
+      card.dataset.phoneSlide = String(normalizedIndex);
+      return;
+    }
+
+    window.gsap.set(nextSlide, {
+      opacity: 0,
+      willChange: 'opacity'
+    });
+
+    card._phoneSlideTween = window.gsap.timeline({
+      defaults: { overwrite: 'auto' },
+      onComplete: () => {
+        currentSlide.classList.remove('is-current');
+        window.gsap.set([currentSlide, nextSlide], { clearProps: 'opacity,willChange' });
+        card.classList.remove('is-sliding');
+        card._phoneSlideTween = null;
+      }
+    })
+      .to(currentSlide, { opacity: 0, duration: .5, ease: 'power2.inOut' }, 0)
+      .to(nextSlide, { opacity: 1, duration: .5, ease: 'power2.inOut' }, 0);
     card.dataset.phoneSlide = String(normalizedIndex);
   };
 
-  const stopPhoneSlideshow = (resetSlides = true) => {
+  const stopPhoneSlideshow = (resetSlides = true, exceptVideo = null) => {
     window.clearInterval(stageSlideTimer);
     stageSlideTimer = 0;
-    if (resetSlides) uiPhoneCards.forEach((card) => setPhoneSlide(card, 0));
+    uiPhoneCards.forEach((card) => {
+      const video = card.querySelector('.ui-phone-card__video');
+      if (!video || video === exceptVideo) return;
+      video.pause();
+      video.currentTime = 0;
+    });
+    if (resetSlides) uiPhoneCards.forEach((card) => setPhoneSlide(card, 0, false));
   };
 
   const startPhoneSlideshow = (card) => {
-    stopPhoneSlideshow(false);
+    const video = card.querySelector('.ui-phone-card__video');
+    stopPhoneSlideshow(false, video);
     hydratePhoneSlides(card);
     setPhoneSlide(card, 0);
     if (reduceMotion.matches) return;
+
+    if (video) {
+      if (video.paused || video.ended) video.currentTime = 0;
+      video.play().catch(() => undefined);
+      return;
+    }
 
     stageSlideTimer = window.setInterval(() => {
       if (!card.classList.contains('is-flipped')) {
@@ -1680,48 +2183,51 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     stageFlipTimer = 0;
     stopPhoneSlideshow();
     uiPhoneCards.forEach((card) => {
+      const isReturningMain = card.classList.contains('is-main')
+        && card.classList.contains('is-flipped');
+      if (isReturningMain) card.style.setProperty('--phone-flip-duration', '720ms');
+      else card.style.removeProperty('--phone-flip-duration');
       card.classList.remove('is-flipped');
       card.setAttribute('aria-pressed', 'false');
     });
+    setPhoneCopyVisibility(false);
   };
 
-  const expandMainPhone = () => {
+  const expandMainPhone = async () => {
     if (stageActivePhone === null) return;
+    const activeIndex = stageActivePhone;
     const mainCard = uiPhoneCards[stageActivePhone];
     if (!mainCard) return;
-    hydratePhoneSlides(mainCard);
+    await hydratePhoneSlides(mainCard);
+    if (stageActivePhone !== activeIndex || uiPhoneCards[stageActivePhone] !== mainCard) return;
     mainCard.classList.add('is-flipped');
     mainCard.setAttribute('aria-pressed', 'true');
+    setPhoneCopyVisibility(true);
     startPhoneSlideshow(mainCard);
   };
 
-  const keepMainPhoneInView = () => {
-    if (stageActivePhone === null) return;
-    const mainCard = uiPhoneCards[stageActivePhone];
-    if (!mainCard) return;
-
-    const cardRect = mainCard.getBoundingClientRect();
-    const headerBottom = document.querySelector('.site-header')?.getBoundingClientRect().bottom ?? 0;
-    const safeTop = headerBottom + 12;
-    const safeBottom = window.innerHeight - 20;
-    let offset = 0;
-
-    if (cardRect.top < safeTop) offset = cardRect.top - safeTop;
-    else if (cardRect.bottom > safeBottom) offset = cardRect.bottom - safeBottom;
-
-    if (Math.abs(offset) > 1) window.scrollBy({ top: Math.round(offset), behavior: 'auto' });
+  const flipPhoneDuringMove = (card, activeIndex, durationMs) => {
+    if (!card) return;
+    hydratePhoneSlides(card);
+    if (stageActivePhone !== activeIndex || uiPhoneCards[activeIndex] !== card) return;
+    setPhoneSlide(card, 0, false);
+    card.style.setProperty('--phone-flip-duration', `${durationMs}ms`);
+    card.classList.add('is-flipped');
+    card.setAttribute('aria-pressed', 'true');
   };
 
   const resetPhoneStage = (resetPosition = false) => {
     const previousAnchor = stageActivePhone ?? stageRestingPhone;
     collapsePhoneStage();
+    stageDragOffset = 0;
+    uiPhoneGallery?.classList.remove('is-dragging');
     if (stageActivePhone !== null) stageRestingPhone = stageActivePhone;
     stageActivePhone = null;
     if (resetPosition) stageRestingPhone = Math.floor(uiPhoneCards.length / 2);
     renderPhoneStage(previousAnchor);
   };
 
-  const activatePhoneCard = (card, expandAfterMove = true) => {
+  const activatePhoneCard = (card, expandAfterMove = true, previousAnchorOverride = null) => {
     if (!card) return;
     const nextIndex = Number(card.dataset.phoneIndex);
     const isCurrentMain = stageActivePhone !== null && nextIndex === stageActivePhone;
@@ -1731,7 +2237,6 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       stageFlipTimer = 0;
       if (card.classList.contains('is-flipped')) resetPhoneStage();
       else {
-        keepMainPhoneInView();
         expandMainPhone();
       }
       return;
@@ -1741,21 +2246,68 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     /* Start decoding the selected work as soon as it is clicked, so the
        quicker flip never waits on an image at the end of the move. */
     hydratePhoneSlides(card);
-    const previousAnchor = stageActivePhone ?? stageRestingPhone;
+    const previousAnchor = Number.isFinite(previousAnchorOverride)
+      ? previousAnchorOverride
+      : stageActivePhone ?? stageRestingPhone;
+    const startsAtCenter = Math.abs(getPhoneIndexDifference(nextIndex, previousAnchor)) < .001;
+    const transitionDuration = startsAtCenter ? 520 : 720;
     stageActivePhone = wrapPhoneIndex(nextIndex);
     renderPhoneStage(previousAnchor);
+    flipPhoneDuringMove(card, stageActivePhone, transitionDuration);
+
+    const audioVideo = card.querySelector('.ui-phone-card__video:not([muted])');
+    if (audioVideo) {
+      audioVideo.currentTime = 0;
+      audioVideo.play().catch(() => undefined);
+    }
 
     if (!expandAfterMove) return;
-    const delay = reduceMotion.matches ? 0 : 210;
+    const delay = reduceMotion.matches ? 0 : transitionDuration;
     stageFlipTimer = window.setTimeout(() => {
       stageFlipTimer = 0;
-      keepMainPhoneInView();
       expandMainPhone();
     }, delay);
   };
 
   if (uiPhoneGallery && uiPhoneTrack && uiPhoneSequence) {
+    setPhoneCopyVisibility(false);
     renderPhoneStage();
+
+    uiPhoneCards.forEach((card) => {
+      card.addEventListener('pointerenter', () => {
+        if (card.classList.contains('is-main') || uiPhoneGallery.classList.contains('is-dragging')) return;
+        hydratePhoneSlides(card);
+        if (window.gsap && !reduceMotion.matches) {
+          window.gsap.to(card, {
+            '--phone-opacity': 1,
+            '--phone-brightness': 1.12,
+            duration: .34,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        } else {
+          card.style.setProperty('--phone-opacity', '1');
+          card.style.setProperty('--phone-brightness', '1.12');
+        }
+      });
+
+      card.addEventListener('pointerleave', () => {
+        const baseOpacity = card.dataset.phoneBaseOpacity || '.48';
+        const baseBrightness = card.dataset.phoneBaseBrightness || '.78';
+        if (window.gsap && !reduceMotion.matches) {
+          window.gsap.to(card, {
+            '--phone-opacity': baseOpacity,
+            '--phone-brightness': baseBrightness,
+            duration: .38,
+            ease: 'power2.out',
+            overwrite: 'auto'
+          });
+        } else {
+          card.style.setProperty('--phone-opacity', baseOpacity);
+          card.style.setProperty('--phone-brightness', baseBrightness);
+        }
+      });
+    });
 
     uiPhoneGallery.addEventListener('pointerdown', (event) => {
       if (event.button !== 0) return;
@@ -1769,8 +2321,18 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     uiPhoneGallery.addEventListener('pointermove', (event) => {
       if (event.pointerId !== stagePointerId) return;
       stagePointerDelta = event.clientX - stagePointerStartX;
-      if (Math.abs(stagePointerDelta) > 4) uiPhoneGallery.classList.add('is-dragging');
-      uiPhoneGallery.style.setProperty('--phone-drag-x', `${stagePointerDelta}px`);
+      if (Math.abs(stagePointerDelta) <= 4) return;
+      if (!uiPhoneGallery.classList.contains('is-dragging')) {
+        if (stageActivePhone !== null) {
+          stageRestingPhone = stageActivePhone;
+          collapsePhoneStage();
+          stageActivePhone = null;
+        }
+        uiPhoneGallery.classList.add('is-dragging');
+      }
+      const stepPixels = Math.max(window.innerWidth * .17, 1);
+      stageDragOffset = -stagePointerDelta / stepPixels;
+      renderPhoneStage(undefined, { immediate: true });
     });
 
     const endStagePointer = (event, cancelled = false) => {
@@ -1778,20 +2340,17 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       const dragged = Math.abs(stagePointerDelta) > 4;
       if (dragged || stagePointerCard) stageSuppressClickUntil = performance.now() + 220;
       uiPhoneGallery.classList.remove('is-dragging');
-      uiPhoneGallery.style.setProperty('--phone-drag-x', '0px');
 
       if (!cancelled && dragged) {
-        const stepPixels = Math.max(window.innerWidth * .17, 1);
-        const steps = Math.max(1, Math.round(Math.abs(stagePointerDelta) / stepPixels));
-        const stageAnchor = stageActivePhone ?? stageRestingPhone;
-        const nextIndex = wrapPhoneIndex(stageAnchor - Math.sign(stagePointerDelta) * steps);
-        if (stageActivePhone === null) {
-          const previousAnchor = stageRestingPhone;
-          stageRestingPhone = nextIndex;
-          renderPhoneStage(previousAnchor);
-        } else {
-          activatePhoneCard(uiPhoneCards[nextIndex], false);
-        }
+        const previousAnchor = stageRestingPhone + stageDragOffset;
+        const nextIndex = wrapPhoneIndex(stageRestingPhone + Math.round(stageDragOffset));
+        stageRestingPhone = nextIndex;
+        stageDragOffset = 0;
+        activatePhoneCard(uiPhoneCards[nextIndex], true, previousAnchor);
+      } else if (cancelled && dragged) {
+        const previousAnchor = stageRestingPhone + stageDragOffset;
+        stageDragOffset = 0;
+        renderPhoneStage(previousAnchor);
       } else if (!cancelled && stagePointerCard) {
         activatePhoneCard(stagePointerCard, true);
       }
@@ -1799,6 +2358,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       stagePointerId = null;
       stagePointerCard = null;
       stagePointerDelta = 0;
+      stageDragOffset = 0;
     };
 
     uiPhoneGallery.addEventListener('pointerup', endStagePointer);
@@ -1815,6 +2375,139 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     resetPhoneStage();
     resetUxProject();
   });
+
+  let worksUxEntranceReady = false;
+  const initWorksUxEntrance = () => {
+    if (
+      worksUxEntranceReady ||
+      !worksUxScroll ||
+      !worksUxScrollScene ||
+      !worksUxScrollMark ||
+      !worksUxScrollCards.length ||
+      !window.gsap ||
+      !window.ScrollTrigger
+    ) return;
+
+    worksUxEntranceReady = true;
+    const { gsap, ScrollTrigger } = window;
+    gsap.registerPlugin(ScrollTrigger);
+    worksUxScroll.classList.add('is-motion-ready');
+
+    const media = gsap.matchMedia();
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      const cardStarts = [
+        { x: 92, y: -25, rotation: 24, scale: .88 },
+        { x: 76, y: -34, rotation: 18, scale: .9 },
+        { x: 65, y: -28, rotation: 14, scale: .92 },
+        { x: 58, y: -38, rotation: 20, scale: .9 }
+      ];
+
+      worksUxScrollCards.forEach((card, index) => {
+        const start = cardStarts[index];
+        gsap.set(card, {
+          autoAlpha: 0,
+          x: () => window.innerWidth * start.x / 100,
+          y: () => window.innerHeight * start.y / 100,
+          rotation: start.rotation,
+          scale: start.scale
+        });
+      });
+
+      const renderModeBridge = (rawProgress) => {
+        const progress = Math.max(0, Math.min(1, rawProgress));
+        const eased = progress * progress * (3 - 2 * progress);
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        const galleryRect = worksGalleryPage.getBoundingClientRect();
+        const markWidth = worksUxScrollMark.getBoundingClientRect().width;
+        const markHeight = markWidth * 440 / 1400;
+        const isCompact = window.matchMedia('(max-aspect-ratio: 4/3)').matches;
+        const sourceX = viewportWidth * .31771;
+        const sourceY = galleryRect.top + viewportWidth * .44792;
+        const targetX = viewportWidth * (isCompact ? -.11 : -.065);
+        /* Match the landing composition by visible pixels. The UX JPG and the
+           home word PNG have different internal top padding, so their element
+           boxes need different anchors to land on the same optical line. */
+        const targetY = viewportHeight * (isCompact ? .57 : .697);
+        const x = sourceX + (targetX - sourceX) * eased;
+        const y = sourceY + (targetY - sourceY) * eased;
+        const switchProgress = Math.max(0, Math.min(1, (progress - .28) / .44));
+
+        worksUxScrollMark.classList.toggle('is-bridge-visible', progress > .002);
+        gsap.set(worksUxScrollMark, { x, y, autoAlpha: progress > .002 ? 1 : 0 });
+        gsap.set(worksUxScrollMarkUi, { autoAlpha: 1 - switchProgress });
+        gsap.set(worksUxScrollMarkUx, { autoAlpha: switchProgress });
+        /* The source board and the bridge are pixel-identical at takeover.
+           Hide the baked source immediately so the diagonal move never shows
+           a second, fading copy left behind. */
+        worksGalleryPage.style.setProperty(
+          '--gallery-mode-cleaner-opacity',
+          progress > .002 ? '1' : '0'
+        );
+      };
+
+      const bridgeTrigger = ScrollTrigger.create({
+        trigger: worksUxScroll,
+        start: 'top bottom',
+        end: 'top top',
+        invalidateOnRefresh: true,
+        onRefresh: (self) => renderModeBridge(self.progress),
+        onUpdate: (self) => renderModeBridge(self.progress),
+        onLeaveBack: () => renderModeBridge(0)
+      });
+
+      const timeline = gsap.timeline({
+        defaults: { ease: 'power2.out' },
+        scrollTrigger: {
+          trigger: worksUxScroll,
+          start: 'top top',
+          end: () => `+=${Math.round(window.innerHeight * 2.75)}`,
+          pin: worksUxScrollScene,
+          pinSpacing: true,
+          scrub: .7,
+          anticipatePin: 0,
+          invalidateOnRefresh: true
+        }
+      });
+
+      worksUxScrollCards.forEach((card, index) => {
+        timeline.to(card, {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          rotation: 0,
+          scale: 1,
+          duration: 1.02
+        }, index * .36);
+      });
+
+      const refresh = () => ScrollTrigger.refresh();
+      const pendingImages = worksUxScrollCards.filter((image) => !image.complete);
+      pendingImages.forEach((image) => image.addEventListener('load', refresh, { once: true }));
+
+      return () => {
+        bridgeTrigger.kill();
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+      };
+    });
+
+    media.add('(prefers-reduced-motion: reduce)', () => {
+      const markWidth = worksUxScrollMark.getBoundingClientRect().width;
+      const markHeight = markWidth * 440 / 1400;
+      const isCompact = window.matchMedia('(max-aspect-ratio: 4/3)').matches;
+      gsap.set(worksUxScrollMark, {
+        x: window.innerWidth * (isCompact ? -.11 : -.065),
+        y: window.innerHeight * (isCompact ? .57 : .697)
+      });
+      gsap.set(worksUxScrollMarkUi, { autoAlpha: 0 });
+      gsap.set(worksUxScrollMarkUx, { autoAlpha: 1 });
+      worksUxScrollMark.classList.add('is-bridge-visible');
+      gsap.set(worksUxScrollMark, { autoAlpha: 1 });
+      worksGalleryPage.style.setProperty('--gallery-mode-cleaner-opacity', '1');
+      gsap.set(worksUxScrollCards, { autoAlpha: 1, clearProps: 'transform' });
+    });
+  };
 
   const resolveRoute = () => {
     const route = location.hash.replace(/^#/, '').split(/[/?]/)[0];
@@ -1842,7 +2535,9 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const route = resolveRoute();
     const page = route.startsWith('works') ? 'works' : route;
     const activeRoute = route.startsWith('works') ? 'works' : route;
+    const enteringWorks = page === 'works' && landing.dataset.page !== 'works';
     landing.dataset.page = page;
+    if (page !== 'home') clearHomeTextCursor();
     landing.setAttribute(
       'aria-label',
       route.startsWith('works') ? 'Wine Joy Studio Works' : route === 'class' ? 'Wine Joy Studio Class' : 'Wine Joy Studio 首页'
@@ -1854,21 +2549,29 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     worksFlow.setAttribute('aria-hidden', inWorks ? 'false' : 'true');
     worksPage.setAttribute('aria-hidden', inWorks ? 'false' : 'true');
     worksGalleryPage.setAttribute('aria-hidden', inWorks ? 'false' : 'true');
-    worksUxPage.setAttribute('aria-hidden', inWorks ? 'false' : 'true');
+    worksUxScroll?.setAttribute('aria-hidden', inWorks ? 'false' : 'true');
+    worksUxPage?.setAttribute('aria-hidden', inWorks ? 'false' : 'true');
     classPage.setAttribute('aria-hidden', route === 'class' ? 'false' : 'true');
     homePage.setAttribute('aria-hidden', route.startsWith('works') ? 'true' : 'false');
 
     if (inWorks) {
       resetClassCounters();
       alignWorksSection(route);
-      if (route === 'works') replayWorksTileDrop();
+      if (route === 'works') {
+        resetWorksTileEntrance();
+        if (enteringWorks) playWorksRouteTransition();
+      }
       requestAnimationFrame(() => {
+        initWorksUxEntrance();
         updateWorksWine();
         updateWorksUxSmile();
         updateWorksModeTabs();
+        updateWorksIntroBackground();
         renderPhoneStage();
+        window.ScrollTrigger?.refresh();
       });
     } else {
+      stopWorksRouteTransition();
       resetPhoneStage(true);
       resetUxProject();
       if (route === 'home' || route === 'class') {
@@ -1891,6 +2594,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   window.addEventListener('resize', () => renderPhoneStage(), { passive: true });
   reduceMotion.addEventListener?.('change', () => {
     queueWorksMotionUpdate();
+    if (reduceMotion.matches) clearHomeTextCursor();
     if (landing.dataset.page === 'class') replayClassCounters();
   });
   renderRoute();

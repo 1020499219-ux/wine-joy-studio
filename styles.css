@@ -29,6 +29,48 @@ body { overflow-x: clip; }
 
 a { color: inherit; text-decoration: none; }
 
+.home-text-cursor {
+  position: fixed;
+  z-index: 4;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(15.2vh 0 0 0);
+  contain: strict;
+  pointer-events: none;
+  user-select: none;
+}
+
+.landing:not([data-page="home"]) .home-text-cursor { display: none; }
+
+.home-text-cursor__point {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: rgba(239, 240, 240, .82);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: .06em;
+  white-space: nowrap;
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) rotate(var(--cursor-angle)) scale(1);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  transition:
+    opacity 300ms linear,
+    transform 300ms cubic-bezier(.4, 0, 1, 1);
+}
+
+.home-text-cursor__point.is-exiting {
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) rotate(var(--cursor-angle)) scale(.06);
+}
+
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .home-text-cursor { display: none; }
+}
+
 .landing {
   position: relative;
   width: 100%;
@@ -307,6 +349,37 @@ a { color: inherit; text-decoration: none; }
   display: none;
   min-height: 100svh;
   overflow: hidden;
+}
+
+.works-route-transition {
+  position: absolute;
+  z-index: 30;
+  left: 50%;
+  top: 0;
+  display: none;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  width: 100vw;
+  height: 100svh;
+  overflow: hidden;
+  pointer-events: none;
+  background: #101010;
+  transform: translateX(-50%);
+  will-change: opacity;
+}
+
+.works-route-transition i {
+  display: block;
+  width: calc(100% + 1px);
+  height: 100%;
+  margin-left: -1px;
+  background: #181919;
+  transform: scaleY(0);
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .works-route-transition { display: none !important; }
 }
 
 .landing[data-page="works"] .top-subject,
@@ -1183,6 +1256,66 @@ a { color: inherit; text-decoration: none; }
   z-index: 0;
 }
 
+/* This UX board no longer uses framing brackets. Erase only the bracket
+   strokes baked into the source slice; all neighboring artwork stays intact. */
+.class-variable-bracket-cleaner {
+  position: absolute;
+  z-index: 4;
+  top: 19.15cqw;
+  width: 4.75cqw;
+  height: 13.55cqw;
+  background: #202020;
+  pointer-events: none;
+}
+
+.class-variable-bracket-cleaner--left { left: 27.35cqw; }
+.class-variable-bracket-cleaner--right { right: 5.4cqw; }
+
+/* Rebuild only the small dot above the Class-page wine word so it shares the
+   same gentle float/trail motion as the home mark; the baked source dot is
+   covered by the matching board-color patch underneath. */
+.class-variable-wine-dot-cleaner {
+  position: absolute;
+  z-index: 1;
+  left: 4.95cqw;
+  top: 16.8cqw;
+  width: 4.8cqw;
+  height: 4.5cqw;
+  background: #202020;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.class-variable-wine-dot {
+  position: absolute;
+  z-index: 2;
+  left: 5.25cqw;
+  top: 17.3cqw;
+  width: 4.5cqw;
+  height: 4.2cqw;
+  pointer-events: none;
+}
+
+.class-variable-wine-dot img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 55%;
+  will-change: transform, filter, opacity;
+  animation: wine-dot-float 2.85s cubic-bezier(.45, 0, .25, 1) infinite;
+}
+
+.class-variable-wine-dot__trail {
+  z-index: 1;
+  opacity: 0;
+  filter: blur(3px) brightness(1.55);
+  animation-name: wine-dot-trail !important;
+}
+
+.class-variable-wine-dot__main { z-index: 2; }
+
 .class-panel--variable-ux .class-variable-title-cleaner--ux {
   z-index: 5;
 }
@@ -1191,104 +1324,49 @@ a { color: inherit; text-decoration: none; }
   z-index: 6;
 }
 
-/* Rebuild both UX title brackets to match the source board: three thin bars
-   (dark -> gray -> white toward the title on the left; white -> gray -> dark
-   on the right) with short top/bottom stubs, framing the full title and
-   description block. The opaque host uses the same tone as the board so it
-   masks the baked copies underneath without adding visible seams. */
-.class-variable-brackets {
-  --brace-stroke: max(1px, .14cqw);
-  position: absolute;
-  z-index: 7;
-  top: 19.43cqw;
-  width: 3.9cqw;
-  height: 12.58cqw;
-  background: #202020;
-  display: none;
-  pointer-events: none;
-  user-select: none;
-}
-
-.class-variable-brackets--left { left: 27.15cqw; }
-.class-variable-brackets--right { right: 5.95cqw; }
-
-.class-variable-brackets i {
-  position: absolute;
-  top: 0;
-  left: calc(var(--brace-index) * .78cqw);
-  display: block;
-  width: var(--brace-stroke);
-  height: 100%;
-  background: currentColor;
-}
-
-.class-variable-brackets i::before,
-.class-variable-brackets i::after {
+/* Keep the baked source mosaic erased independently, so the animated
+   replacement can sit lower without revealing a second pixel layer. */
+.class-panel--variable-ux::after {
   content: "";
   position: absolute;
-  width: var(--brace-cap);
-  height: var(--brace-stroke);
-  background: currentColor;
+  z-index: 4;
+  left: 81.55cqw;
+  top: 24.1cqw;
+  width: 8.55cqw;
+  height: 10.15cqw;
+  background: #202020;
+  pointer-events: none;
 }
 
-.class-variable-brackets--left i {
-  left: auto;
-  right: calc(var(--brace-index) * .78cqw);
-}
-
-.class-variable-brackets--left i::before,
-.class-variable-brackets--left i::after {
-  left: 0;
-}
-
-.class-variable-brackets--right i::before,
-.class-variable-brackets--right i::after {
-  right: 0;
-}
-
-.class-variable-brackets i::before { top: 0; }
-.class-variable-brackets i::after { bottom: 0; }
-
-.class-variable-brackets i:nth-child(1) {
-  --brace-index: 0;
-  --brace-cap: .35cqw;
-  color: #f2f3f3;
-}
-.class-variable-brackets i:nth-child(2) {
-  --brace-index: 1;
-  --brace-cap: .55cqw;
-  color: rgba(166, 168, 171, .72);
-}
-.class-variable-brackets i:nth-child(3) {
-  --brace-index: 2;
-  --brace-cap: .9cqw;
-  color: rgba(105, 107, 110, .56);
-}
-.class-variable-brackets i:nth-child(4) {
-  --brace-index: 3;
-  --brace-cap: 1.45cqw;
-  color: rgba(57, 59, 60, .42);
-}
+/* Cover the lower baked pixel cluster too; both source clusters are removed
+   while the surrounding UX copy and brackets remain untouched. */
+.class-panel--variable-ux::before { content: none; }
 
 .class-variable-ux-mosaic {
   --cell: 1.12cqw;
   --drift-x: -.075cqw;
-  --mosaic-shift-x: 3.5cqw;
-  --mosaic-shift-y: 2.1cqw;
+  --mosaic-shift-x: 0cqw;
+  --mosaic-shift-y: 0cqw;
   position: absolute;
   z-index: 7;
-  left: 84.4cqw;
+  left: 81.5cqw;
   right: auto;
-  top: 27.05cqw;
+  /* Allow for the existing -2.2cqw upward parallax travel while keeping the
+     live pixels and their cover safely below “全面进阶”. */
+  top: 29cqw;
   display: block;
-  width: 8.6cqw;
-  height: 8.7cqw;
+  width: 9.1cqw;
+  height: 9.6cqw;
   /* Replace the pixels baked into the source board with the same animated
      cloud used on the home and Works screens. */
   background: #202020;
-  box-shadow: 0 0 0 .85cqw #202020;
+  box-shadow: 0 0 0 .5cqw #202020;
   pointer-events: none;
   user-select: none;
+}
+
+.class-panel--variable-ux .class-variable-ux-mosaic {
+  display: block;
 }
 
 /* Keep the host mask over the source artwork's original pixel cluster while
@@ -1329,6 +1407,13 @@ a { color: inherit; text-decoration: none; }
   top: 8.45cqw;
   width: 27.2cqw;
   height: 10cqw;
+}
+
+/* The left curriculum copy is already present in the source artwork. Keep it
+   visible without the opaque reveal strips that briefly read as a black block
+   underneath the text while this panel scrolls into view. */
+.class-value-list-mask--left > i {
+  background: transparent;
 }
 
 .class-value-list-mask > i {
@@ -1374,20 +1459,21 @@ a { color: inherit; text-decoration: none; }
   display: block;
   width: 100%;
   height: 3.42cqw;
-  background: #101010;
+  background: transparent;
   transform: scaleX(0);
   transform-origin: right center;
   will-change: transform;
 }
 
 .class-curriculum-copy-mask.is-motion-ready > i {
+  background: #101010;
   transform: scaleX(1);
 }
 
 .class-curriculum-copy-mask.is-motion-ready.is-revealed > i {
   transform: scaleX(0);
-  transition: transform 420ms cubic-bezier(.16, 1, .3, 1);
-  transition-delay: calc(var(--line) * 90ms);
+  transition: transform 360ms cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--line) * 110ms);
 }
 
 .class-curriculum-mosaic {
@@ -1584,6 +1670,21 @@ a { color: inherit; text-decoration: none; }
   z-index: 3;
 }
 
+/* The baked divider is already present in the source board. A narrow duplicate
+   from the clipped title replica made one side read as a visibly heavier line;
+   mask only that extra stroke and leave the original divider untouched. */
+.class-panel--sticker::after {
+  content: "";
+  position: absolute;
+  z-index: 5;
+  left: 40.65cqw;
+  top: 10.02cqw;
+  width: .5cqw;
+  height: 12.05cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
 .class-audience-summary-cleaner::after {
   content: "";
   position: absolute;
@@ -1662,10 +1763,10 @@ a { color: inherit; text-decoration: none; }
   content: "";
   position: absolute;
   z-index: 2;
-  left: 46.59cqw;
-  top: 27.87cqw;
-  width: 14.25cqw;
-  height: 4.69cqw;
+  left: 45.1cqw;
+  top: 27.5cqw;
+  width: 16cqw;
+  height: 5.6cqw;
   background: #101010;
   pointer-events: none;
 }
@@ -1741,20 +1842,19 @@ a { color: inherit; text-decoration: none; }
   pointer-events: auto;
 }
 
-@media (prefers-reduced-motion: reduce) and (hover: hover) {
-  .class-variable-title--warp:not(.class-portfolio-title-warp):hover > .class-warp-text__source {
-    text-shadow: -.038em 0 0 #28F54D, .038em 0 0 #FF62E6;
-  }
-}
-
 .class-variable-title--ux {
   left: 32.9cqw;
   top: 21.65cqw;
-  font-size: 4.05cqw;
+  font-size: 4.2cqw;
+  font-weight: 350;
+  font-synthesis: none;
 }
 
 .class-variable-title__strong { font-weight: 650; }
 .class-variable-title__green { color: #24ef59; }
+.class-panel--variable-ux .class-variable-title--ux > span {
+  font-weight: 350;
+}
 .class-variable-title [data-proximity-text] { font-weight: 400; }
 .class-variable-title .class-variable-title__strong { font-weight: 650; }
 
@@ -1821,7 +1921,7 @@ a { color: inherit; text-decoration: none; }
   z-index: 3;
   left: 43.45cqw;
   top: 24.3cqw;
-  width: 25.45cqw;
+  width: 20.8cqw;
   height: max(1px, .065cqw);
   background: #aaa;
 }
@@ -2519,6 +2619,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .landing[data-page="works"] .works-flow { display: block; }
+.landing[data-page="works"] .works-flow.is-route-transitioning { z-index: 6; }
+.landing[data-page="works"].is-works-intro-background .stage::before { background: #181919; }
+.landing[data-page="works"].is-works-intro-background .brand-cn img {
+  content: url("./assets/header-cn-logo-transparent.png");
+}
 .landing[data-page="works"] .works-page,
 .landing[data-page="works"] .works-gallery-page,
 .landing[data-page="works"] .works-ux-page { display: block; }
@@ -2540,6 +2645,8 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   scroll-margin-top: 0;
 }
+
+.works-flow > .works-page { overflow: visible; }
 
 /* The mode mark sits exactly on the UI/UX section boundary. Its confirmed UX
    offset extends slightly below the UI section, so the parent must not clip
@@ -2765,6 +2872,11 @@ a { color: inherit; text-decoration: none; }
 
 .ui-phone-gallery.is-dragging { cursor: grabbing; }
 
+/* GSAP owns carousel position/scale interpolation when available. Keeping
+   the CSS transition off prevents the browser transition and GSAP tween from
+   competing during a phone move. */
+.ui-phone-gallery--gsap .ui-phone-card { transition: none; }
+
 .ui-phone-copy {
   position: absolute;
   /* Keep the complete title/description/source stack above the decorative
@@ -2782,7 +2894,42 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
   user-select: none;
   transform: translateX(-50%);
+  visibility: hidden;
+  opacity: 1;
+  transition: visibility 0s linear 420ms;
 }
+
+.ui-phone-copy.is-visible {
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+.ui-phone-copy__title,
+.ui-phone-copy__description,
+.ui-phone-copy__meta {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translate3d(0, -18px, 0);
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease,
+    transform 180ms ease;
+  will-change: transform, opacity, filter;
+}
+
+.ui-phone-copy.is-visible .ui-phone-copy__title,
+.ui-phone-copy.is-visible .ui-phone-copy__description,
+.ui-phone-copy.is-visible .ui-phone-copy__meta {
+  opacity: 1;
+  filter: blur(0);
+  transform: translate3d(0, 0, 0);
+  transition-duration: 520ms;
+  transition-timing-function: cubic-bezier(.16, 1, .3, 1);
+}
+
+.ui-phone-copy.is-visible .ui-phone-copy__title { transition-delay: 40ms; }
+.ui-phone-copy.is-visible .ui-phone-copy__description { transition-delay: 135ms; }
+.ui-phone-copy.is-visible .ui-phone-copy__meta { transition-delay: 230ms; }
 
 .ui-phone-copy__title {
   display: flex;
@@ -2897,6 +3044,20 @@ a { color: inherit; text-decoration: none; }
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .ui-phone-copy,
+  .ui-phone-copy__title,
+  .ui-phone-copy__description,
+  .ui-phone-copy__meta {
+    transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
+    filter: none !important;
+    transform: none;
+  }
+
+  .ui-phone-copy { transform: translateX(-50%); }
+}
+
 .ui-phone-track {
   position: absolute;
   inset: 0;
@@ -2925,14 +3086,16 @@ a { color: inherit; text-decoration: none; }
     translate3d(-50%, -50%, 0)
     translate3d(var(--phone-x, 0cqw), var(--phone-y, 0cqw), 0)
     translate3d(var(--phone-drag-x), 0, 0)
-    scale(var(--phone-scale, 1));
+    scale(var(--phone-scale, 1))
+    scale(var(--phone-hover-scale, 1));
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
   opacity: var(--phone-opacity, 1);
+  filter: brightness(var(--phone-brightness, 1));
   transition:
     transform 360ms cubic-bezier(.16, 1, .3, 1),
     opacity 180ms ease;
-  will-change: transform;
+  will-change: transform, opacity, filter;
 }
 
 .ui-phone-gallery.is-dragging .ui-phone-card { transition: none; }
@@ -2960,7 +3123,7 @@ a { color: inherit; text-decoration: none; }
   transform-style: preserve-3d;
   transform: translate3d(-50%, -50%, 0) rotateY(0deg);
   transition:
-    transform 320ms cubic-bezier(.16, 1, .3, 1),
+    transform var(--phone-flip-duration, 320ms) cubic-bezier(.16, 1, .3, 1),
     opacity 120ms ease;
 }
 
@@ -2971,11 +3134,21 @@ a { color: inherit; text-decoration: none; }
   opacity: 0;
   transform: translate3d(-50%, -50%, 0) rotateY(180deg);
   transition:
-    transform 320ms cubic-bezier(.16, 1, .3, 1),
+    transform var(--phone-flip-duration, 320ms) cubic-bezier(.16, 1, .3, 1),
     opacity 140ms ease;
 }
 
+.ui-phone-card.is-sliding .ui-phone-card__image--selected {
+  transition: none;
+  will-change: opacity;
+}
+
 .ui-phone-card__image--selected.is-current { opacity: 1; }
+
+.ui-phone-card__video {
+  background: transparent;
+  object-fit: contain;
+}
 
 .ui-phone-card:hover .ui-phone-card__image--default,
 .ui-phone-card:focus-visible .ui-phone-card__image--default { opacity: 0; }
@@ -2990,6 +3163,79 @@ a { color: inherit; text-decoration: none; }
 
 .ui-phone-card.is-flipped .ui-phone-card__image--selected {
   transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+}
+
+/* Project 1 prototype: the case stays fixed while the supplied UI screens
+   travel through a clipped display window. */
+.ui-phone-card__page-phone {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  display: block;
+  width: 7.026cqw;
+  height: 13.2cqw;
+  pointer-events: none;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transform: translate3d(-50%, -50%, 0) rotateY(180deg);
+  opacity: 0;
+  transition:
+    transform var(--phone-flip-duration, 320ms) cubic-bezier(.16, 1, .3, 1),
+    opacity 140ms ease;
+}
+
+.ui-phone-card.is-flipped .ui-phone-card__page-phone {
+  transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+  opacity: 1;
+}
+
+.ui-phone-card__page-shell {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.ui-phone-card__screen {
+  position: absolute;
+  z-index: 1;
+  /* The UI bleeds underneath the shell's own black bezel. Keeping the shell
+     above the screen preserves its exact authored thickness on all four
+     sides and avoids sub-pixel seams at browser zoom levels. */
+  left: 15%;
+  top: 8%;
+  width: 70%;
+  height: 80.5%;
+  display: block;
+  overflow: hidden;
+  border-radius: 15% / 7%;
+  background: #050505;
+  isolation: isolate;
+}
+
+.ui-phone-card.ui-phone-card--paged .ui-phone-card__image--selected {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition: opacity 140ms ease;
+  user-select: none;
+  pointer-events: none;
+}
+
+.ui-phone-card.ui-phone-card--paged .ui-phone-card__image--selected.is-current { opacity: 1; }
+
+.ui-phone-card.ui-phone-card--paged.is-sliding .ui-phone-card__image--selected {
+  transition: none;
+  will-change: transform;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3374,22 +3620,24 @@ a { color: inherit; text-decoration: none; }
 
 .works-brackets {
   position: absolute;
-  top: 29.85vh;
-  width: 1.8cqw;
-  height: 32.5vh;
+  top: 35.15vh;
+  z-index: 1;
+  width: 6.8cqw;
+  height: 24.55vh;
 }
 
-.works-brackets--left { left: 6.42cqw; }
-.works-brackets--right { right: 6.42cqw; transform: scaleX(-1); }
+.works-brackets--left { left: 6.4cqw; }
+.works-brackets--right { right: 6.4cqw; transform: scaleX(-1); }
 
 .works-brackets i {
+  display: block;
   position: absolute;
-  inset-block: 0;
   left: 0;
+  top: 0;
   width: 0;
-  color: #363839;
-  border-left: max(2px, .11cqw) solid currentColor;
-  opacity: .31;
+  height: 100%;
+  border-left: max(2px, .14cqw) solid #393b3c;
+  opacity: .34;
 }
 
 .works-brackets i::before,
@@ -3397,36 +3645,51 @@ a { color: inherit; text-decoration: none; }
   content: "";
   position: absolute;
   left: 0;
-  width: 1.8cqw;
-  height: max(2px, .11cqw);
-  background: currentColor;
+  width: 1.45cqw;
+  height: max(2px, .14cqw);
+  background: #393b3c;
 }
 
 .works-brackets i::before { top: 0; }
 .works-brackets i::after { bottom: 0; }
+.works-brackets i:nth-child(2) { left: 2.7cqw; border-color: #686a6b; opacity: .54; }
+.works-brackets i:nth-child(2)::before,
+.works-brackets i:nth-child(2)::after { width: .9cqw; background: #686a6b; }
+.works-brackets i:nth-child(3) { left: 4.65cqw; border-color: #a7a9aa; opacity: .72; }
+.works-brackets i:nth-child(3)::before,
+.works-brackets i:nth-child(3)::after { width: .55cqw; background: #a7a9aa; }
+.works-brackets i:nth-child(4) { left: 6.15cqw; border-color: #f2f3f3; opacity: .94; }
+.works-brackets i:nth-child(4)::before,
+.works-brackets i:nth-child(4)::after { width: .35cqw; background: #f2f3f3; }
 .works-tiles {
-  --tile: min(5.35cqw, 9.5vh);
+  /* Fixed elliptical hover track: cards animate in place and never follow
+     the pointer, so every project image remains readable. */
+  --tile: min(14.2875cqw, 25.425vh);
   position: absolute;
-  left: 15.75cqw;
-  top: 29.9vh;
-  width: 68cqw;
-  height: 34vh;
+  z-index: 4;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
 .works-tiles i {
   position: absolute;
-  left: calc(var(--x) * var(--tile));
-  top: calc(var(--y) * var(--tile));
-  width: calc(var(--w) * var(--tile));
-  height: calc(var(--h) * var(--tile));
+  left: 50%;
+  top: 50%;
+  width: var(--tile);
+  height: var(--tile);
   border-radius: .26cqw;
-  background-color: #242525;
+  background-color: transparent;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: cover;
-  opacity: 1;
+  background-size: contain;
+  opacity: 0;
   filter: none;
   animation: none;
+  transform: translate(-50%, -50%) scale(.58);
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
 }
 
 .works-tiles.is-dropping i {
@@ -3436,16 +3699,36 @@ a { color: inherit; text-decoration: none; }
   will-change: transform, opacity;
 }
 
-.works-tiles i:nth-child(1) { background-image: url("./assets/works-tiles/1.jpg"); }
-.works-tiles i:nth-child(2) { background-image: url("./assets/works-tiles/2.jpg"); }
-.works-tiles i:nth-child(3) { background-image: url("./assets/works-tiles/3.jpg"); }
-.works-tiles i:nth-child(4) { background-image: url("./assets/works-tiles/4.jpg"); }
-.works-tiles i:nth-child(5) { background-image: url("./assets/works-tiles/5.jpg"); }
-.works-tiles i:nth-child(6) { background-image: url("./assets/works-tiles/6.jpg"); }
-.works-tiles i:nth-child(7) { background-image: url("./assets/works-tiles/7.jpg"); }
-.works-tiles i:nth-child(8) { background-image: url("./assets/works-tiles/8.jpg"); }
-.works-tiles i:nth-child(9) { background-image: url("./assets/works-tiles/9.jpg"); }
-.works-tiles i:nth-child(10) { background-image: url("./assets/works-tiles/10.jpg"); }
+.works-tiles i:nth-child(1) { background-image: url("./assets/works-tiles/1.png"); }
+.works-tiles i:nth-child(2) { background-image: url("./assets/works-tiles/4.png"); }
+.works-tiles i:nth-child(3) { background-image: url("./assets/works-tiles/3.png"); }
+.works-tiles i:nth-child(4) { background-image: url("./assets/works-tiles/2.png"); }
+.works-tiles i:nth-child(5) { background-image: url("./assets/works-tiles/5.png"); }
+.works-tiles i:nth-child(6) { background-image: url("./assets/works-tiles/6.png"); }
+.works-tiles i:nth-child(7) { background-image: url("./assets/works-tiles/7.png"); }
+.works-tiles i:nth-child(8) { background-image: url("./assets/works-tiles/8.png"); }
+.works-tiles i:nth-child(9) { background-image: url("./assets/works-tiles/9.png"); }
+.works-tiles i:nth-child(10) { background-image: url("./assets/works-tiles/10.png"); }
+.works-tiles i:nth-child(11) { background-image: url("./assets/works-tiles/11.png"); }
+.works-tiles i:nth-child(12) { background-image: url("./assets/works-tiles/12.png"); }
+.works-tiles i:nth-child(13) { background-image: url("./assets/works-tiles/13.png"); }
+.works-tiles i:nth-child(14) { background-image: url("./assets/works-tiles/14.png"); }
+.works-tiles i:nth-child(15) { background-image: url("./assets/works-tiles/15.png"); }
+.works-tiles i:nth-child(16) { background-image: url("./assets/works-tiles/16.png"); }
+.works-tiles i:nth-child(17) { background-image: url("./assets/works-tiles/17.png"); }
+.works-tiles i:nth-child(18) { background-image: url("./assets/works-tiles/18.png"); }
+.works-tiles i:nth-child(19) { background-image: url("./assets/works-tiles/19.png"); }
+.works-tiles i:nth-child(20) { background-image: url("./assets/works-tiles/20.png"); }
+.works-tiles i:nth-child(21) { background-image: url("./assets/works-tiles/21.png"); }
+.works-tiles i:nth-child(22) { background-image: url("./assets/works-tiles/22.png"); }
+.works-tiles i:nth-child(23) { background-image: url("./assets/works-tiles/23.png"); }
+.works-tiles i:nth-child(24) { background-image: url("./assets/works-tiles/24.png"); }
+.works-tiles i:nth-child(25) { background-image: url("./assets/works-tiles/25.png"); }
+.works-tiles i:nth-child(26) { background-image: url("./assets/works-tiles/26.png"); }
+.works-tiles i:nth-child(27) { background-image: url("./assets/works-tiles/27.png"); }
+.works-tiles i:nth-child(28) { background-image: url("./assets/works-tiles/28.png"); }
+.works-tiles i:nth-child(29) { background-image: url("./assets/works-tiles/29.png"); }
+.works-tiles i:nth-child(30) { background-image: url("./assets/works-tiles/30.png"); }
 
 .works-tiles i:nth-child(1)  { --drop-index: 0; --drop-rotate: -4deg; }
 .works-tiles i:nth-child(2)  { --drop-index: 1; --drop-rotate: 3deg; }
@@ -3457,6 +3740,12 @@ a { color: inherit; text-decoration: none; }
 .works-tiles i:nth-child(8)  { --drop-index: 7; --drop-rotate: 3deg; }
 .works-tiles i:nth-child(9)  { --drop-index: 8; --drop-rotate: -2deg; }
 .works-tiles i:nth-child(10) { --drop-index: 9; --drop-rotate: 4deg; }
+.works-tiles i:nth-child(11) { --drop-index: 10; --drop-rotate: -3deg; }
+.works-tiles i:nth-child(12) { --drop-index: 11; --drop-rotate: 2deg; }
+.works-tiles i:nth-child(13) { --drop-index: 12; --drop-rotate: -4deg; }
+.works-tiles i:nth-child(14) { --drop-index: 13; --drop-rotate: 3deg; }
+.works-tiles i:nth-child(15) { --drop-index: 14; --drop-rotate: -2deg; }
+.works-tiles i:nth-child(16) { --drop-index: 15; --drop-rotate: 4deg; }
 
 @keyframes works-tile-flip {
   0% {
@@ -3505,13 +3794,13 @@ a { color: inherit; text-decoration: none; }
 }
 
 .works-copy u { text-underline-offset: .12em; text-decoration-thickness: 1px; }
-.works-copy__headline { left: 40.2cqw; top: 30.55vh; font-size: clamp(24px, 1.92cqw, 74px); }
+.works-copy__headline { left: 40.2cqw; top: 35.05vh; font-size: clamp(24px, 1.92cqw, 74px); }
 .works-copy__headline .eyes { display: inline-block; margin-inline: .05em; font-size: .76em; transform: translateY(-.04em); }
 .works-copy__many { left: 27.6cqw; top: 40.25vh; font-size: clamp(21px, 1.72cqw, 66px); color: rgba(126,128,129,.36); }
 .works-copy__plain { left: 40.2cqw; top: 40.25vh; font-size: clamp(22px, 1.78cqw, 68px); }
-.works-copy__more { left: 31.9cqw; top: 44.85vh; font-size: clamp(20px, 1.65cqw, 63px); color: rgba(121,123,124,.32); }
-.works-copy__better { left: 21.45cqw; top: 50.05vh; font-size: clamp(22px, 1.8cqw, 69px); }
-.works-copy__professional { left: 54.6cqw; top: calc(29.9vh + min(11.77cqw, 20.9vh)); font-size: clamp(20px, 1.63cqw, 63px); color: rgba(121,123,124,.34); }
+.works-copy__more { left: 31.9cqw; top: 45.75vh; font-size: clamp(20px, 1.65cqw, 63px); color: rgba(121,123,124,.32); }
+.works-copy__better { left: 21.45cqw; top: 50.9vh; font-size: clamp(22px, 1.8cqw, 69px); }
+.works-copy__professional { left: 54.6cqw; top: 55.9vh; font-size: clamp(20px, 1.63cqw, 63px); color: rgba(121,123,124,.34); }
 .works-copy__professional a { margin-left: .28em; }
 
 .works-wine {
@@ -3640,4 +3929,153 @@ a { color: inherit; text-decoration: none; }
   .class-can-object,
   .class-can-pour,
   .class-can-copy { opacity: 1; transform: none; filter: none; clip-path: inset(0); }
+}
+
+/* UX project entrance — a pinned, scroll-scrubbed scene based on the supplied
+   1920×1080 boards. The card PNGs already contain their approved artwork and
+   type, so this layer only controls composition and motion. */
+.works-flow > .works-ux-scroll {
+  position: relative;
+  z-index: 6;
+  min-height: 100svh;
+  overflow: visible;
+  background: transparent;
+}
+
+.works-ux-scroll__scene {
+  position: relative;
+  width: 100cqw;
+  height: 100svh;
+  min-height: 42cqw;
+  overflow: visible;
+  background: transparent;
+  isolation: auto;
+}
+
+.works-ux-scroll__mark {
+  position: fixed;
+  z-index: 5;
+  left: 0;
+  top: 0;
+  width: 36.458cqw;
+  aspect-ratio: 1400 / 440;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.works-ux-scroll__mark.is-bridge-visible { visibility: visible; }
+
+/* The reference board contains the original UI mark as baked pixels. This
+   cleaner increases only while the bridge takes ownership, preventing the
+   source mark and the moving mark from ever appearing together. */
+.works-gallery-mode-cleaner {
+  position: absolute;
+  z-index: 4;
+  left: 31.1cqw;
+  top: 43.8cqw;
+  width: 37.8cqw;
+  height: 12.5cqw;
+  background: #101010;
+  opacity: var(--gallery-mode-cleaner-opacity, 0);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.works-ux-scroll__mark-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+  mix-blend-mode: lighten;
+  user-select: none;
+  will-change: opacity;
+}
+
+.works-ux-scroll__mark-image--ui { opacity: 1; }
+.works-ux-scroll__mark-image--ux { opacity: 0; }
+
+.works-ux-scroll__motto {
+  position: absolute;
+  z-index: 1;
+  right: 4.5cqw;
+  /* The supplied cutout has less transparent top padding than the home motto,
+     so its box sits lower to match the home composition's visible-pixel line. */
+  top: 73.5vh;
+  display: block;
+  width: 23cqw;
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.works-ux-scroll__cards {
+  position: absolute;
+  z-index: 10;
+  inset: 0;
+  pointer-events: none;
+}
+
+.works-ux-scroll__card {
+  position: absolute;
+  display: block;
+  height: auto;
+  object-fit: contain;
+  transform-origin: 50% 50%;
+  will-change: transform, opacity;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.works-ux-scroll__card--1 {
+  left: 2.1cqw;
+  top: 20.1vh;
+  width: 24.65cqw;
+}
+
+.works-ux-scroll__card--2 {
+  left: 27.8cqw;
+  top: 24.8vh;
+  width: 22.65cqw;
+}
+
+.works-ux-scroll__card--3 {
+  left: 51.8cqw;
+  top: 31.2vh;
+  width: 21.15cqw;
+}
+
+.works-ux-scroll__card--4 {
+  left: 75.3cqw;
+  top: 20.8vh;
+  width: 22.25cqw;
+}
+
+@media (max-aspect-ratio: 4/3) {
+  .works-ux-scroll__scene { min-height: 100svh; }
+  .works-ux-scroll__mark {
+    width: 56cqw;
+  }
+  .works-ux-scroll__motto {
+    right: 5cqw;
+    top: 74vh;
+    width: 40cqw;
+  }
+  .works-ux-scroll__card--1 { left: -8cqw; top: 22vh; width: 34cqw; }
+  .works-ux-scroll__card--2 { left: 20cqw; top: 28vh; width: 31cqw; }
+  .works-ux-scroll__card--3 { left: 47cqw; top: 34vh; width: 29cqw; }
+  .works-ux-scroll__card--4 { left: 73cqw; top: 24vh; width: 31cqw; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .works-ux-scroll__mark-image--ui { opacity: 0; }
+  .works-ux-scroll__mark-image--ux { opacity: 1; }
+  .works-ux-scroll__card { opacity: 1 !important; }
 }

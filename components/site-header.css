@@ -245,6 +245,21 @@ wine-site-header { display: contents; }
 .landing[data-page="works"] .site-header { opacity: 1; }
 .landing[data-page="works"] .rule { display: block; }
 
+/* Keep the complete navigation component in its own viewport layer. The host
+   used to remain `display: contents`, which left its fixed children vulnerable
+   when a later ScrollTrigger scene established a new containing context. */
+.landing[data-page="works"] wine-site-header {
+  position: fixed;
+  z-index: 100;
+  inset: 0 0 auto;
+  display: block;
+  width: 100%;
+  height: 15.5vh;
+  pointer-events: none;
+}
+
+.landing[data-page="works"] wine-site-header a { pointer-events: auto; }
+
 /* One persistent header for the whole Works story; it masks headers baked into static references. */
 .landing[data-page="works"] .stage::before {
   content: "";
