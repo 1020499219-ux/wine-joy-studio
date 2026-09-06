@@ -2920,6 +2920,13 @@ a { color: inherit; text-decoration: none; }
 
 .ui-phone-gallery.is-dragging { cursor: grabbing; }
 
+.ui-phone-gallery.is-phone-focus {
+  /* The enlarged modal phone extends beyond the authored carousel band.
+     Remove both-axis clipping only while focused so it remains complete even
+     when the user opens it before the section is perfectly aligned. */
+  overflow: visible;
+}
+
 .ui-phone-gallery.is-phone-focus .ui-phone-card:not(.is-main) {
   pointer-events: none;
 }

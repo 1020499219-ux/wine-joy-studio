@@ -2387,6 +2387,15 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     }
 
     collapsePhoneStage();
+    /* The detail behaves like a viewport modal. Normalize the section before
+       locking page scroll so a phone opened from a partially visible carousel
+       cannot inherit that scroll offset and be clipped at the top edge. */
+    if (expandAfterMove && worksGalleryPage) {
+      const galleryTop = window.scrollY + worksGalleryPage.getBoundingClientRect().top;
+      if (Math.abs(window.scrollY - galleryTop) > 1) {
+        window.scrollTo({ top: Math.round(galleryTop), behavior: 'auto' });
+      }
+    }
     /* Start decoding the selected work as soon as it is clicked, so the
        quicker flip never waits on an image at the end of the move. */
     hydratePhoneSlides(card);
