@@ -27,7 +27,55 @@ body { margin: 0; min-height: 100%; background: #101010; }
 
 body { overflow-x: clip; }
 
+html.is-phone-modal-open,
+html.is-phone-modal-open body {
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+html.is-phone-modal-open .works-gallery-page {
+  z-index: 10;
+}
+
+html.is-phone-modal-open wine-site-header {
+  opacity: .42;
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+html.is-phone-modal-open .landing[data-page="works"] wine-site-header a {
+  pointer-events: none;
+}
+
+html.is-phone-modal-open .works-gallery-page::after {
+  content: "";
+  position: fixed;
+  z-index: 6;
+  inset: 0;
+  background: rgba(16, 16, 16, .2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  pointer-events: auto;
+}
+
 a { color: inherit; text-decoration: none; }
+
+/* Home entrance animates the approved page elements themselves. There is no
+   duplicate full-screen scene to swap out at the end of the sequence. */
+.landing[data-page="home"].is-home-intro-pending .top-subject,
+.landing[data-page="home"].is-home-intro-pending .site-header .brand-cn,
+.landing[data-page="home"].is-home-intro-pending .site-header .signature,
+.landing[data-page="home"].is-home-intro-pending .site-header .nav,
+.landing[data-page="home"].is-home-intro-pending .rule,
+.landing[data-page="home"].is-home-intro-pending .studio-title,
+.landing[data-page="home"].is-home-intro-pending .hero-home .brackets,
+.landing[data-page="home"].is-home-intro-pending .hero-home .pixel-cloud,
+.landing[data-page="home"].is-home-intro-pending .hero-home .wine-word,
+.landing[data-page="home"].is-home-intro-pending .hero-home .motto,
+.landing[data-page="home"].is-home-intro-pending .home-text-cursor {
+  opacity: 0;
+  visibility: hidden;
+}
 
 .home-text-cursor {
   position: fixed;
@@ -46,15 +94,15 @@ a { color: inherit; text-decoration: none; }
   position: absolute;
   left: 0;
   top: 0;
-  color: rgba(239, 240, 240, .82);
+  color: rgba(239, 240, 240, .32);
   font-family: "Helvetica Neue", Arial, sans-serif;
-  font-size: 10px;
+  font-size: clamp(8px, .576cqw, 11.2px);
   font-weight: 400;
   line-height: 1;
-  letter-spacing: .06em;
+  letter-spacing: .01em;
   white-space: nowrap;
   opacity: 1;
-  transform: translate3d(-50%, -50%, 0) rotate(var(--cursor-angle)) scale(1);
+  transform: translate3d(-50%, -50%, 0) scale(1);
   transform-origin: 50% 50%;
   will-change: transform, opacity;
   transition:
@@ -64,7 +112,7 @@ a { color: inherit; text-decoration: none; }
 
 .home-text-cursor__point.is-exiting {
   opacity: 0;
-  transform: translate3d(-50%, -50%, 0) rotate(var(--cursor-angle)) scale(.06);
+  transform: translate3d(-50%, -50%, 0) scale(.06);
 }
 
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
@@ -2872,6 +2920,14 @@ a { color: inherit; text-decoration: none; }
 
 .ui-phone-gallery.is-dragging { cursor: grabbing; }
 
+.ui-phone-gallery.is-phone-focus .ui-phone-card:not(.is-main) {
+  pointer-events: none;
+}
+
+.ui-phone-gallery.is-phone-focus {
+  z-index: 7;
+}
+
 /* GSAP owns carousel position/scale interpolation when available. Keeping
    the CSS transition off prevents the browser transition and GSAP tween from
    competing during a phone move. */
@@ -2883,7 +2939,7 @@ a { color: inherit; text-decoration: none; }
      UI/UX mode mark at the section boundary. The copy remains pointer-free,
      so the mode tabs underneath keep their original hit area and behavior. */
   z-index: 8;
-  top: 34.6cqw;
+  top: 34.5cqw;
   left: 50%;
   width: min(92cqw, 1600px);
   display: flex;
@@ -3016,7 +3072,7 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-width: 700px) {
   .ui-phone-copy {
-    top: 35.6cqw;
+    top: 35.5cqw;
     width: calc(100% - 24px);
   }
 
@@ -3091,7 +3147,9 @@ a { color: inherit; text-decoration: none; }
   transform-origin: 50% 50%;
   transform-style: preserve-3d;
   opacity: var(--phone-opacity, 1);
-  filter: brightness(var(--phone-brightness, 1));
+  filter:
+    blur(var(--phone-blur, 0px))
+    brightness(var(--phone-brightness, 1));
   transition:
     transform 360ms cubic-bezier(.16, 1, .3, 1),
     opacity 180ms ease;
@@ -3662,109 +3720,48 @@ a { color: inherit; text-decoration: none; }
 .works-brackets i:nth-child(4)::before,
 .works-brackets i:nth-child(4)::after { width: .35cqw; background: #f2f3f3; }
 .works-tiles {
-  /* Fixed elliptical hover track: cards animate in place and never follow
-     the pointer, so every project image remains readable. */
-  --tile: min(14.2875cqw, 25.425vh);
+  /* Each child is one client project. The individual cutouts keep a fixed
+     editorial cluster so assets from different projects never intermix. */
   position: absolute;
   z-index: 4;
   inset: 0;
+  top: 50%;
+  bottom: auto;
   width: 100%;
-  height: 100%;
+  height: min(100svh, 56.25cqw);
+  pointer-events: none;
+  transform: translate(3.5cqw, calc(-50% + 7vh)) scale(.91);
+  transform-origin: center 52%;
+}
+
+.works-tiles__group {
+  position: absolute;
+  inset: 0;
+  display: block;
   pointer-events: none;
 }
 
-.works-tiles i {
+.works-tiles__group i {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--tile);
-  height: var(--tile);
+  z-index: var(--z, auto);
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: calc(var(--w) * 1.22cqw);
+  aspect-ratio: var(--ratio);
   border-radius: .26cqw;
   background-color: transparent;
+  background-image: var(--tile-image);
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
   opacity: 0;
   filter: none;
-  animation: none;
-  transform: translate(-50%, -50%) scale(.58);
+  transform: translate(-50%, -50%) scale(.62);
   transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
 
-.works-tiles.is-dropping i {
-  animation: works-tile-flip 560ms cubic-bezier(.16, 1, .3, 1) calc(var(--drop-index) * 65ms) both;
-  transform-style: preserve-3d;
-  backface-visibility: hidden;
-  will-change: transform, opacity;
-}
-
-.works-tiles i:nth-child(1) { background-image: url("./assets/works-tiles/1.png"); }
-.works-tiles i:nth-child(2) { background-image: url("./assets/works-tiles/4.png"); }
-.works-tiles i:nth-child(3) { background-image: url("./assets/works-tiles/3.png"); }
-.works-tiles i:nth-child(4) { background-image: url("./assets/works-tiles/2.png"); }
-.works-tiles i:nth-child(5) { background-image: url("./assets/works-tiles/5.png"); }
-.works-tiles i:nth-child(6) { background-image: url("./assets/works-tiles/6.png"); }
-.works-tiles i:nth-child(7) { background-image: url("./assets/works-tiles/7.png"); }
-.works-tiles i:nth-child(8) { background-image: url("./assets/works-tiles/8.png"); }
-.works-tiles i:nth-child(9) { background-image: url("./assets/works-tiles/9.png"); }
-.works-tiles i:nth-child(10) { background-image: url("./assets/works-tiles/10.png"); }
-.works-tiles i:nth-child(11) { background-image: url("./assets/works-tiles/11.png"); }
-.works-tiles i:nth-child(12) { background-image: url("./assets/works-tiles/12.png"); }
-.works-tiles i:nth-child(13) { background-image: url("./assets/works-tiles/13.png"); }
-.works-tiles i:nth-child(14) { background-image: url("./assets/works-tiles/14.png"); }
-.works-tiles i:nth-child(15) { background-image: url("./assets/works-tiles/15.png"); }
-.works-tiles i:nth-child(16) { background-image: url("./assets/works-tiles/16.png"); }
-.works-tiles i:nth-child(17) { background-image: url("./assets/works-tiles/17.png"); }
-.works-tiles i:nth-child(18) { background-image: url("./assets/works-tiles/18.png"); }
-.works-tiles i:nth-child(19) { background-image: url("./assets/works-tiles/19.png"); }
-.works-tiles i:nth-child(20) { background-image: url("./assets/works-tiles/20.png"); }
-.works-tiles i:nth-child(21) { background-image: url("./assets/works-tiles/21.png"); }
-.works-tiles i:nth-child(22) { background-image: url("./assets/works-tiles/22.png"); }
-.works-tiles i:nth-child(23) { background-image: url("./assets/works-tiles/23.png"); }
-.works-tiles i:nth-child(24) { background-image: url("./assets/works-tiles/24.png"); }
-.works-tiles i:nth-child(25) { background-image: url("./assets/works-tiles/25.png"); }
-.works-tiles i:nth-child(26) { background-image: url("./assets/works-tiles/26.png"); }
-.works-tiles i:nth-child(27) { background-image: url("./assets/works-tiles/27.png"); }
-.works-tiles i:nth-child(28) { background-image: url("./assets/works-tiles/28.png"); }
-.works-tiles i:nth-child(29) { background-image: url("./assets/works-tiles/29.png"); }
-.works-tiles i:nth-child(30) { background-image: url("./assets/works-tiles/30.png"); }
-
-.works-tiles i:nth-child(1)  { --drop-index: 0; --drop-rotate: -4deg; }
-.works-tiles i:nth-child(2)  { --drop-index: 1; --drop-rotate: 3deg; }
-.works-tiles i:nth-child(3)  { --drop-index: 2; --drop-rotate: -2deg; }
-.works-tiles i:nth-child(4)  { --drop-index: 3; --drop-rotate: 4deg; }
-.works-tiles i:nth-child(5)  { --drop-index: 4; --drop-rotate: -3deg; }
-.works-tiles i:nth-child(6)  { --drop-index: 5; --drop-rotate: 2deg; }
-.works-tiles i:nth-child(7)  { --drop-index: 6; --drop-rotate: -4deg; }
-.works-tiles i:nth-child(8)  { --drop-index: 7; --drop-rotate: 3deg; }
-.works-tiles i:nth-child(9)  { --drop-index: 8; --drop-rotate: -2deg; }
-.works-tiles i:nth-child(10) { --drop-index: 9; --drop-rotate: 4deg; }
-.works-tiles i:nth-child(11) { --drop-index: 10; --drop-rotate: -3deg; }
-.works-tiles i:nth-child(12) { --drop-index: 11; --drop-rotate: 2deg; }
-.works-tiles i:nth-child(13) { --drop-index: 12; --drop-rotate: -4deg; }
-.works-tiles i:nth-child(14) { --drop-index: 13; --drop-rotate: 3deg; }
-.works-tiles i:nth-child(15) { --drop-index: 14; --drop-rotate: -2deg; }
-.works-tiles i:nth-child(16) { --drop-index: 15; --drop-rotate: 4deg; }
-
-@keyframes works-tile-flip {
-  0% {
-    opacity: 0;
-    transform: perspective(38cqw) rotateY(var(--drop-rotate)) scale(.94);
-  }
-  54% {
-    opacity: 1;
-    transform: perspective(38cqw) rotateY(calc(var(--drop-rotate) * -.55)) scaleX(1.02) scaleY(.98);
-  }
-  76% {
-    opacity: 1;
-    transform: perspective(38cqw) rotateY(calc(var(--drop-rotate) * .18)) scaleX(1.005) scaleY(.995);
-  }
-  100% {
-    opacity: 1;
-    transform: perspective(38cqw) rotateY(0deg) scale(1);
-  }
-}
+.works-tiles__group i[data-front] { z-index: 90; }
 
 .works-pixels { --cell: 1.06cqw; }
 .works-pixels--left { left: 12.14cqw; top: 45.45vh; }
@@ -3886,7 +3883,7 @@ a { color: inherit; text-decoration: none; }
 
 @media (max-aspect-ratio: 4/3) {
   .works-brackets { top: 35vh; height: 26vh; }
-  .works-tiles { left: 18cqw; top: 36vh; transform: scale(.78); transform-origin: left top; }
+  .works-tiles { transform: translate(1.5cqw, calc(-50% + 5vh)) scale(.75); transform-origin: center 52%; }
   .works-copy { transform: translate(-15cqw, 8vh) scale(.72); transform-origin: center top; }
   .works-pixels--left { left: 20cqw; top: 42vh; }
   .works-pixels--right { right: 12cqw; top: 49vh; }
@@ -3898,7 +3895,7 @@ a { color: inherit; text-decoration: none; }
   .works-wine-fragment { display: none; }
   .works-wine { filter: none; transform: none; }
   .works-mode-tabs__image { transition-duration: 1ms !important; }
-  .works-tiles.is-dropping i { animation: none !important; opacity: 1; transform: none; }
+  .works-tiles__group i { transition: none !important; }
 }
 
 @media (max-aspect-ratio: 4/3) {

@@ -90,16 +90,27 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let uxDetailLoadToken = 0;
   let worksTileEntrance = null;
   let worksRingActiveIndex = -1;
+  let worksRingTilesCache = null;
+  let worksRingHitRegions = [];
+  let worksRingHitRegionsDirty = true;
+  let worksPointerFrame = 0;
+  let worksPointerSample = null;
+  const worksRingTrail = [];
+  const worksRingTrailMax = 6;
+  const worksRingTrailHoldDuration = 110;
+  const worksRingTrailFadeDuration = .18;
+  const worksRingTrailDrainInterval = 24;
+  let worksRingTrailIdleTimer = 0;
+  let worksRingTrailDrainTimer = 0;
   let worksRouteTransitionTimeline = null;
   let worksRouteTransitionActive = false;
 
-  const homeCursorSpacing = 46;
+  const homeCursorSpacing = 34;
   const homeCursorMaxPoints = 70;
-  const homeCursorExitDuration = 300;
-  const homeCursorRemovalInterval = 20;
+  const homeCursorExitDuration = 520;
+  const homeCursorRemovalInterval = 28;
   const homeCursorPoints = [];
   let homeCursorLastPoint = null;
-  let homeCursorHeading = 0;
   let homeCursorIdleTimer = 0;
   let homeCursorDrainTimer = 0;
 
@@ -133,7 +144,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     homeCursorDrainTimer = window.setInterval(removeNext, homeCursorRemovalInterval);
   };
 
-  const queueHomeCursorDrain = (delay = 80) => {
+  const queueHomeCursorDrain = (delay = 150) => {
     window.clearTimeout(homeCursorIdleTimer);
     homeCursorIdleTimer = window.setTimeout(drainHomeTextCursor, delay);
   };
@@ -145,14 +156,15 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     homeCursorLastPoint = null;
   };
 
-  const addHomeCursorPoint = (x, y, angle) => {
+  const addHomeCursorPoint = (x, y) => {
     if (!homeTextCursor) return;
     const point = document.createElement('span');
     point.className = 'home-text-cursor__point';
     point.textContent = 'WINE JOY STUDIO';
-    point.style.left = `${x}px`;
-    point.style.top = `${y}px`;
-    point.style.setProperty('--cursor-angle', `${angle}deg`);
+    /* A subtle 2px grid keeps neighbouring labels on clean shared baselines
+       while preserving the shape of the pointer path. */
+    point.style.left = `${Math.round(x / 2) * 2}px`;
+    point.style.top = `${Math.round(y / 2) * 2}px`;
     homeTextCursor.append(point);
     homeCursorPoints.push(point);
 
@@ -182,7 +194,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const current = { x: event.clientX, y: event.clientY };
     if (!homeCursorLastPoint) {
       homeCursorLastPoint = current;
-      addHomeCursorPoint(current.x, current.y, homeCursorHeading);
+      addHomeCursorPoint(current.x, current.y);
       queueHomeCursorDrain();
       return;
     }
@@ -195,11 +207,6 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       return;
     }
 
-    let readableHeading = Math.atan2(dy, dx) * 180 / Math.PI;
-    if (readableHeading > 90) readableHeading -= 180;
-    if (readableHeading < -90) readableHeading += 180;
-    const headingDelta = ((readableHeading - homeCursorHeading + 540) % 360) - 180;
-    homeCursorHeading += headingDelta * .72;
     const unitX = dx / distance;
     const unitY = dy / distance;
     const count = Math.min(Math.floor(distance / homeCursorSpacing), 16);
@@ -207,8 +214,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     for (let index = 1; index <= count; index += 1) {
       addHomeCursorPoint(
         homeCursorLastPoint.x + unitX * homeCursorSpacing * index,
-        homeCursorLastPoint.y + unitY * homeCursorSpacing * index,
-        homeCursorHeading
+        homeCursorLastPoint.y + unitY * homeCursorSpacing * index
       );
     }
 
@@ -302,6 +308,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         duration: .5,
         ease: 'power2.out'
       }, 'reveal+=.2');
+    worksRouteTransitionTimeline.timeScale(1.65);
   };
 
   const classLessonData = Array.from({ length: 16 }, (_, index) => ({
@@ -472,84 +479,161 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
   const layoutWorksTileRing = () => {
     if (!worksTiles) return [];
-    const tiles = [...worksTiles.querySelectorAll('i')];
-    const step = (Math.PI * 2) / Math.max(tiles.length, 1);
-    tiles.forEach((tile, index) => {
-      const angle = -Math.PI / 2 + index * step;
-      const x = 50 + Math.cos(angle) * 34;
-      const y = 53 + Math.sin(angle) * 28;
-      tile.style.left = `${x.toFixed(3)}%`;
-      tile.style.top = `${y.toFixed(3)}%`;
-      tile.style.zIndex = String(20 + Math.round(y));
+    if (!worksRingTilesCache) {
+      worksRingTilesCache = [...worksTiles.querySelectorAll('.works-tiles__group i')];
+    }
+    return worksRingTilesCache;
+  };
+
+  const invalidateWorksRingHitRegions = () => {
+    worksRingHitRegionsDirty = true;
+  };
+
+  const refreshWorksRingHitRegions = () => {
+    const tiles = layoutWorksTileRing();
+    /* Read every tile in one batch. Pointer movement can then use this cached
+       geometry without forcing layout or changing the authored composition. */
+    worksRingHitRegions = tiles.map((tile) => {
+      const rect = tile.getBoundingClientRect();
+      return {
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+        centerX: rect.left + rect.width / 2,
+        centerY: rect.top + rect.height / 2
+      };
     });
-    return tiles;
+    worksRingHitRegionsDirty = false;
   };
 
   const hideWorksRingTile = (tile) => {
     if (!tile || !window.gsap) return;
     window.gsap.to(tile, {
       opacity: 0,
-      scale: .58,
-      duration: reduceMotion.matches ? 0 : .82,
-      ease: 'power2.inOut',
+      duration: reduceMotion.matches ? 0 : worksRingTrailFadeDuration,
+      ease: 'power2.in',
       overwrite: 'auto'
     });
   };
 
-  const revealWorksRingTile = (index) => {
-    if (!worksTiles || !window.gsap) return;
-    const tiles = [...worksTiles.querySelectorAll('i')];
-    if (!tiles.length || index === worksRingActiveIndex) return;
+  const stopWorksRingTrailDrain = () => {
+    window.clearTimeout(worksRingTrailIdleTimer);
+    window.clearInterval(worksRingTrailDrainTimer);
+    worksRingTrailIdleTimer = 0;
+    worksRingTrailDrainTimer = 0;
+  };
 
-    if (worksRingActiveIndex >= 0) hideWorksRingTile(tiles[worksRingActiveIndex]);
+  const drainWorksRingTrail = () => {
+    stopWorksRingTrailDrain();
+    const fadeOldest = () => {
+      const tile = worksRingTrail.shift();
+      if (!tile) {
+        stopWorksRingTrailDrain();
+        worksRingActiveIndex = -1;
+        return;
+      }
+      const activeTile = layoutWorksTileRing()[worksRingActiveIndex];
+      if (tile === activeTile) worksRingActiveIndex = -1;
+      hideWorksRingTile(tile);
+    };
+
+    fadeOldest();
+    worksRingTrailDrainTimer = window.setInterval(fadeOldest, worksRingTrailDrainInterval);
+  };
+
+  const queueWorksRingTrailDrain = (delay = worksRingTrailHoldDuration) => {
+    stopWorksRingTrailDrain();
+    worksRingTrailIdleTimer = window.setTimeout(drainWorksRingTrail, delay);
+  };
+
+  const revealWorksRingTile = (index, nearbyCount = 1) => {
+    if (!worksTiles || !window.gsap) return;
+    const tiles = layoutWorksTileRing();
+    if (!tiles.length) return;
+    if (index === worksRingActiveIndex) {
+      queueWorksRingTrailDrain();
+      return;
+    }
+
     const tile = tiles[index];
+    stopWorksRingTrailDrain();
+    const previousTrailIndex = worksRingTrail.indexOf(tile);
+    if (previousTrailIndex >= 0) worksRingTrail.splice(previousTrailIndex, 1);
+    worksRingTrail.push(tile);
     worksRingActiveIndex = index;
-    window.gsap.killTweensOf(tile);
-    window.gsap.fromTo(tile, {
-      opacity: 0,
-      scale: .58,
-      xPercent: -50,
-      yPercent: -50
-    }, {
-      opacity: 1,
-      scale: 1,
-      xPercent: -50,
-      yPercent: -50,
-      duration: reduceMotion.matches ? 0 : .5,
-      ease: 'back.out(1.45)',
-      overwrite: true
-    });
+    if (previousTrailIndex < 0) {
+      window.gsap.killTweensOf(tile);
+      window.gsap.to(tile, {
+        opacity: 1,
+        duration: reduceMotion.matches ? 0 : .27,
+        ease: 'power3.out',
+        overwrite: 'auto'
+      });
+    }
+
+    while (worksRingTrail.length > Math.max(worksRingTrailMax, nearbyCount)) {
+      hideWorksRingTile(worksRingTrail.shift());
+    }
+    queueWorksRingTrailDrain();
+  };
+
+  const clearWorksRingTile = () => {
+    if (worksRingActiveIndex < 0) return;
+    worksRingActiveIndex = -1;
+    queueWorksRingTrailDrain(worksRingTrailHoldDuration);
   };
 
   const resetWorksTileEntrance = () => {
     worksTileEntrance?.kill();
     worksTileEntrance = null;
     worksRingActiveIndex = -1;
+    stopWorksRingTrailDrain();
+    worksRingTrail.length = 0;
     if (!worksTiles || !window.gsap) return;
     const tiles = layoutWorksTileRing();
     window.gsap.killTweensOf(tiles);
-    window.gsap.set(tiles, {
-      opacity: 0,
-      scale: .58,
-      xPercent: -50,
-      yPercent: -50,
-      visibility: 'visible',
-      willChange: 'transform, opacity'
+    tiles.forEach((tile) => {
+      window.gsap.set(tile, {
+        opacity: 0,
+        scale: 1,
+        rotation: Number(tile.dataset.r || 0),
+        xPercent: -50,
+        yPercent: -50,
+        visibility: 'visible',
+        willChange: 'transform, opacity'
+      });
     });
+    invalidateWorksRingHitRegions();
   };
 
   const hideWorksTileTrail = () => {
     if (!worksTiles || !window.gsap) return;
+    stopWorksRingTrailDrain();
+    if (worksPointerFrame) cancelAnimationFrame(worksPointerFrame);
+    worksPointerFrame = 0;
+    worksPointerSample = null;
     worksRingActiveIndex = -1;
-    const tiles = [...worksTiles.querySelectorAll('i')];
-    window.gsap.to(tiles, {
+    const tiles = layoutWorksTileRing();
+    const visibleTrail = worksRingTrail.splice(0);
+    const inactiveTiles = tiles.filter((tile) => !visibleTrail.includes(tile));
+    window.gsap.killTweensOf(tiles);
+    window.gsap.set(inactiveTiles, { opacity: 0 });
+    window.gsap.to(visibleTrail, {
       opacity: 0,
-      scale: .58,
-      duration: reduceMotion.matches ? 0 : .82,
-      ease: 'power2.inOut',
-      stagger: { each: .025, from: 'end' },
-      overwrite: 'auto'
+      duration: reduceMotion.matches ? 0 : .72,
+      ease: 'sine.out',
+      stagger: reduceMotion.matches ? 0 : .08,
+      overwrite: true
     });
+  };
+
+  const releaseWorksTileTrail = () => {
+    if (worksPointerFrame) cancelAnimationFrame(worksPointerFrame);
+    worksPointerFrame = 0;
+    worksPointerSample = null;
+    worksRingActiveIndex = -1;
+    queueWorksRingTrailDrain(worksRingTrailHoldDuration);
   };
 
   const syncWorksTileTrailBoundary = () => {
@@ -577,22 +661,60 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     landing.classList.toggle('is-works-intro-background', Boolean(introVisible));
   };
 
-  worksPage?.addEventListener('pointermove', (event) => {
-    if (worksRouteTransitionActive || landing.dataset.page !== 'works' || !worksTiles || syncWorksTileTrailBoundary()) return;
-    const tiles = [...worksTiles.querySelectorAll('i')];
-    if (!tiles.length) return;
-    const rect = worksPage.getBoundingClientRect();
-    const centerX = rect.left + rect.width * .5;
-    const centerY = rect.top + rect.height * .53;
-    const normalizedX = (event.clientX - centerX) / Math.max(rect.width * .34, 1);
-    const normalizedY = (event.clientY - centerY) / Math.max(rect.height * .28, 1);
-    const pointerAngle = Math.atan2(normalizedY, normalizedX);
-    const step = (Math.PI * 2) / tiles.length;
-    const index = Math.round((((pointerAngle + Math.PI / 2) + Math.PI * 2) % (Math.PI * 2)) / step) % tiles.length;
-    revealWorksRingTile(index);
-  });
+  const distanceFromPointToRect = (x, y, rect) => {
+    const dx = Math.max(rect.left - x, 0, x - rect.right);
+    const dy = Math.max(rect.top - y, 0, y - rect.bottom);
+    return Math.hypot(dx, dy);
+  };
 
-  worksPage?.addEventListener('pointerleave', hideWorksTileTrail);
+  const renderWorksTileHover = () => {
+    worksPointerFrame = 0;
+    const pointer = worksPointerSample;
+    worksPointerSample = null;
+    if (
+      !pointer
+      || worksRouteTransitionActive
+      || landing.dataset.page !== 'works'
+      || !worksTiles
+      || syncWorksTileTrailBoundary()
+    ) return;
+
+    const tiles = layoutWorksTileRing();
+    if (!tiles.length) return;
+    if (worksRingHitRegionsDirty) refreshWorksRingHitRegions();
+    const activationRadius = Math.max(160, Math.min(window.innerWidth, window.innerHeight) * .20);
+    const nearbyTiles = [];
+
+    worksRingHitRegions.forEach((region, tileIndex) => {
+      const edgeDistance = distanceFromPointToRect(pointer.clientX, pointer.clientY, region);
+      if (edgeDistance > activationRadius) return;
+
+      /* Every nearby tile has an independent hit region, even when covered.
+         Distance orders the trail without excluding overlapping images. */
+      const centerDistance = Math.hypot(
+        pointer.clientX - region.centerX,
+        pointer.clientY - region.centerY
+      );
+      nearbyTiles.push({ index: tileIndex, distance: centerDistance });
+    });
+
+    if (nearbyTiles.length) {
+      nearbyTiles.sort((a, b) => b.distance - a.distance);
+      nearbyTiles.forEach(({ index }) => revealWorksRingTile(index, nearbyTiles.length));
+    } else {
+      clearWorksRingTile();
+    }
+  };
+
+  const queueWorksTileHover = (event) => {
+    if (event.pointerType === 'touch') return;
+    worksPointerSample = { clientX: event.clientX, clientY: event.clientY };
+    if (!worksPointerFrame) worksPointerFrame = requestAnimationFrame(renderWorksTileHover);
+  };
+
+  worksPage?.addEventListener('pointerenter', queueWorksTileHover);
+  worksPage?.addEventListener('pointermove', queueWorksTileHover);
+  worksPage?.addEventListener('pointerleave', releaseWorksTileTrail);
 
   const setWorksMode = (mode) => {
     if (!worksModeTabs) return;
@@ -726,6 +848,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   };
 
   const queueWorksMotionUpdate = () => {
+    invalidateWorksRingHitRegions();
     if (wineScrollFrame) return;
     wineScrollFrame = requestAnimationFrame(() => {
       wineScrollFrame = 0;
@@ -1957,6 +2080,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const baseAnchor = stageActivePhone ?? stageRestingPhone;
     const stageAnchor = baseAnchor + stageDragOffset;
     const hasActivePhone = stageActivePhone !== null;
+    const phoneFocusActive = hasActivePhone;
     const stageGsap = window.gsap;
     const useGsapStageMotion = Boolean(stageGsap && !reduceMotion.matches && uiPhoneGallery);
     const immediateStageRender = immediate || uiPhoneGallery?.dataset.phoneMotionReady !== 'true';
@@ -1969,6 +2093,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       uiPhoneGallery.classList.add('ui-phone-gallery--gsap');
       uiPhoneGallery.dataset.phoneMotionReady = 'true';
     }
+    uiPhoneGallery?.classList.toggle('is-phone-focus', phoneFocusActive);
+    document.documentElement.classList.toggle('is-phone-modal-open', phoneFocusActive);
 
     renderPhoneCopy();
 
@@ -1983,15 +2109,17 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       const crossesHiddenSeam = !isMain
         && Math.abs(previousDifference - difference) > uiPhoneCards.length / 2;
       const phoneX = isMain ? 0 : difference * ringStepX;
-      const phoneY = isMain ? -8 : -8 + distance * distance * 2.67;
-      const scale = isMain ? 1.8 : Math.max(1.06, 1.22 - distance * .04);
+      const phoneY = isMain ? -7.5 : -8 + distance * distance * 2.67;
+      const scale = isMain ? 2.46 : Math.max(1.06, 1.22 - distance * .04);
       const baseOpacity = isMain
         ? 1
-        : distance >= 4 ? 0 : hasActivePhone ? .32 : Math.max(.3, .52 - distance * .065);
+        : distance >= 4 ? 0 : phoneFocusActive ? .26 : Math.max(.3, .52 - distance * .065);
       const baseBrightness = isMain
         ? 1
-        : hasActivePhone ? .66 : Math.max(.64, .82 - distance * .045);
+        : phoneFocusActive ? .64 : Math.max(.64, .82 - distance * .045);
+      const blur = isMain || !phoneFocusActive ? 0 : Math.min(7.5, 4.4 + distance * .75);
       const isHovered = card.matches(':hover') && !isMain
+        && !phoneFocusActive
         && !uiPhoneGallery?.classList.contains('is-dragging');
       const opacity = isHovered ? 1 : baseOpacity;
       const brightness = isHovered ? 1.12 : baseBrightness;
@@ -2006,31 +2134,47 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         '--phone-y': `${phoneY.toFixed(3)}cqw`,
         '--phone-scale': String(scale),
         '--phone-opacity': String(opacity),
-        '--phone-brightness': String(brightness)
+        '--phone-brightness': String(brightness),
+        '--phone-blur': `${blur.toFixed(2)}px`
       };
       card._phoneStageTween?.kill();
       card._phoneStageTween = null;
-      if (useGsapStageMotion && !immediateStageRender && isMain) {
-        const startsAtCenter = Math.abs(previousDifference) < .001;
+      if (useGsapStageMotion && !immediateStageRender && isMain && phoneFocusActive) {
+        const positionState = { ...motionState };
+        delete positionState['--phone-scale'];
         card._phoneStageTween = stageGsap.timeline({
           onComplete: () => { card._phoneStageTween = null; }
         })
           .to(card, {
-            ...motionState,
+            ...positionState,
             '--phone-hover-scale': 1,
-            duration: startsAtCenter ? .52 : .72,
-            ease: 'power3.inOut',
+            duration: .62,
+            ease: 'power3.out',
+            overwrite: 'auto'
+          }, 0)
+          .to(card, {
+            '--phone-scale': String(scale),
+            duration: .72,
+            ease: 'back.out(1.16)',
             overwrite: 'auto'
           }, 0);
       } else if (useGsapStageMotion && !immediateStageRender && wasMain) {
+        const returnPositionState = { ...motionState };
+        delete returnPositionState['--phone-scale'];
         card._phoneStageTween = stageGsap.timeline({
           onComplete: () => { card._phoneStageTween = null; }
         })
           .to(card, {
-            ...motionState,
+            ...returnPositionState,
             '--phone-hover-scale': 1,
-            duration: .72,
-            ease: 'power3.inOut',
+            duration: .62,
+            ease: 'power3.out',
+            overwrite: 'auto'
+          }, 0)
+          .to(card, {
+            '--phone-scale': String(scale),
+            duration: .64,
+            ease: 'back.out(1.1)',
             overwrite: 'auto'
           }, 0);
       } else if (useGsapStageMotion && !immediateStageRender && crossesHiddenSeam) {
@@ -2249,17 +2393,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const previousAnchor = Number.isFinite(previousAnchorOverride)
       ? previousAnchorOverride
       : stageActivePhone ?? stageRestingPhone;
-    const startsAtCenter = Math.abs(getPhoneIndexDifference(nextIndex, previousAnchor)) < .001;
-    const transitionDuration = startsAtCenter ? 520 : 720;
+    const transitionDuration = 720;
+    const flipDuration = 340;
     stageActivePhone = wrapPhoneIndex(nextIndex);
     renderPhoneStage(previousAnchor);
-    flipPhoneDuringMove(card, stageActivePhone, transitionDuration);
-
-    const audioVideo = card.querySelector('.ui-phone-card__video:not([muted])');
-    if (audioVideo) {
-      audioVideo.currentTime = 0;
-      audioVideo.play().catch(() => undefined);
-    }
+    flipPhoneDuringMove(card, stageActivePhone, flipDuration);
 
     if (!expandAfterMove) return;
     const delay = reduceMotion.matches ? 0 : transitionDuration;
@@ -2275,7 +2413,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
     uiPhoneCards.forEach((card) => {
       card.addEventListener('pointerenter', () => {
-        if (card.classList.contains('is-main') || uiPhoneGallery.classList.contains('is-dragging')) return;
+        if (
+          stageActivePhone !== null
+          || card.classList.contains('is-main')
+          || uiPhoneGallery.classList.contains('is-dragging')
+        ) return;
         hydratePhoneSlides(card);
         if (window.gsap && !reduceMotion.matches) {
           window.gsap.to(card, {
@@ -2311,6 +2453,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
     uiPhoneGallery.addEventListener('pointerdown', (event) => {
       if (event.button !== 0) return;
+      if (stageActivePhone !== null) return;
       stagePointerId = event.pointerId;
       stagePointerCard = event.target.closest('.ui-phone-card');
       stagePointerStartX = event.clientX;
@@ -2365,8 +2508,20 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     uiPhoneGallery.addEventListener('pointercancel', (event) => endStagePointer(event, true));
     uiPhoneGallery.addEventListener('click', (event) => {
       const card = event.target.closest('.ui-phone-card');
-      if (!card || performance.now() < stageSuppressClickUntil) return;
+      if (performance.now() < stageSuppressClickUntil) return;
+      if (stageActivePhone !== null) {
+        resetPhoneStage();
+        return;
+      }
+      if (!card) {
+        return;
+      }
       activatePhoneCard(card, true);
+    });
+
+    worksGalleryPage?.addEventListener('click', (event) => {
+      if (stageActivePhone === null || event.target.closest('.ui-phone-gallery')) return;
+      resetPhoneStage();
     });
   }
 
