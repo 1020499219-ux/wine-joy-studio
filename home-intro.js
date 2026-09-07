@@ -74,7 +74,6 @@
     const wineStartY = openingTop - wineRect.top;
     const mottoStartX = stageRect.left + stageRect.width * .565 - mottoRect.left;
     const mottoStartY = openingTop - mottoRect.top;
-    const splitDistance = stageRect.width * .075;
     const ruleFinalOpacity = new Map(
       rules.map((rule) => [rule, Number.parseFloat(getComputedStyle(rule).opacity) || .38])
     );
@@ -119,27 +118,25 @@
     timeline
       .addLabel('separate', .08)
       .to(wine, {
-        x: wineStartX - splitDistance,
-        duration: .32
+        x: 0,
+        duration: .42
       }, 'separate')
       .to(motto, {
-        x: mottoStartX + splitDistance,
-        duration: .32
+        x: 0,
+        duration: .42
       }, 'separate')
-      .addLabel('descend', .38)
+      .addLabel('descend', .5)
       .to(wine, {
-        x: 0,
         y: 0,
         duration: .62,
         ease: 'power4.inOut'
       }, 'descend')
       .to(motto, {
-        x: 0,
         y: 0,
         duration: .62,
         ease: 'power4.inOut'
       }, 'descend')
-      .addLabel('pageReveal', .92)
+      .addLabel('pageReveal', 1.04)
       .to(headerPieces, {
         autoAlpha: 1,
         y: 0,

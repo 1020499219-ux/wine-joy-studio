@@ -29,6 +29,18 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   const worksUxScrollMarkUi = document.querySelector('.works-ux-scroll__mark-image--ui');
   const worksUxScrollMarkUx = document.querySelector('.works-ux-scroll__mark-image--ux');
   const worksUxScrollCards = [...document.querySelectorAll('.works-ux-scroll__card')];
+  const uxFinanceCard = document.querySelector('.works-ux-scroll__card--2');
+  const uxFinanceDetail = document.querySelector('.ux-finance-detail');
+  const uxFinanceDetailStage = document.querySelector('.ux-finance-detail__stage');
+  const uxFinanceDetailClose = document.querySelector('.ux-finance-detail__close');
+  const uxFinanceMedia = document.querySelector('.ux-finance-detail__media');
+  const uxFinanceMediaImages = [...document.querySelectorAll('.ux-finance-detail__media img')];
+  const uxFinanceMediaCurtain = document.querySelector('.ux-finance-detail__media-curtain');
+  const uxFinanceTitleStrokes = [...document.querySelectorAll('[data-ux-finance-stroke-char]')];
+  const uxFinanceTitleWipe = document.querySelector('.ux-finance-detail__title-wipe');
+  const uxFinanceCopyCnMask = document.querySelector('.ux-finance-detail__text-mask--cn');
+  const uxFinanceCopyEnMask = document.querySelector('.ux-finance-detail__text-mask--en');
+  const uxFinanceMosaic = document.querySelector('.ux-finance-detail__mosaic');
   const worksModeTabs = document.querySelector('.works-mode-tabs');
   const worksModeLinks = [...document.querySelectorAll('.works-mode-tabs__tab')];
   const worksUxPage = document.querySelector('.works-ux-page');
@@ -88,6 +100,10 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let activeClassLesson = -1;
   let activeUxType = null;
   let uxDetailLoadToken = 0;
+  let uxFinanceTextTimeline = null;
+  let uxFinanceMediaRevealContext = null;
+  let uxFinanceReturnScrollY = null;
+  let uxFinanceEdgeFrame = 0;
   let worksTileEntrance = null;
   let worksRingActiveIndex = -1;
   let worksRingTilesCache = null;
@@ -105,7 +121,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let worksRouteTransitionTimeline = null;
   let worksRouteTransitionActive = false;
 
-  const homeCursorSpacing = 34;
+  const homeCursorSpacing = 12.5;
   const homeCursorMaxPoints = 70;
   const homeCursorExitDuration = 520;
   const homeCursorRemovalInterval = 28;
@@ -160,7 +176,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     if (!homeTextCursor) return;
     const point = document.createElement('span');
     point.className = 'home-text-cursor__point';
-    point.textContent = 'WINE JOY STUDIO';
+    point.textContent = 'WINE JOY';
     /* A subtle 2px grid keeps neighbouring labels on clean shared baselines
        while preserving the shape of the pointer path. */
     point.style.left = `${Math.round(x / 2) * 2}px`;
@@ -986,6 +1002,244 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   });
 
   resetUxProject();
+
+  const uxFinanceDetailRoute = 'works-ux/finance';
+  const isUxFinanceDetailRoute = () => location.hash.replace(/^#/, '') === uxFinanceDetailRoute;
+
+  const syncUxFinanceMediaEdge = () => {
+    if (!uxFinanceDetailStage) return;
+    if (window.innerWidth <= 768) {
+      uxFinanceDetailStage.style.removeProperty('--ux-finance-viewport-right');
+      return;
+    }
+
+    const stageRight = uxFinanceDetailStage.getBoundingClientRect().right;
+    const rightGutter = Math.max(0, window.innerWidth - stageRight);
+    uxFinanceDetailStage.style.setProperty('--ux-finance-viewport-right', `${-rightGutter}px`);
+  };
+
+  const queueUxFinanceMediaEdgeSync = () => {
+    if (uxFinanceEdgeFrame) return;
+    uxFinanceEdgeFrame = requestAnimationFrame(() => {
+      uxFinanceEdgeFrame = 0;
+      syncUxFinanceMediaEdge();
+    });
+  };
+
+  const destroyUxFinanceMediaReveal = () => {
+    uxFinanceMediaRevealContext?.revert();
+    uxFinanceMediaRevealContext = null;
+  };
+
+  const initUxFinanceMediaReveal = () => {
+    destroyUxFinanceMediaReveal();
+    if (!uxFinanceMedia || !uxFinanceMediaImages.length || !window.gsap) return;
+
+    const { gsap, ScrollTrigger } = window;
+    if (!ScrollTrigger || reduceMotion.matches) {
+      gsap.set(uxFinanceMediaImages, { clearProps: 'clipPath,webkitClipPath,willChange' });
+      if (uxFinanceMediaCurtain) gsap.set(uxFinanceMediaCurtain, { autoAlpha: 0 });
+      return;
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+    uxFinanceMediaRevealContext = gsap.context(() => {
+      gsap.set(uxFinanceMediaImages[0], {
+        clipPath: 'inset(0% 0% 0% 100%)',
+        webkitClipPath: 'inset(0% 0% 0% 100%)',
+        willChange: 'clip-path'
+      });
+
+      if (uxFinanceMediaImages[1]) {
+        gsap.set(uxFinanceMediaImages[1], {
+          clipPath: 'inset(4px 4px 4px 100%)',
+          webkitClipPath: 'inset(4px 4px 4px 100%)',
+          willChange: 'clip-path'
+        });
+      }
+
+      if (uxFinanceMediaCurtain && uxFinanceMediaImages[1]) {
+        gsap.set(uxFinanceMediaCurtain, { autoAlpha: 1 });
+        ScrollTrigger.create({
+          trigger: uxFinanceMediaImages[1],
+          scroller: uxFinanceMedia,
+          start: 'bottom 68%',
+          onEnter: () => gsap.set(uxFinanceMediaCurtain, { autoAlpha: 0 }),
+          onLeaveBack: () => gsap.set(uxFinanceMediaCurtain, { autoAlpha: 1 })
+        });
+      }
+
+      uxFinanceMediaImages.slice(2).forEach((image) => {
+        const isLastImage = image === uxFinanceMediaImages[uxFinanceMediaImages.length - 1];
+        const bottomInset = image === uxFinanceMediaImages[7] ? '2px' : '0%';
+        gsap.fromTo(image, {
+          clipPath: `inset(0% 0% ${bottomInset} 100%)`,
+          webkitClipPath: `inset(0% 0% ${bottomInset} 100%)`,
+          willChange: 'clip-path'
+        }, {
+          clipPath: `inset(0% 0% ${bottomInset} 0%)`,
+          webkitClipPath: `inset(0% 0% ${bottomInset} 0%)`,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: image,
+            scroller: uxFinanceMedia,
+            start: 'top 68%',
+            end: isLastImage ? 'bottom bottom' : 'top 22%',
+            scrub: .9,
+            invalidateOnRefresh: true
+          }
+        });
+      });
+    }, uxFinanceDetail);
+
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  };
+
+  const closeUxFinanceDetail = ({ restoreFocus = true, syncRoute = true } = {}) => {
+    if (!uxFinanceDetail || uxFinanceDetail.hidden) return;
+    const returnScrollY = uxFinanceReturnScrollY;
+    uxFinanceTextTimeline?.kill();
+    uxFinanceTextTimeline = null;
+    destroyUxFinanceMediaReveal();
+    uxFinanceDetail.hidden = true;
+    uxFinanceDetail.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('is-ux-finance-detail-open');
+    if (syncRoute && isUxFinanceDetailRoute()) {
+      history.replaceState(null, '', '#works-ux');
+    }
+    requestAnimationFrame(() => {
+      const targetScrollY = Number.isFinite(returnScrollY)
+        ? returnScrollY
+        : worksUxPinTrigger?.start;
+      if (Number.isFinite(targetScrollY)) {
+        window.scrollTo({ top: targetScrollY, behavior: 'auto' });
+        window.ScrollTrigger?.update();
+      }
+      worksUxCardTimeline?.progress(1).pause();
+      window.gsap?.set(worksUxScrollCards, {
+        autoAlpha: 1,
+        x: 0,
+        y: 0,
+        rotation: 0
+      });
+    });
+    uxFinanceReturnScrollY = null;
+    if (restoreFocus) uxFinanceCard?.focus({ preventScroll: true });
+  };
+
+  const openUxFinanceDetail = ({ syncRoute = true, focusClose = true } = {}) => {
+    if (!uxFinanceDetail || !uxFinanceDetailStage) return;
+    if (syncRoute && !isUxFinanceDetailRoute()) {
+      uxFinanceReturnScrollY = window.scrollY;
+      history.pushState(null, '', `#${uxFinanceDetailRoute}`);
+    }
+    uxFinanceDetail.hidden = false;
+    uxFinanceDetail.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('is-ux-finance-detail-open');
+    syncUxFinanceMediaEdge();
+    if (uxFinanceMedia) uxFinanceMedia.scrollTop = 0;
+    initUxFinanceMediaReveal();
+    if (focusClose) uxFinanceDetailClose?.focus({ preventScroll: true });
+
+    const textMasks = [uxFinanceCopyCnMask, uxFinanceCopyEnMask].filter(Boolean);
+    uxFinanceTextTimeline?.kill();
+    if (!window.gsap || reduceMotion.matches) {
+      window.gsap?.set(textMasks, { scaleX: 0 });
+      window.gsap?.set(uxFinanceTitleStrokes, { strokeDasharray: 1200, strokeDashoffset: 0 });
+      if (uxFinanceTitleWipe) window.gsap?.set(uxFinanceTitleWipe, { attr: { width: 1500 } });
+      if (uxFinanceMosaic) window.gsap?.set(uxFinanceMosaic, { autoAlpha: 1, clearProps: 'transform' });
+      return;
+    }
+
+    const { gsap } = window;
+    gsap.set(uxFinanceTitleStrokes, {
+      strokeDasharray: 1200,
+      strokeDashoffset: 1200
+    });
+    if (uxFinanceTitleWipe) gsap.set(uxFinanceTitleWipe, { attr: { width: 0 } });
+    if (uxFinanceMosaic) {
+      gsap.set(uxFinanceMosaic, {
+        autoAlpha: 0,
+        y: -22,
+        willChange: 'transform, opacity'
+      });
+    }
+    gsap.set(uxFinanceCopyCnMask, {
+      scaleX: 1,
+      '--mask-top': '0%',
+      '--mask-bottom': '-15%',
+      force3D: true
+    });
+    gsap.set(uxFinanceCopyEnMask, {
+      scaleX: 1,
+      '--mask-top': '0%',
+      '--mask-bottom': '-11%',
+      force3D: true
+    });
+
+    uxFinanceTextTimeline = gsap.timeline({
+      onComplete: () => { uxFinanceTextTimeline = null; }
+    });
+    uxFinanceTextTimeline
+      .to(uxFinanceTitleStrokes, {
+        strokeDashoffset: 0,
+        duration: 1.2,
+        ease: 'power2.out',
+        stagger: .035
+      }, .08)
+      .to(uxFinanceTitleWipe, {
+        attr: { width: 1500 },
+        duration: .58,
+        ease: 'power2.inOut'
+      }, 1.38)
+      .to(uxFinanceMosaic, {
+        autoAlpha: 1,
+        y: 0,
+        duration: .4,
+        ease: 'power3.out',
+        clearProps: 'willChange'
+      }, .98)
+      .to(uxFinanceCopyCnMask, {
+        '--mask-top': '115%',
+        '--mask-bottom': '100%',
+        duration: 1.3,
+        ease: 'power3.inOut',
+        force3D: true
+      }, .46)
+      .to(uxFinanceCopyEnMask, {
+        '--mask-top': '111%',
+        '--mask-bottom': '100%',
+        duration: 1.15,
+        ease: 'power2.inOut',
+        force3D: true
+      }, .78);
+
+    if (uxFinanceMediaImages[0]) {
+      uxFinanceTextTimeline.to(uxFinanceMediaImages[0], {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        webkitClipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1.3,
+        ease: 'power3.inOut'
+      }, .46);
+    }
+
+    if (uxFinanceMediaImages[1]) {
+      uxFinanceTextTimeline.to(uxFinanceMediaImages[1], {
+        clipPath: 'inset(4px 4px 4px 4px)',
+        webkitClipPath: 'inset(4px 4px 4px 4px)',
+        duration: 1.3,
+        ease: 'power3.inOut'
+      }, .46);
+    }
+  };
+
+  uxFinanceCard?.addEventListener('click', openUxFinanceDetail);
+  uxFinanceCard?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    openUxFinanceDetail();
+  });
+  uxFinanceDetailClose?.addEventListener('click', () => closeUxFinanceDetail());
 
   classLessonButtons.forEach((button, index) => {
     const number = button.querySelector('span');
@@ -2033,7 +2287,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
   let stageActivePhone = null;
   let stageRestingPhone = 3;
-  let stageFlipTimer = 0;
+  let stagePhonePhase = 'resting';
+  let stageEntranceTimeline = null;
   let stageSlideTimer = 0;
   let stagePointerId = null;
   let stagePointerCard = null;
@@ -2074,13 +2329,27 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     uiPhoneCopy.dataset.phoneIndex = String(projectIndex);
   };
 
+  const balancePhoneModal = () => {
+    if (stageActivePhone === null || !uiPhoneCopy) return;
+    const mainCard = uiPhoneCards[stageActivePhone];
+    if (!mainCard) return;
+
+    document.documentElement.style.setProperty('--phone-modal-balance-y', '0px');
+    const phoneRect = mainCard.getBoundingClientRect();
+    const copyRect = uiPhoneCopy.getBoundingClientRect();
+    const balancedShift = (window.innerHeight - copyRect.bottom - phoneRect.top) / 2;
+    const safeTop = Math.max(24, window.innerHeight * .025);
+    const safeShift = Math.max(balancedShift, safeTop - phoneRect.top);
+    document.documentElement.style.setProperty('--phone-modal-balance-y', `${safeShift}px`);
+  };
+
   const renderPhoneStage = (previousAnchor, { immediate = false } = {}) => {
     uiPhoneTrack?.style.removeProperty('transform');
     uiPhoneCards.forEach((card) => card.classList.remove('is-wrapping'));
     const baseAnchor = stageActivePhone ?? stageRestingPhone;
     const stageAnchor = baseAnchor + stageDragOffset;
     const hasActivePhone = stageActivePhone !== null;
-    const phoneFocusActive = hasActivePhone;
+    const phoneFocusActive = hasActivePhone && stagePhonePhase === 'focused';
     const stageGsap = window.gsap;
     const useGsapStageMotion = Boolean(stageGsap && !reduceMotion.matches && uiPhoneGallery);
     const immediateStageRender = immediate || uiPhoneGallery?.dataset.phoneMotionReady !== 'true';
@@ -2109,15 +2378,17 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       const crossesHiddenSeam = !isMain
         && Math.abs(previousDifference - difference) > uiPhoneCards.length / 2;
       const phoneX = isMain ? 0 : difference * ringStepX;
-      const phoneY = isMain ? -7.5 : -8 + distance * distance * 2.67;
-      const scale = isMain ? 2.46 : Math.max(1.06, 1.22 - distance * .04);
+      const phoneY = isMain && phoneFocusActive ? -7.5 : -8 + distance * distance * 2.67;
+      const scale = isMain && phoneFocusActive
+        ? 2.46
+        : Math.max(1.06, 1.22 - distance * .04);
       const baseOpacity = isMain
         ? 1
         : distance >= 4 ? 0 : phoneFocusActive ? .26 : Math.max(.3, .52 - distance * .065);
       const baseBrightness = isMain
         ? 1
         : phoneFocusActive ? .64 : Math.max(.64, .82 - distance * .045);
-      const blur = isMain || !phoneFocusActive ? 0 : Math.min(7.5, 4.4 + distance * .75);
+      const blur = isMain || !phoneFocusActive ? 0 : 14;
       const isHovered = card.matches(':hover') && !isMain
         && !phoneFocusActive
         && !uiPhoneGallery?.classList.contains('is-dragging');
@@ -2133,6 +2404,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         '--phone-x': `${phoneX.toFixed(3)}cqw`,
         '--phone-y': `${phoneY.toFixed(3)}cqw`,
         '--phone-scale': String(scale),
+        '--phone-rotate': '0deg',
         '--phone-opacity': String(opacity),
         '--phone-brightness': String(brightness),
         '--phone-blur': `${blur.toFixed(2)}px`
@@ -2153,9 +2425,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
             overwrite: 'auto'
           }, 0)
           .to(card, {
-            '--phone-scale': String(scale),
-            duration: .72,
-            ease: 'back.out(1.16)',
+            keyframes: [
+              { '--phone-scale': '1.6', '--phone-rotate': '-2.5deg', duration: .18, ease: 'power1.out' },
+              { '--phone-scale': '2.1', '--phone-rotate': '2deg', duration: .18, ease: 'power1.out' },
+              { '--phone-scale': String(scale), '--phone-rotate': '0deg', duration: .26, ease: 'power2.out' }
+            ],
             overwrite: 'auto'
           }, 0);
       } else if (useGsapStageMotion && !immediateStageRender && wasMain) {
@@ -2188,12 +2462,13 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
           overwrite: 'auto'
         });
       } else if (useGsapStageMotion && !immediateStageRender) {
-        stageGsap.to(card, {
+        card._phoneStageTween = stageGsap.to(card, {
           ...motionState,
           duration: .78,
           delay: Math.min(distance, 4) * .025,
           ease: 'power3.inOut',
-          overwrite: 'auto'
+          overwrite: 'auto',
+          onComplete: () => { card._phoneStageTween = null; }
         });
       } else if (useGsapStageMotion) {
         stageGsap.set(card, motionState);
@@ -2201,6 +2476,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         Object.entries(motionState).forEach(([property, value]) => card.style.setProperty(property, value));
       }
     });
+
+    if (phoneFocusActive) balancePhoneModal();
 
   };
 
@@ -2323,10 +2600,21 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   };
 
   const collapsePhoneStage = () => {
-    window.clearTimeout(stageFlipTimer);
-    stageFlipTimer = 0;
+    stageEntranceTimeline?.kill();
+    stageEntranceTimeline = null;
+    document.documentElement.style.removeProperty('--phone-modal-balance-y');
     stopPhoneSlideshow();
+    if (window.gsap && siteHeader) {
+      window.gsap.killTweensOf(siteHeader);
+      window.gsap.set(siteHeader, { clearProps: 'opacity,filter' });
+    }
     uiPhoneCards.forEach((card) => {
+      card.style.removeProperty('--phone-focus-lock-x');
+      card.style.removeProperty('--phone-focus-lock-y');
+      card.style.removeProperty('--phone-entrance-x');
+      card.style.removeProperty('--phone-entrance-y');
+      card.style.removeProperty('--phone-entrance-scale');
+      card.style.removeProperty('--phone-entrance-rotation');
       const isReturningMain = card.classList.contains('is-main')
         && card.classList.contains('is-flipped');
       if (isReturningMain) card.style.setProperty('--phone-flip-duration', '720ms');
@@ -2342,11 +2630,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const activeIndex = stageActivePhone;
     const mainCard = uiPhoneCards[stageActivePhone];
     if (!mainCard) return;
-    await hydratePhoneSlides(mainCard);
-    if (stageActivePhone !== activeIndex || uiPhoneCards[stageActivePhone] !== mainCard) return;
     mainCard.classList.add('is-flipped');
     mainCard.setAttribute('aria-pressed', 'true');
     setPhoneCopyVisibility(true);
+    await hydratePhoneSlides(mainCard);
+    if (stageActivePhone !== activeIndex || uiPhoneCards[stageActivePhone] !== mainCard) return;
     startPhoneSlideshow(mainCard);
   };
 
@@ -2367,6 +2655,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     uiPhoneGallery?.classList.remove('is-dragging');
     if (stageActivePhone !== null) stageRestingPhone = stageActivePhone;
     stageActivePhone = null;
+    stagePhonePhase = 'resting';
     if (resetPosition) stageRestingPhone = Math.floor(uiPhoneCards.length / 2);
     renderPhoneStage(previousAnchor);
   };
@@ -2377,8 +2666,12 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const isCurrentMain = stageActivePhone !== null && nextIndex === stageActivePhone;
 
     if (isCurrentMain) {
-      window.clearTimeout(stageFlipTimer);
-      stageFlipTimer = 0;
+      stageEntranceTimeline?.kill();
+      stageEntranceTimeline = null;
+      if (stagePhonePhase !== 'focused') {
+        resetPhoneStage();
+        return;
+      }
       if (card.classList.contains('is-flipped')) resetPhoneStage();
       else {
         expandMainPhone();
@@ -2387,33 +2680,113 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     }
 
     collapsePhoneStage();
-    /* The detail behaves like a viewport modal. Normalize the section before
-       locking page scroll so a phone opened from a partially visible carousel
-       cannot inherit that scroll offset and be clipped at the top edge. */
-    if (expandAfterMove && worksGalleryPage) {
-      const galleryTop = window.scrollY + worksGalleryPage.getBoundingClientRect().top;
-      if (Math.abs(window.scrollY - galleryTop) > 1) {
-        window.scrollTo({ top: Math.round(galleryTop), behavior: 'auto' });
-      }
-    }
     /* Start decoding the selected work as soon as it is clicked, so the
        quicker flip never waits on an image at the end of the move. */
     hydratePhoneSlides(card);
     const previousAnchor = Number.isFinite(previousAnchorOverride)
       ? previousAnchorOverride
       : stageActivePhone ?? stageRestingPhone;
-    const transitionDuration = 720;
-    const flipDuration = 340;
     stageActivePhone = wrapPhoneIndex(nextIndex);
-    renderPhoneStage(previousAnchor);
-    flipPhoneDuringMove(card, stageActivePhone, flipDuration);
+    stagePhonePhase = 'centering';
 
-    if (!expandAfterMove) return;
-    const delay = reduceMotion.matches ? 0 : transitionDuration;
-    stageFlipTimer = window.setTimeout(() => {
-      stageFlipTimer = 0;
+    if (!expandAfterMove || reduceMotion.matches || !window.gsap) {
+      stagePhonePhase = 'focused';
+      renderPhoneStage(previousAnchor, { immediate: true });
+      flipPhoneDuringMove(card, stageActivePhone, 1);
       expandMainPhone();
-    }, delay);
+      return;
+    }
+
+    const activeIndex = stageActivePhone;
+    let entranceScale = 1;
+    let entranceX = 0;
+    let entranceY = 0;
+    const ringDistance = Math.abs(getPhoneIndexDifference(activeIndex, previousAnchor));
+    const moveDuration = ringDistance < .01 ? 0 : .68;
+    const flipDuration = .34;
+    const holdDuration = .08;
+
+    renderPhoneStage(previousAnchor, { immediate: ringDistance < .01 });
+
+    stageEntranceTimeline = window.gsap.timeline({
+      onComplete: () => {
+        if (stageActivePhone !== activeIndex || uiPhoneCards[activeIndex] !== card) return;
+        card.style.removeProperty('--phone-entrance-x');
+        card.style.removeProperty('--phone-entrance-y');
+        card.style.removeProperty('--phone-entrance-scale');
+        card.style.removeProperty('--phone-entrance-rotation');
+        stageEntranceTimeline = null;
+        expandMainPhone();
+      }
+    });
+
+    stageEntranceTimeline
+      .to({}, { duration: moveDuration })
+      .call(() => flipPhoneDuringMove(card, activeIndex, flipDuration * 1000))
+      .to({}, { duration: flipDuration + holdDuration })
+      .call(() => {
+        if (stageActivePhone !== activeIndex || uiPhoneCards[activeIndex] !== card) return;
+        const centeredRect = card.getBoundingClientRect();
+        const backgroundRects = uiPhoneCards.map((phoneCard) => phoneCard.getBoundingClientRect());
+        stagePhonePhase = 'focused';
+        renderPhoneStage(previousAnchor, { immediate: true });
+        const finalRect = card.getBoundingClientRect();
+        const focusedRects = uiPhoneCards.map((phoneCard) => phoneCard.getBoundingClientRect());
+        const backgroundCards = uiPhoneCards.filter((phoneCard) => phoneCard !== card);
+        uiPhoneCards.forEach((phoneCard, index) => {
+          if (phoneCard === card) return;
+          const beforeRect = backgroundRects[index];
+          const afterRect = focusedRects[index];
+          const lockX = beforeRect.left + beforeRect.width / 2
+            - (afterRect.left + afterRect.width / 2);
+          const lockY = beforeRect.top + beforeRect.height / 2
+            - (afterRect.top + afterRect.height / 2);
+          phoneCard.style.setProperty('--phone-focus-lock-x', `${lockX}px`);
+          phoneCard.style.setProperty('--phone-focus-lock-y', `${lockY}px`);
+        });
+        window.gsap.set(backgroundCards, { '--phone-blur': '0px' });
+        if (siteHeader) window.gsap.set(siteHeader, { opacity: 1, filter: 'blur(0px)' });
+        if (!centeredRect.width || !finalRect.width) return;
+
+        entranceScale = centeredRect.width / finalRect.width;
+        entranceX = centeredRect.left + centeredRect.width / 2
+          - (finalRect.left + finalRect.width / 2);
+        entranceY = centeredRect.top + centeredRect.height / 2
+          - (finalRect.top + finalRect.height / 2);
+        window.gsap.set(card, {
+          '--phone-entrance-x': `${entranceX}px`,
+          '--phone-entrance-y': `${entranceY}px`,
+          '--phone-entrance-scale': entranceScale,
+          '--phone-entrance-rotation': '0deg'
+        });
+      })
+      .addLabel('expand')
+      .to(card, {
+        '--phone-entrance-x': '0px',
+        '--phone-entrance-y': '0px',
+        '--phone-entrance-scale': 1,
+        '--phone-entrance-rotation': '0deg',
+        duration: .78,
+        ease: 'elastic.out(1, .48)',
+        overwrite: 'auto'
+      }, 'expand')
+      .call(() => {
+        if (stageActivePhone === activeIndex && uiPhoneCards[activeIndex] === card) {
+          setPhoneCopyVisibility(true);
+        }
+      }, null, 'expand+=.3')
+      .to(uiPhoneCards.filter((phoneCard) => phoneCard !== card), {
+        '--phone-blur': '14px',
+        duration: .5,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      }, 'expand')
+      .to(siteHeader || {}, {
+        opacity: 0,
+        duration: .4,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      }, 'expand');
   };
 
   if (uiPhoneGallery && uiPhoneTrack && uiPhoneSequence) {
@@ -2443,6 +2816,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       });
 
       card.addEventListener('pointerleave', () => {
+        if (stageActivePhone !== null) return;
         const baseOpacity = card.dataset.phoneBaseOpacity || '.48';
         const baseBrightness = card.dataset.phoneBaseBrightness || '.78';
         if (window.gsap && !reduceMotion.matches) {
@@ -2536,11 +2910,14 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
+    closeUxFinanceDetail();
     resetPhoneStage();
     resetUxProject();
   });
 
   let worksUxEntranceReady = false;
+  let worksUxCardTimeline = null;
+  let worksUxPinTrigger = null;
   const initWorksUxEntrance = () => {
     if (
       worksUxEntranceReady ||
@@ -2557,13 +2934,26 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     gsap.registerPlugin(ScrollTrigger);
     worksUxScroll.classList.add('is-motion-ready');
 
+    /* Hold the phone gallery for a short scroll distance before the UX bridge
+       begins, so a single trackpad gesture cannot skip straight past it. */
+    ScrollTrigger.create({
+      id: 'works-phone-gallery-hold',
+      trigger: worksGalleryPage,
+      start: 'top 15%',
+      end: () => `+=${Math.round(window.innerHeight * .85)}`,
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+      invalidateOnRefresh: true
+    });
+
     const media = gsap.matchMedia();
     media.add('(prefers-reduced-motion: no-preference)', () => {
       const cardStarts = [
-        { x: 92, y: -25, rotation: 24, scale: .88 },
-        { x: 76, y: -34, rotation: 18, scale: .9 },
-        { x: 65, y: -28, rotation: 14, scale: .92 },
-        { x: 58, y: -38, rotation: 20, scale: .9 }
+        { x: 75, y: -13, rotation: 20, waveY: 5.5 },
+        { x: 58, y: 12, rotation: -15, waveY: -5 },
+        { x: 36, y: -11, rotation: 17, waveY: 4.6 },
+        { x: 12, y: 10, rotation: -12, waveY: -4.2 }
       ];
 
       worksUxScrollCards.forEach((card, index) => {
@@ -2573,7 +2963,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
           x: () => window.innerWidth * start.x / 100,
           y: () => window.innerHeight * start.y / 100,
           rotation: start.rotation,
-          scale: start.scale
+          force3D: true
         });
       });
 
@@ -2587,7 +2977,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         const markHeight = markWidth * 440 / 1400;
         const isCompact = window.matchMedia('(max-aspect-ratio: 4/3)').matches;
         const sourceX = viewportWidth * .31771;
-        const sourceY = galleryRect.top + viewportWidth * .44792;
+        const sourceY = galleryRect.top + viewportWidth * .33792;
         const targetX = viewportWidth * (isCompact ? -.11 : -.065);
         /* Match the landing composition by visible pixels. The UX JPG and the
            home word PNG have different internal top padding, so their element
@@ -2620,29 +3010,44 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         onLeaveBack: () => renderModeBridge(0)
       });
 
-      const timeline = gsap.timeline({
-        defaults: { ease: 'power2.out' },
-        scrollTrigger: {
-          trigger: worksUxScroll,
-          start: 'top top',
-          end: () => `+=${Math.round(window.innerHeight * 2.75)}`,
-          pin: worksUxScrollScene,
-          pinSpacing: true,
-          scrub: .7,
-          anticipatePin: 0,
-          invalidateOnRefresh: true
-        }
-      });
+      worksUxCardTimeline = gsap.timeline({ paused: true });
 
       worksUxScrollCards.forEach((card, index) => {
-        timeline.to(card, {
-          autoAlpha: 1,
+        const start = cardStarts[index];
+        const entranceTime = index * .2;
+        const direction = index % 2 === 0 ? -1 : 1;
+        worksUxCardTimeline.set(card, { autoAlpha: 1 }, entranceTime);
+        worksUxCardTimeline.to(card, {
+          x: () => window.innerWidth * start.x * .45 / 100,
+          y: () => window.innerHeight * start.waveY / 100,
+          rotation: direction * 2.8,
+          duration: .56,
+          ease: 'sine.in',
+          force3D: true
+        }, entranceTime);
+        worksUxCardTimeline.to(card, {
           x: 0,
           y: 0,
           rotation: 0,
-          scale: 1,
-          duration: 1.02
-        }, index * .36);
+          duration: .72,
+          ease: 'sine.out',
+          force3D: true
+        }, entranceTime + .56);
+      });
+
+      worksUxPinTrigger = ScrollTrigger.create({
+        trigger: worksUxScroll,
+        start: 'top top',
+        end: () => `+=${Math.round(window.innerHeight * 2.75)}`,
+        pin: worksUxScrollScene,
+        pinSpacing: true,
+        anticipatePin: 0,
+        invalidateOnRefresh: true,
+        onEnter: () => worksUxCardTimeline?.restart(),
+        onEnterBack: () => {
+          if (worksUxCardTimeline?.progress() === 0) worksUxCardTimeline.restart();
+        },
+        onLeaveBack: () => worksUxCardTimeline?.pause(0)
       });
 
       const refresh = () => ScrollTrigger.refresh();
@@ -2651,8 +3056,10 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
       return () => {
         bridgeTrigger.kill();
-        timeline.scrollTrigger?.kill();
-        timeline.kill();
+        worksUxPinTrigger?.kill();
+        worksUxCardTimeline?.kill();
+        worksUxPinTrigger = null;
+        worksUxCardTimeline = null;
       };
     });
 
@@ -2750,12 +3157,19 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         });
       }
     }
+
+    if (isUxFinanceDetailRoute()) {
+      openUxFinanceDetail({ syncRoute: false, focusClose: false });
+    } else {
+      closeUxFinanceDetail({ restoreFocus: false, syncRoute: false });
+    }
   };
 
   window.addEventListener('hashchange', renderRoute);
   window.addEventListener('scroll', queueWorksMotionUpdate, { passive: true });
   window.addEventListener('resize', queueWorksMotionUpdate, { passive: true });
   window.addEventListener('resize', () => renderPhoneStage(), { passive: true });
+  window.addEventListener('resize', queueUxFinanceMediaEdgeSync, { passive: true });
   reduceMotion.addEventListener?.('change', () => {
     queueWorksMotionUpdate();
     if (reduceMotion.matches) clearHomeTextCursor();
