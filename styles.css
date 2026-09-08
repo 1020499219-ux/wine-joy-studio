@@ -1112,7 +1112,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .class-capability-slot .class-panel--sticker {
-  opacity: 1 !important;
+  opacity: 0;
   visibility: visible;
 }
 
@@ -3395,7 +3395,7 @@ a { color: inherit; text-decoration: none; }
     transition: none !important;
     transform: none !important;
     clip-path: none !important;
-    opacity: 1 !important;
+    opacity: 0;
   }
 
   .class-panel--sticker.is-capability-motion-ready .class-capability-title-layer,
@@ -3785,7 +3785,7 @@ a { color: inherit; text-decoration: none; }
   width: 100%;
   height: min(100svh, 56.25cqw);
   pointer-events: none;
-  transform: translate(3.5cqw, calc(-50% + 7vh)) scale(.91);
+  transform: translate(3.5cqw, calc(-50% + 7vh)) scale(.87);
   transform-origin: center 52%;
 }
 
@@ -3811,7 +3811,7 @@ a { color: inherit; text-decoration: none; }
   background-size: contain;
   opacity: 0;
   filter: none;
-  transform: translate(-50%, -50%) scale(.62);
+  transform: translate(-50%, -50%) scale(1) rotate(var(--r, 0deg)) !important;
   transform-origin: 50% 50%;
   will-change: transform, opacity;
 }
@@ -3839,10 +3839,33 @@ a { color: inherit; text-decoration: none; }
 }
 
 .works-copy a {
+  display: inline-block;
   color: #20f34f;
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: .12em;
+}
+
+.works-copy__roll-character {
+  position: relative;
+  display: inline-block;
+  line-height: inherit;
+}
+
+.works-copy__roll-layer {
+  display: block;
+  color: inherit;
+  will-change: transform, opacity;
+}
+
+.works-copy__roll-layer--current {
+  position: relative;
+}
+
+.works-copy__roll-layer--incoming,
+.works-copy__roll-layer--trail {
+  position: absolute;
+  inset: 0;
 }
 
 .works-copy u { text-underline-offset: .12em; text-decoration-thickness: 1px; }
@@ -4088,6 +4111,16 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
+.works-ux-scroll__card[data-ux-project-id] {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.works-ux-scroll__card[data-ux-project-id]:focus-visible {
+  outline: max(2px, .1cqw) solid rgba(255, 255, 255, .9);
+  outline-offset: max(3px, .18cqw);
+}
+
 .works-ux-scroll__card {
   position: absolute;
   display: block;
@@ -4109,13 +4142,6 @@ a { color: inherit; text-decoration: none; }
   left: 27.8cqw;
   top: 24.8vh;
   width: 22.65cqw;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.works-ux-scroll__card--2:focus-visible {
-  outline: max(2px, .1cqw) solid rgba(255, 255, 255, .9);
-  outline-offset: max(3px, .18cqw);
 }
 
 .works-ux-scroll__card--3 {
@@ -4149,11 +4175,11 @@ a { color: inherit; text-decoration: none; }
 @media (prefers-reduced-motion: reduce) {
   .works-ux-scroll__mark-image--ui { opacity: 0; }
   .works-ux-scroll__mark-image--ux { opacity: 1; }
-  .works-ux-scroll__card { opacity: 1 !important; }
+  .works-ux-scroll__card { opacity: 0; }
 }
 
-html.is-ux-finance-detail-open,
-html.is-ux-finance-detail-open body {
+html.is-ux-detail-open,
+html.is-ux-detail-open body {
   overflow: hidden;
 }
 
@@ -4186,8 +4212,13 @@ html.is-ux-finance-detail-open body {
 }
 
 @media (min-width: 769px) {
-  .ux-finance-detail__stage {
+  .ux-finance-detail[data-ux-detail] .ux-finance-detail__stage {
+    --ux-finance-viewport-right: calc(100% - 100vw);
+    left: 0;
+    width: max(100vw, 177.7778svh);
+    height: max(56.25vw, 100svh);
     overflow: visible;
+    transform: translate3d(0, -50%, 0);
   }
 }
 
@@ -4310,6 +4341,43 @@ html.is-ux-finance-detail-open body {
   stroke: none;
 }
 
+.ux-finance-detail__live-copy {
+  position: absolute;
+  z-index: 1;
+  left: 10.45%;
+  top: 50.463%;
+  width: 33.15%;
+  min-height: 20.84%;
+  display: none;
+  background: #101010;
+  box-shadow: 0 0 0 .8cqw #101010;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  pointer-events: none;
+  user-select: none;
+}
+
+.ux-finance-detail__live-copy[aria-hidden="false"] {
+  display: block;
+}
+
+.ux-finance-detail__live-copy p {
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 0;
+}
+
+.ux-finance-detail__live-copy-cn {
+  color: rgba(190, 190, 190, .72);
+  font-size: clamp(10px, .78cqw, 30px);
+  line-height: 1.46;
+}
+
+.ux-finance-detail__live-copy-en {
+  margin-top: .72cqw !important;
+  color: rgba(115, 115, 115, .38);
+  font: 300 clamp(7px, .44cqw, 17px) / 1.42 Arial, sans-serif;
+}
+
 .ux-finance-detail__mosaic {
   --cell: 1.95cqw;
   --drift-x: .075cqw;
@@ -4334,7 +4402,7 @@ html.is-ux-finance-detail-open body {
   position: absolute;
   display: block;
   overflow: hidden;
-  z-index: 1;
+  z-index: 2;
   background: #101010;
   transform: scaleX(1);
   transform-origin: right center;
@@ -4378,21 +4446,19 @@ html.is-ux-finance-detail-open body {
   z-index: 20;
   top: max(20px, 2.2vh);
   left: max(22px, 2.2vw);
-  min-width: 74px;
+  width: 34px;
   height: 34px;
-  padding: 0 10px;
-  border: 1px solid rgba(255, 255, 255, .42);
+  padding: 0;
+  border: 0;
   border-radius: 0;
-  background: rgba(16, 16, 16, .88);
+  background: transparent;
   color: rgba(255, 255, 255, .88);
-  font: 500 11px / 1 Arial, sans-serif;
-  letter-spacing: .12em;
+  font: 400 22px / 1 Arial, sans-serif;
   cursor: pointer;
 }
 
 .ux-finance-detail__close:hover,
 .ux-finance-detail__close:focus-visible {
-  border-color: rgba(255, 255, 255, .8);
   color: #fff;
   outline: none;
 }

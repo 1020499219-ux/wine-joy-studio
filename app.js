@@ -29,18 +29,25 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   const worksUxScrollMarkUi = document.querySelector('.works-ux-scroll__mark-image--ui');
   const worksUxScrollMarkUx = document.querySelector('.works-ux-scroll__mark-image--ux');
   const worksUxScrollCards = [...document.querySelectorAll('.works-ux-scroll__card')];
-  const uxFinanceCard = document.querySelector('.works-ux-scroll__card--2');
-  const uxFinanceDetail = document.querySelector('.ux-finance-detail');
-  const uxFinanceDetailStage = document.querySelector('.ux-finance-detail__stage');
-  const uxFinanceDetailClose = document.querySelector('.ux-finance-detail__close');
-  const uxFinanceMedia = document.querySelector('.ux-finance-detail__media');
-  const uxFinanceMediaImages = [...document.querySelectorAll('.ux-finance-detail__media img')];
-  const uxFinanceMediaCurtain = document.querySelector('.ux-finance-detail__media-curtain');
-  const uxFinanceTitleStrokes = [...document.querySelectorAll('[data-ux-finance-stroke-char]')];
-  const uxFinanceTitleWipe = document.querySelector('.ux-finance-detail__title-wipe');
-  const uxFinanceCopyCnMask = document.querySelector('.ux-finance-detail__text-mask--cn');
-  const uxFinanceCopyEnMask = document.querySelector('.ux-finance-detail__text-mask--en');
-  const uxFinanceMosaic = document.querySelector('.ux-finance-detail__mosaic');
+  const uxDetailCards = [...document.querySelectorAll('[data-ux-project-id]')];
+  const uxDetail = document.querySelector('[data-ux-detail]');
+  const uxDetailStage = uxDetail?.querySelector('.ux-finance-detail__stage');
+  const uxDetailClose = uxDetail?.querySelector('.ux-finance-detail__close');
+  const uxDetailBase = uxDetail?.querySelector('.ux-finance-detail__base');
+  const uxDetailMedia = uxDetail?.querySelector('.ux-finance-detail__media');
+  const uxDetailMediaCurtain = uxDetail?.querySelector('.ux-finance-detail__media-curtain');
+  const uxDetailTitle = uxDetail?.querySelector('.ux-finance-detail__stroke-title');
+  const uxDetailTitleStrokeGroup = uxDetail?.querySelector('[data-ux-detail-title-strokes]');
+  const uxDetailTitleFillGroup = uxDetail?.querySelector('[data-ux-detail-title-fills]');
+  const uxDetailTitleWipe = uxDetail?.querySelector('.ux-finance-detail__title-wipe');
+  const uxDetailLiveCopy = uxDetail?.querySelector('[data-ux-detail-live-copy]');
+  const uxDetailLiveCopyCn = uxDetail?.querySelector('[data-ux-detail-copy-cn]');
+  const uxDetailLiveCopyEn = uxDetail?.querySelector('[data-ux-detail-copy-en]');
+  const uxDetailCopyCnMask = uxDetail?.querySelector('.ux-finance-detail__text-mask--cn');
+  const uxDetailCopyEnMask = uxDetail?.querySelector('.ux-finance-detail__text-mask--en');
+  const uxDetailMosaic = uxDetail?.querySelector('.ux-finance-detail__mosaic');
+  let uxDetailMediaImages = [];
+  let uxDetailTitleStrokes = [];
   const worksModeTabs = document.querySelector('.works-mode-tabs');
   const worksModeLinks = [...document.querySelectorAll('.works-mode-tabs__tab')];
   const worksUxPage = document.querySelector('.works-ux-page');
@@ -100,10 +107,12 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let activeClassLesson = -1;
   let activeUxType = null;
   let uxDetailLoadToken = 0;
-  let uxFinanceTextTimeline = null;
-  let uxFinanceMediaRevealContext = null;
-  let uxFinanceReturnScrollY = null;
-  let uxFinanceEdgeFrame = 0;
+  let uxDetailTextTimeline = null;
+  let uxDetailMediaRevealContext = null;
+  let uxDetailReturnScrollY = null;
+  let uxDetailEdgeFrame = 0;
+  let uxDetailIntroToken = 0;
+  let activeUxDetailProject = null;
   let worksTileEntrance = null;
   let worksRingActiveIndex = -1;
   let worksRingTilesCache = null;
@@ -112,10 +121,113 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let worksPointerFrame = 0;
   let worksPointerSample = null;
   const worksRingTrail = [];
-  const worksRingTrailMax = 6;
-  const worksRingTrailHoldDuration = 110;
-  const worksRingTrailFadeDuration = .18;
-  const worksRingTrailDrainInterval = 24;
+  const createUxDetailReveal = (bottomInsets = {}, options = {}) => ({
+    introInsets: ['inset(0% 0% 0% 100%)', 'inset(4px 4px 4px 100%)'],
+    introFinalInsets: ['inset(0% 0% 0% 0%)', 'inset(4px 4px 4px 4px)'],
+    introStart: .46,
+    introDuration: 1.7,
+    titleStrokeStart: .08,
+    titleStrokeDuration: 1.2,
+    titleStrokeStagger: .035,
+    titleFillStart: 1.38,
+    titleFillDuration: .58,
+    copyCnStart: .46,
+    copyCnDuration: 1.7,
+    copyEnStart: .78,
+    copyEnDuration: 1.38,
+    scrollStartIndex: 2,
+    curtainImageIndex: 1,
+    curtainStart: 'bottom 68%',
+    imageStart: 'top 68%',
+    imageEnd: 'top 22%',
+    lastImageEnd: 'bottom bottom',
+    scrub: .9,
+    imageRevealScale: options.imageRevealScale ?? .8,
+    bottomInsets
+  });
+  const uxDetailProjects = new Map([
+    ['finance', {
+      id: 'finance',
+      route: 'works-ux/finance',
+      label: '海外金融 APP 交易链路体验升级详情',
+      mediaLabel: '海外金融 APP 项目展示图',
+      titleLines: ['海外金融APP', '交易链路体验升级'],
+      baseImage: './assets/ux-finance-detail/screen-03.jpg',
+      pages: [
+        { src: './assets/ux-finance-detail/right-pages/page-01.jpg?v=2', alt: '海外金融 APP 项目封面' },
+        { src: './assets/ux-finance-detail/right-pages/page-01b.jpg?v=1', alt: '海外金融 APP 界面总览' },
+        { src: './assets/ux-finance-detail/right-pages/page-02.jpg', alt: '海外金融 APP 产品走查' },
+        { src: './assets/ux-finance-detail/right-pages/page-03.jpg?v=2', alt: '海外金融 APP 获客问题分析' },
+        { src: './assets/ux-finance-detail/right-pages/page-04.jpg?v=3', alt: '海外金融 APP 核心问题分析' },
+        { src: './assets/ux-finance-detail/right-pages/page-05.jpg?v=2', alt: '海外金融 APP AI 功能入口与首页重构' },
+        { src: './assets/ux-finance-detail/right-pages/page-06.jpg', alt: '海外金融 APP 竞品资产分析' },
+        { src: './assets/ux-finance-detail/right-pages/page-07.jpg?v=2', alt: '海外金融 APP 资产看板设计' },
+        { src: './assets/ux-finance-detail/right-pages/page-08.jpg?v=2', alt: '海外金融 APP 色彩与字体规范' }
+      ],
+      reveal: createUxDetailReveal({ 7: '2px' })
+    }],
+    ['ticket', {
+      id: 'ticket',
+      route: 'works-ux/ticket',
+      label: '票星球 APP 抢票流程链路优化详情',
+      mediaLabel: '票星球 APP 项目展示图',
+      titleLines: ['票星球APP', '抢票流程链路优化'],
+      copyCn: '票星球是一款面向现场娱乐消费场景的新一代票务平台，围绕年轻用户从演出发现、信息筛选到购票决策的完整流程展开体验优化。项目通过用户研究、路径梳理与界面重构，提升信息获取效率与抢票决策体验，并建立兼具年轻感与品牌识别度的视觉体系。',
+      copyEn: 'This is an end-to-end ticketing experience optimization project for Ticket Planet, focused on reducing friction across event discovery, information filtering, and purchase decisions. Through user research, journey analysis, and interface redesign, the project improves content clarity and decision efficiency while building a distinctive visual system for younger live-entertainment audiences.',
+      baseImage: './assets/ux-finance-detail/screen-03.jpg',
+      pages: [
+        { src: './assets/ux-ticket-detail/right-pages/page-01.jpg?v=6', alt: '票星球 APP 项目封面与项目介绍' },
+        { src: './assets/ux-ticket-detail/right-pages/page-02.jpg?v=6', alt: '票星球 APP 用户群体、品牌理念与界面总览' },
+        { src: './assets/ux-ticket-detail/right-pages/page-03.jpg?v=7', alt: '票星球 APP 品牌视觉系统' },
+        { src: './assets/ux-ticket-detail/right-pages/page-03b.jpg?v=1', alt: '票星球 APP 首页重构与信息获取策略' },
+        { src: './assets/ux-ticket-detail/right-pages/page-04.jpg?v=6', alt: '票星球 APP 首页设计细节与未选方案' }
+      ],
+      reveal: createUxDetailReveal()
+    }],
+    ['flight', {
+      id: 'flight',
+      route: 'works-ux/flight',
+      label: '南航 APP 机票预订链路升级详情',
+      mediaLabel: '南航 APP 项目展示图',
+      titleLines: ['南航APP', '机票预订链路升级'],
+      copyCn: '南方航空 APP 是一站式航旅出行服务平台。本次项目聚焦机票预订全链路，围绕用户从航班搜索、信息对比到选舱与支付的完整流程展开体验升级。通过用户调研、数据分析、信息架构重组与界面优化，提升购票决策效率与核心业务转化，并建立更轻盈统一的品牌视觉体系。',
+      copyEn: 'This is an end-to-end flight-booking experience redesign for the China Southern Airlines app, focused on simplifying search, comparison, cabin selection, and payment decisions. Through user research, data analysis, information restructuring, and interface redesign, the project improves booking efficiency and commercial conversion while establishing a lighter, more consistent visual experience across the travel journey.',
+      baseImage: './assets/ux-finance-detail/screen-03.jpg',
+      pages: [
+        { src: './assets/ux-flight-detail/right-pages/page-01.jpg?v=1', alt: '南航 APP 机票预订链路升级项目封面' },
+        { src: './assets/ux-flight-detail/right-pages/page-02.jpg?v=2', alt: '南航 APP 项目介绍与核心界面总览' },
+        { src: './assets/ux-flight-detail/right-pages/page-03.jpg?v=2', alt: '南航 APP 项目流程与设计工作范围' },
+        { src: './assets/ux-flight-detail/right-pages/page-04.jpg?v=2', alt: '南航 APP 改版背景与核心问题分析' },
+        { src: './assets/ux-flight-detail/right-pages/page-05.jpg?v=3', alt: '南航 APP 首页方案与出行主题视觉图标' },
+        { src: './assets/ux-flight-detail/right-pages/page-06.jpg?v=3', alt: '南航 APP 舱位权益与购票决策方案' }
+      ],
+      reveal: createUxDetailReveal()
+    }],
+    ['resale', {
+      id: 'resale',
+      route: 'works-ux/resale',
+      label: '严选二手回收链路体验升级详情',
+      mediaLabel: '严选二手回收链路体验升级项目展示图',
+      titleLines: ['严选二手', '回收链路体验升级'],
+      copyCn: '爱回收是一个专注于二手数码产品回收与交易的电商平台，服务个人用户和二手商品买家。平台提供回收估价、交易和配送等服务，主要面向手机、笔记本等数码产品消费者，致力于为用户提供高效、安全、环保的二手交易解决方案，符合环保和循环经济理念。',
+      copyEn: 'This is an end-to-end resale and recycling experience redesign for AiHuiShou, focused on simplifying device evaluation, trade-in decisions, and transaction handoff. Through user research, journey analysis, AI-assisted valuation, and interface redesign, the project reduces operational friction, strengthens trust, and builds a more efficient and recognizable circular-commerce experience.',
+      baseImage: './assets/ux-finance-detail/screen-03.jpg',
+      pages: [
+        { src: './assets/ux-resale-detail/right-pages/page-01.jpg?v=1', alt: '严选二手项目核心界面总览' },
+        { src: './assets/ux-resale-detail/right-pages/page-02.jpg?v=1', alt: '严选二手项目介绍与推进流程' },
+        { src: './assets/ux-resale-detail/right-pages/page-03.jpg?v=1', alt: '严选二手改版原因与设计目标' },
+        { src: './assets/ux-resale-detail/right-pages/page-04.jpg?v=1', alt: '严选二手用户调研与人群分析' },
+        { src: './assets/ux-resale-detail/right-pages/page-05.jpg?v=1', alt: '严选二手核心链路体验升级' },
+        { src: './assets/ux-resale-detail/right-pages/page-06.jpg?v=1', alt: '严选二手 AI 智选功能方案' },
+        { src: './assets/ux-resale-detail/right-pages/page-07.jpg?v=1', alt: '严选二手品牌形象与角色设计' }
+      ],
+      reveal: createUxDetailReveal()
+    }]
+  ]);
+  const worksRingTrailMax = 5;
+  const worksRingTrailHoldDuration = 10;
+  const worksRingTrailFadeDuration = .15;
+  const worksRingTrailDrainInterval = 25;
   let worksRingTrailIdleTimer = 0;
   let worksRingTrailDrainTimer = 0;
   let worksRouteTransitionTimeline = null;
@@ -250,7 +362,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     worksRouteTransitionTimeline = null;
     if (!worksRouteTransition || !window.gsap) return;
     const introContent = worksPage.querySelectorAll(
-      '.works-brackets, .works-pixels, .works-copy p, .works-wine'
+      '.works-brackets, .works-pixels, .works-copy p, .works-copy a, .works-wine'
     );
     worksFlow?.classList.remove('is-route-transitioning');
     window.gsap.set(worksRouteTransition, { display: 'grid', autoAlpha: 1, zIndex: 0 });
@@ -266,12 +378,40 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     if (!worksRouteTransition || !window.gsap) return;
     const bars = worksRouteTransition.querySelectorAll('i');
     const introContent = worksPage.querySelectorAll(
-      '.works-brackets, .works-pixels, .works-copy p, .works-wine'
+      '.works-brackets, .works-pixels, .works-copy p, .works-copy a, .works-wine'
     );
     window.gsap.set(worksRouteTransition, { display: 'none', clearProps: 'opacity,visibility' });
     window.gsap.set(bars, { clearProps: 'transform,willChange' });
     window.gsap.set(introContent, { clearProps: 'opacity,visibility,transform' });
   };
+
+  const prepareWorksAccentRolls = (links) => links.map((link) => {
+    if (!link.dataset.letterRollReady) {
+      const label = link.textContent || '';
+      link.textContent = '';
+      link.dataset.letterRollReady = 'true';
+      link.setAttribute('aria-label', label);
+
+      [...label].forEach((character) => {
+        const characterWrap = document.createElement('span');
+        characterWrap.className = 'works-copy__roll-character';
+        characterWrap.setAttribute('aria-hidden', 'true');
+
+        ['current', 'incoming', 'trail'].forEach((layerName) => {
+          const layer = document.createElement('span');
+          layer.className = `works-copy__roll-layer works-copy__roll-layer--${layerName}`;
+          layer.textContent = character;
+          characterWrap.append(layer);
+        });
+        link.append(characterWrap);
+      });
+    }
+
+    return {
+      link,
+      characters: [...link.querySelectorAll('.works-copy__roll-character')]
+    };
+  });
 
   const playWorksRouteTransition = () => {
     if (!worksRouteTransition || !worksPage || !window.gsap || reduceMotion.matches) {
@@ -286,6 +426,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const gsap = window.gsap;
     const bars = [...worksRouteTransition.querySelectorAll('i')];
     const copyLines = [...worksPage.querySelectorAll('.works-copy p')];
+    const accentLinks = [...worksPage.querySelectorAll('.works-copy a')];
+    const accentRolls = prepareWorksAccentRolls(accentLinks);
     const supportingVisuals = [...worksPage.querySelectorAll(
       '.works-brackets, .works-pixels, .works-wine'
     )];
@@ -298,6 +440,21 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     });
     gsap.set(supportingVisuals, { autoAlpha: 0 });
     gsap.set(copyLines, { autoAlpha: 0, y: 26 });
+    gsap.set(accentLinks, { autoAlpha: 0 });
+    accentRolls.forEach(({ characters }) => {
+      gsap.set(characters.map((character) => character.querySelector('.works-copy__roll-layer--current')), {
+        autoAlpha: 1,
+        yPercent: 0
+      });
+      gsap.set(characters.map((character) => character.querySelector('.works-copy__roll-layer--incoming')), {
+        autoAlpha: .18,
+        yPercent: 105
+      });
+      gsap.set(characters.map((character) => character.querySelector('.works-copy__roll-layer--trail')), {
+        autoAlpha: 0,
+        yPercent: 185
+      });
+    });
 
     worksRouteTransitionTimeline = gsap.timeline({
       defaults: { ease: 'power3.inOut' },
@@ -324,6 +481,46 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         duration: .5,
         ease: 'power2.out'
       }, 'reveal+=.2');
+
+    accentRolls.forEach(({ link, characters }, linkIndex) => {
+      const rollStart = .78 + linkIndex * .18;
+      worksRouteTransitionTimeline.set(link, { autoAlpha: 1 }, `reveal+=${rollStart}`);
+
+      characters.forEach((character, characterIndex) => {
+        const characterStart = `reveal+=${rollStart + characterIndex * .045}`;
+        const current = character.querySelector('.works-copy__roll-layer--current');
+        const incoming = character.querySelector('.works-copy__roll-layer--incoming');
+        const trail = character.querySelector('.works-copy__roll-layer--trail');
+
+        worksRouteTransitionTimeline
+          .to(current, {
+            autoAlpha: 0,
+            yPercent: -112,
+            duration: .56,
+            ease: 'power3.inOut',
+            force3D: true
+          }, characterStart)
+          .to(incoming, {
+            autoAlpha: 1,
+            yPercent: 0,
+            duration: .56,
+            ease: 'power3.inOut',
+            force3D: true
+          }, characterStart)
+          .to(trail, {
+            autoAlpha: .2,
+            yPercent: 72,
+            duration: .42,
+            ease: 'power2.out',
+            force3D: true
+          }, characterStart)
+          .to(trail, {
+            autoAlpha: 0,
+            duration: .14,
+            ease: 'sine.out'
+          }, `reveal+=${rollStart + characterIndex * .045 + .42}`);
+      });
+    });
     worksRouteTransitionTimeline.timeScale(1.65);
   };
 
@@ -582,7 +779,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       window.gsap.killTweensOf(tile);
       window.gsap.to(tile, {
         opacity: 1,
-        duration: reduceMotion.matches ? 0 : .27,
+        duration: reduceMotion.matches ? 0 : 0,
         ease: 'power3.out',
         overwrite: 'auto'
       });
@@ -607,15 +804,12 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     stopWorksRingTrailDrain();
     worksRingTrail.length = 0;
     if (!worksTiles || !window.gsap) return;
-    const tiles = layoutWorksTileRing();
-    window.gsap.killTweensOf(tiles);
-    tiles.forEach((tile) => {
+    const allTiles = worksTiles.querySelectorAll('.works-tiles__group i');
+    window.gsap.killTweensOf(allTiles);
+    allTiles.forEach((tile) => {
+      tile.style.setProperty('--r', (tile.dataset.r || 0) + 'deg');
       window.gsap.set(tile, {
         opacity: 0,
-        scale: 1,
-        rotation: Number(tile.dataset.r || 0),
-        xPercent: -50,
-        yPercent: -50,
         visibility: 'visible',
         willChange: 'transform, opacity'
       });
@@ -698,15 +892,12 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const tiles = layoutWorksTileRing();
     if (!tiles.length) return;
     if (worksRingHitRegionsDirty) refreshWorksRingHitRegions();
-    const activationRadius = Math.max(160, Math.min(window.innerWidth, window.innerHeight) * .20);
+    const activationRadius = Math.max(140, Math.min(window.innerWidth, window.innerHeight) * .16);
     const nearbyTiles = [];
 
     worksRingHitRegions.forEach((region, tileIndex) => {
       const edgeDistance = distanceFromPointToRect(pointer.clientX, pointer.clientY, region);
       if (edgeDistance > activationRadius) return;
-
-      /* Every nearby tile has an independent hit region, even when covered.
-         Distance orders the trail without excluding overlapping images. */
       const centerDistance = Math.hypot(
         pointer.clientX - region.centerX,
         pointer.clientY - region.centerY
@@ -1003,108 +1194,196 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
   resetUxProject();
 
-  const uxFinanceDetailRoute = 'works-ux/finance';
-  const isUxFinanceDetailRoute = () => location.hash.replace(/^#/, '') === uxFinanceDetailRoute;
+  const getUxDetailProjectByRoute = () => {
+    const route = location.hash.replace(/^#/, '');
+    return [...uxDetailProjects.values()].find((project) => project.route === route) || null;
+  };
 
-  const syncUxFinanceMediaEdge = () => {
-    if (!uxFinanceDetailStage) return;
+  const renderUxDetailProject = (project) => {
+    if (!project || !uxDetail || !uxDetailMedia) return false;
+    const isCurrentProjectRender = activeUxDetailProject?.id === project.id
+      && uxDetailMediaImages.length === project.pages.length
+      && uxDetailMediaImages.every((image, index) => image.getAttribute('src') === project.pages[index].src);
+    if (isCurrentProjectRender) return true;
+
+    activeUxDetailProject = project;
+    uxDetail.dataset.projectId = project.id;
+    uxDetail.setAttribute('aria-label', project.label);
+    uxDetailMedia.setAttribute('aria-label', project.mediaLabel);
+    uxDetailTitle?.setAttribute('aria-label', project.titleLines.join(' '));
+    if (uxDetailLiveCopyCn) uxDetailLiveCopyCn.textContent = project.copyCn || '';
+    if (uxDetailLiveCopyEn) uxDetailLiveCopyEn.textContent = project.copyEn || '';
+    uxDetailLiveCopy?.setAttribute('aria-hidden', project.copyCn ? 'false' : 'true');
+    if (uxDetailBase) {
+      uxDetailBase.src = project.baseImage;
+      uxDetailBase.alt = project.label;
+    }
+
+    const pageImages = project.pages.map((page) => {
+      const image = document.createElement('img');
+      image.src = page.src;
+      image.alt = page.alt;
+      return image;
+    });
+    uxDetailMedia.replaceChildren(...pageImages);
+    uxDetailMediaImages = pageImages;
+
+    const svgNamespace = 'http://www.w3.org/2000/svg';
+    const linePositions = [190, 430];
+    uxDetailTitleStrokeGroup?.replaceChildren();
+    uxDetailTitleFillGroup?.replaceChildren();
+    project.titleLines.forEach((line, index) => {
+      const y = String(linePositions[index] ?? linePositions[linePositions.length - 1]);
+      const strokeLine = document.createElementNS(svgNamespace, 'text');
+      strokeLine.setAttribute('x', '0');
+      strokeLine.setAttribute('y', y);
+      [...line].forEach((character) => {
+        const span = document.createElementNS(svgNamespace, 'tspan');
+        span.dataset.uxDetailStrokeChar = '';
+        span.textContent = character;
+        strokeLine.append(span);
+      });
+      uxDetailTitleStrokeGroup?.append(strokeLine);
+
+      const fillLine = document.createElementNS(svgNamespace, 'text');
+      fillLine.setAttribute('x', '0');
+      fillLine.setAttribute('y', y);
+      fillLine.textContent = line;
+      uxDetailTitleFillGroup?.append(fillLine);
+    });
+    uxDetailTitleStrokes = [...uxDetail.querySelectorAll('[data-ux-detail-stroke-char]')];
+    return true;
+  };
+
+  const syncUxDetailMediaEdge = () => {
+    if (!uxDetailStage) return;
     if (window.innerWidth <= 768) {
-      uxFinanceDetailStage.style.removeProperty('--ux-finance-viewport-right');
+      uxDetailStage.style.removeProperty('--ux-finance-viewport-right');
       return;
     }
 
-    const stageRight = uxFinanceDetailStage.getBoundingClientRect().right;
-    const rightGutter = Math.max(0, window.innerWidth - stageRight);
-    uxFinanceDetailStage.style.setProperty('--ux-finance-viewport-right', `${-rightGutter}px`);
+    const stageRight = uxDetailStage.getBoundingClientRect().right;
+    const viewportRightOffset = stageRight - window.innerWidth;
+    uxDetailStage.style.setProperty('--ux-finance-viewport-right', `${viewportRightOffset}px`);
   };
 
-  const queueUxFinanceMediaEdgeSync = () => {
-    if (uxFinanceEdgeFrame) return;
-    uxFinanceEdgeFrame = requestAnimationFrame(() => {
-      uxFinanceEdgeFrame = 0;
-      syncUxFinanceMediaEdge();
+  const queueUxDetailMediaEdgeSync = () => {
+    if (uxDetailEdgeFrame) return;
+    uxDetailEdgeFrame = requestAnimationFrame(() => {
+      uxDetailEdgeFrame = 0;
+      syncUxDetailMediaEdge();
     });
   };
 
-  const destroyUxFinanceMediaReveal = () => {
-    uxFinanceMediaRevealContext?.revert();
-    uxFinanceMediaRevealContext = null;
+  const destroyUxDetailMediaReveal = () => {
+    uxDetailMediaRevealContext?.revert();
+    uxDetailMediaRevealContext = null;
   };
 
-  const initUxFinanceMediaReveal = () => {
-    destroyUxFinanceMediaReveal();
-    if (!uxFinanceMedia || !uxFinanceMediaImages.length || !window.gsap) return;
+  const waitForUxDetailImages = (images) => Promise.all(images.map((image) => {
+    if (image.complete) return Promise.resolve();
+    return new Promise((resolve) => {
+      image.addEventListener('load', resolve, { once: true });
+      image.addEventListener('error', resolve, { once: true });
+    });
+  }));
+
+  const initUxDetailMediaReveal = () => {
+    destroyUxDetailMediaReveal();
+    if (!uxDetailMedia || !uxDetailMediaImages.length || !activeUxDetailProject || !window.gsap) return;
 
     const { gsap, ScrollTrigger } = window;
     if (!ScrollTrigger || reduceMotion.matches) {
-      gsap.set(uxFinanceMediaImages, { clearProps: 'clipPath,webkitClipPath,willChange' });
-      if (uxFinanceMediaCurtain) gsap.set(uxFinanceMediaCurtain, { autoAlpha: 0 });
+      gsap.set(uxDetailMediaImages, { clearProps: 'clipPath,webkitClipPath,transform,transformOrigin,willChange' });
+      if (uxDetailMediaCurtain) gsap.set(uxDetailMediaCurtain, { autoAlpha: 0 });
       return;
     }
 
+    const reveal = activeUxDetailProject.reveal;
     gsap.registerPlugin(ScrollTrigger);
-    uxFinanceMediaRevealContext = gsap.context(() => {
-      gsap.set(uxFinanceMediaImages[0], {
-        clipPath: 'inset(0% 0% 0% 100%)',
-        webkitClipPath: 'inset(0% 0% 0% 100%)',
-        willChange: 'clip-path'
+    uxDetailMediaRevealContext = gsap.context(() => {
+      reveal.introInsets.forEach((inset, index) => {
+        if (!uxDetailMediaImages[index]) return;
+        gsap.set(uxDetailMediaImages[index], {
+          clipPath: inset,
+          webkitClipPath: inset,
+          scale: reveal.imageRevealScale,
+          transformOrigin: index === 0 && reveal.imageRevealScale !== 1
+            ? '100% 50%'
+            : '50% 50%',
+          willChange: reveal.imageRevealScale === 1 ? 'clip-path' : 'clip-path, transform'
+        });
       });
 
-      if (uxFinanceMediaImages[1]) {
-        gsap.set(uxFinanceMediaImages[1], {
-          clipPath: 'inset(4px 4px 4px 100%)',
-          webkitClipPath: 'inset(4px 4px 4px 100%)',
-          willChange: 'clip-path'
-        });
-      }
-
-      if (uxFinanceMediaCurtain && uxFinanceMediaImages[1]) {
-        gsap.set(uxFinanceMediaCurtain, { autoAlpha: 1 });
+      const curtainImage = uxDetailMediaImages[reveal.curtainImageIndex];
+      if (uxDetailMediaCurtain && curtainImage) {
+        gsap.set(uxDetailMediaCurtain, { autoAlpha: 1 });
         ScrollTrigger.create({
-          trigger: uxFinanceMediaImages[1],
-          scroller: uxFinanceMedia,
-          start: 'bottom 68%',
-          onEnter: () => gsap.set(uxFinanceMediaCurtain, { autoAlpha: 0 }),
-          onLeaveBack: () => gsap.set(uxFinanceMediaCurtain, { autoAlpha: 1 })
+          trigger: curtainImage,
+          scroller: uxDetailMedia,
+          start: reveal.curtainStart,
+          onEnter: () => gsap.set(uxDetailMediaCurtain, { autoAlpha: 0 }),
+          onLeaveBack: () => gsap.set(uxDetailMediaCurtain, { autoAlpha: 1 })
         });
       }
 
-      uxFinanceMediaImages.slice(2).forEach((image) => {
-        const isLastImage = image === uxFinanceMediaImages[uxFinanceMediaImages.length - 1];
-        const bottomInset = image === uxFinanceMediaImages[7] ? '2px' : '0%';
+      uxDetailMediaImages.slice(reveal.scrollStartIndex).forEach((image, offset) => {
+        const imageIndex = reveal.scrollStartIndex + offset;
+        const isLastImage = imageIndex === uxDetailMediaImages.length - 1;
+        const bottomInset = reveal.bottomInsets[imageIndex] || '0%';
         gsap.fromTo(image, {
           clipPath: `inset(0% 0% ${bottomInset} 100%)`,
           webkitClipPath: `inset(0% 0% ${bottomInset} 100%)`,
-          willChange: 'clip-path'
+          scale: reveal.imageRevealScale,
+          transformOrigin: '50% 50%',
+          willChange: reveal.imageRevealScale === 1 ? 'clip-path' : 'clip-path, transform'
         }, {
           clipPath: `inset(0% 0% ${bottomInset} 0%)`,
           webkitClipPath: `inset(0% 0% ${bottomInset} 0%)`,
+          scale: 1,
           ease: 'none',
           scrollTrigger: {
             trigger: image,
-            scroller: uxFinanceMedia,
-            start: 'top 68%',
-            end: isLastImage ? 'bottom bottom' : 'top 22%',
-            scrub: .9,
+            scroller: uxDetailMedia,
+            start: reveal.imageStart,
+            end: isLastImage ? reveal.lastImageEnd : reveal.imageEnd,
+            scrub: reveal.scrub,
             invalidateOnRefresh: true
           }
         });
       });
-    }, uxFinanceDetail);
+    }, uxDetail);
 
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    const revealContext = uxDetailMediaRevealContext;
+    const refreshReveal = () => {
+      if (uxDetailMediaRevealContext !== revealContext || uxDetail.hidden) return;
+      requestAnimationFrame(() => {
+        if (uxDetailMediaRevealContext !== revealContext || uxDetail.hidden) return;
+        ScrollTrigger.refresh();
+        ScrollTrigger.update();
+      });
+    };
+    uxDetailMediaImages
+      .filter((image) => !image.complete)
+      .forEach((image) => {
+        image.addEventListener('load', refreshReveal, { once: true });
+        image.addEventListener('error', refreshReveal, { once: true });
+      });
+    refreshReveal();
   };
 
-  const closeUxFinanceDetail = ({ restoreFocus = true, syncRoute = true } = {}) => {
-    if (!uxFinanceDetail || uxFinanceDetail.hidden) return;
-    const returnScrollY = uxFinanceReturnScrollY;
-    uxFinanceTextTimeline?.kill();
-    uxFinanceTextTimeline = null;
-    destroyUxFinanceMediaReveal();
-    uxFinanceDetail.hidden = true;
-    uxFinanceDetail.setAttribute('aria-hidden', 'true');
-    document.documentElement.classList.remove('is-ux-finance-detail-open');
-    if (syncRoute && isUxFinanceDetailRoute()) {
+  const closeUxDetail = ({ restoreFocus = true, syncRoute = true } = {}) => {
+    if (!uxDetail || uxDetail.hidden) return;
+    const returnScrollY = uxDetailReturnScrollY;
+    const returnProjectId = activeUxDetailProject?.id;
+    uxDetailTextTimeline?.kill();
+    uxDetailTextTimeline = null;
+    uxDetailIntroToken += 1;
+    destroyUxDetailMediaReveal();
+    uxDetail.hidden = true;
+    uxDetail.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('is-ux-detail-open');
+    if (syncRoute && getUxDetailProjectByRoute()) {
       history.replaceState(null, '', '#works-ux');
     }
     requestAnimationFrame(() => {
@@ -1123,123 +1402,145 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         rotation: 0
       });
     });
-    uxFinanceReturnScrollY = null;
-    if (restoreFocus) uxFinanceCard?.focus({ preventScroll: true });
+    uxDetailReturnScrollY = null;
+    if (restoreFocus && returnProjectId) {
+      uxDetailCards.find((card) => card.dataset.uxProjectId === returnProjectId)
+        ?.focus({ preventScroll: true });
+    }
   };
 
-  const openUxFinanceDetail = ({ syncRoute = true, focusClose = true } = {}) => {
-    if (!uxFinanceDetail || !uxFinanceDetailStage) return;
-    if (syncRoute && !isUxFinanceDetailRoute()) {
-      uxFinanceReturnScrollY = window.scrollY;
-      history.pushState(null, '', `#${uxFinanceDetailRoute}`);
-    }
-    uxFinanceDetail.hidden = false;
-    uxFinanceDetail.setAttribute('aria-hidden', 'false');
-    document.documentElement.classList.add('is-ux-finance-detail-open');
-    syncUxFinanceMediaEdge();
-    if (uxFinanceMedia) uxFinanceMedia.scrollTop = 0;
-    initUxFinanceMediaReveal();
-    if (focusClose) uxFinanceDetailClose?.focus({ preventScroll: true });
-
-    const textMasks = [uxFinanceCopyCnMask, uxFinanceCopyEnMask].filter(Boolean);
-    uxFinanceTextTimeline?.kill();
-    if (!window.gsap || reduceMotion.matches) {
-      window.gsap?.set(textMasks, { scaleX: 0 });
-      window.gsap?.set(uxFinanceTitleStrokes, { strokeDasharray: 1200, strokeDashoffset: 0 });
-      if (uxFinanceTitleWipe) window.gsap?.set(uxFinanceTitleWipe, { attr: { width: 1500 } });
-      if (uxFinanceMosaic) window.gsap?.set(uxFinanceMosaic, { autoAlpha: 1, clearProps: 'transform' });
-      return;
-    }
-
+  const prepareUxDetailIntro = () => {
+    if (!window.gsap || reduceMotion.matches) return;
     const { gsap } = window;
-    gsap.set(uxFinanceTitleStrokes, {
+    gsap.set(uxDetailTitleStrokes, {
       strokeDasharray: 1200,
       strokeDashoffset: 1200
     });
-    if (uxFinanceTitleWipe) gsap.set(uxFinanceTitleWipe, { attr: { width: 0 } });
-    if (uxFinanceMosaic) {
-      gsap.set(uxFinanceMosaic, {
+    if (uxDetailTitleWipe) gsap.set(uxDetailTitleWipe, { attr: { width: 0 } });
+    if (uxDetailMosaic) {
+      gsap.set(uxDetailMosaic, {
         autoAlpha: 0,
         y: -22,
         willChange: 'transform, opacity'
       });
     }
-    gsap.set(uxFinanceCopyCnMask, {
+    gsap.set(uxDetailCopyCnMask, {
       scaleX: 1,
       '--mask-top': '0%',
       '--mask-bottom': '-15%',
       force3D: true
     });
-    gsap.set(uxFinanceCopyEnMask, {
+    gsap.set(uxDetailCopyEnMask, {
       scaleX: 1,
       '--mask-top': '0%',
       '--mask-bottom': '-11%',
       force3D: true
     });
+  };
 
-    uxFinanceTextTimeline = gsap.timeline({
-      onComplete: () => { uxFinanceTextTimeline = null; }
+  const playUxDetailIntro = () => {
+    const textMasks = [uxDetailCopyCnMask, uxDetailCopyEnMask].filter(Boolean);
+    uxDetailTextTimeline?.kill();
+    if (!window.gsap || reduceMotion.matches) {
+      window.gsap?.set(textMasks, { scaleX: 0 });
+      window.gsap?.set(uxDetailTitleStrokes, { strokeDasharray: 1200, strokeDashoffset: 0 });
+      if (uxDetailTitleWipe) window.gsap?.set(uxDetailTitleWipe, { attr: { width: 1500 } });
+      if (uxDetailMosaic) window.gsap?.set(uxDetailMosaic, { autoAlpha: 1, clearProps: 'transform' });
+      return;
+    }
+
+    const { gsap } = window;
+    prepareUxDetailIntro();
+
+    uxDetailTextTimeline = gsap.timeline({
+      onComplete: () => { uxDetailTextTimeline = null; }
     });
-    uxFinanceTextTimeline
-      .to(uxFinanceTitleStrokes, {
+    uxDetailTextTimeline
+      .to(uxDetailTitleStrokes, {
         strokeDashoffset: 0,
-        duration: 1.2,
+        duration: activeUxDetailProject.reveal.titleStrokeDuration,
         ease: 'power2.out',
-        stagger: .035
-      }, .08)
-      .to(uxFinanceTitleWipe, {
+        stagger: activeUxDetailProject.reveal.titleStrokeStagger
+      }, activeUxDetailProject.reveal.titleStrokeStart)
+      .to(uxDetailTitleWipe, {
         attr: { width: 1500 },
-        duration: .58,
+        duration: activeUxDetailProject.reveal.titleFillDuration,
         ease: 'power2.inOut'
-      }, 1.38)
-      .to(uxFinanceMosaic, {
+      }, activeUxDetailProject.reveal.titleFillStart)
+      .to(uxDetailMosaic, {
         autoAlpha: 1,
         y: 0,
         duration: .4,
         ease: 'power3.out',
         clearProps: 'willChange'
       }, .98)
-      .to(uxFinanceCopyCnMask, {
+      .to(uxDetailCopyCnMask, {
         '--mask-top': '115%',
         '--mask-bottom': '100%',
-        duration: 1.3,
+        duration: activeUxDetailProject.reveal.copyCnDuration,
         ease: 'power3.inOut',
         force3D: true
-      }, .46)
-      .to(uxFinanceCopyEnMask, {
+      }, activeUxDetailProject.reveal.copyCnStart)
+      .to(uxDetailCopyEnMask, {
         '--mask-top': '111%',
         '--mask-bottom': '100%',
-        duration: 1.15,
+        duration: activeUxDetailProject.reveal.copyEnDuration,
         ease: 'power2.inOut',
         force3D: true
-      }, .78);
+      }, activeUxDetailProject.reveal.copyEnStart);
 
-    if (uxFinanceMediaImages[0]) {
-      uxFinanceTextTimeline.to(uxFinanceMediaImages[0], {
-        clipPath: 'inset(0% 0% 0% 0%)',
-        webkitClipPath: 'inset(0% 0% 0% 0%)',
-        duration: 1.3,
+    activeUxDetailProject.reveal.introFinalInsets.forEach((inset, index) => {
+      if (!uxDetailMediaImages[index]) return;
+      uxDetailTextTimeline.to(uxDetailMediaImages[index], {
+        clipPath: inset,
+        webkitClipPath: inset,
+        scale: 1,
+        duration: activeUxDetailProject.reveal.introDuration,
         ease: 'power3.inOut'
-      }, .46);
-    }
-
-    if (uxFinanceMediaImages[1]) {
-      uxFinanceTextTimeline.to(uxFinanceMediaImages[1], {
-        clipPath: 'inset(4px 4px 4px 4px)',
-        webkitClipPath: 'inset(4px 4px 4px 4px)',
-        duration: 1.3,
-        ease: 'power3.inOut'
-      }, .46);
-    }
+      }, activeUxDetailProject.reveal.introStart);
+    });
   };
 
-  uxFinanceCard?.addEventListener('click', openUxFinanceDetail);
-  uxFinanceCard?.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    openUxFinanceDetail();
+  const openUxDetail = (project, { syncRoute = true, focusClose = true } = {}) => {
+    if (!project || !uxDetail || !uxDetailStage || !renderUxDetailProject(project)) return;
+    if (syncRoute && location.hash.replace(/^#/, '') !== project.route) {
+      uxDetailReturnScrollY = window.scrollY;
+      history.pushState(null, '', `#${project.route}`);
+    }
+    uxDetail.hidden = false;
+    uxDetail.setAttribute('aria-hidden', 'false');
+    document.documentElement.classList.add('is-ux-detail-open');
+    syncUxDetailMediaEdge();
+    if (uxDetailMedia) uxDetailMedia.scrollTop = 0;
+    initUxDetailMediaReveal();
+    prepareUxDetailIntro();
+    if (focusClose) uxDetailClose?.focus({ preventScroll: true });
+
+    const introToken = ++uxDetailIntroToken;
+    if (reduceMotion.matches) {
+      playUxDetailIntro();
+      return;
+    }
+    const introImages = uxDetailMediaImages.slice(0, activeUxDetailProject.reveal.introInsets.length);
+    waitForUxDetailImages(introImages).then(() => {
+      if (introToken !== uxDetailIntroToken || uxDetail.hidden || activeUxDetailProject?.id !== project.id) return;
+      initUxDetailMediaReveal();
+      playUxDetailIntro();
+    });
+  };
+
+  uxDetailCards.forEach((card) => {
+    const project = uxDetailProjects.get(card.dataset.uxProjectId);
+    if (!project) return;
+    card.addEventListener('click', () => openUxDetail(project));
+    card.addEventListener('keydown', (event) => {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+      openUxDetail(project);
+    });
   });
-  uxFinanceDetailClose?.addEventListener('click', () => closeUxFinanceDetail());
+  uxDetailClose?.addEventListener('click', () => closeUxDetail());
+  renderUxDetailProject(uxDetailProjects.values().next().value);
 
   classLessonButtons.forEach((button, index) => {
     const number = button.querySelector('span');
@@ -2339,7 +2640,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const copyRect = uiPhoneCopy.getBoundingClientRect();
     const balancedShift = (window.innerHeight - copyRect.bottom - phoneRect.top) / 2;
     const safeTop = Math.max(24, window.innerHeight * .025);
-    const safeShift = Math.max(balancedShift, safeTop - phoneRect.top);
+    const opticalShift = Math.min(36, Math.max(18, window.innerHeight * .028));
+    const safeShift = Math.max(balancedShift - opticalShift, safeTop - phoneRect.top);
     document.documentElement.style.setProperty('--phone-modal-balance-y', `${safeShift}px`);
   };
 
@@ -2380,7 +2682,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       const phoneX = isMain ? 0 : difference * ringStepX;
       const phoneY = isMain && phoneFocusActive ? -7.5 : -8 + distance * distance * 2.67;
       const scale = isMain && phoneFocusActive
-        ? 2.46
+        ? 2.952
         : Math.max(1.06, 1.22 - distance * .04);
       const baseOpacity = isMain
         ? 1
@@ -2910,7 +3212,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    closeUxFinanceDetail();
+    closeUxDetail();
     resetPhoneStage();
     resetUxProject();
   });
@@ -2918,6 +3220,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let worksUxEntranceReady = false;
   let worksUxCardTimeline = null;
   let worksUxPinTrigger = null;
+  let worksUxMarkImpactTimeline = null;
   const initWorksUxEntrance = () => {
     if (
       worksUxEntranceReady ||
@@ -3000,6 +3303,32 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         );
       };
 
+      const playModeBridgeLandingImpact = () => {
+        const isCompact = window.matchMedia('(max-aspect-ratio: 4/3)').matches;
+        const landingX = window.innerWidth * (isCompact ? -.11 : -.065);
+        const landingY = window.innerHeight * (isCompact ? .57 : .697);
+        const landingShake = Math.min(6, Math.max(3.5, window.innerWidth * .0016));
+
+        worksUxMarkImpactTimeline?.kill();
+        worksUxMarkImpactTimeline = gsap.timeline({
+          onComplete: () => {
+            worksUxMarkImpactTimeline = null;
+          }
+        });
+        worksUxMarkImpactTimeline.to(worksUxScrollMark, {
+          keyframes: [
+            { x: landingX - landingShake, y: landingY, rotation: -.2, duration: .04, ease: 'none' },
+            { x: landingX + landingShake * .82, rotation: .16, duration: .04, ease: 'none' },
+            { x: landingX - landingShake * .58, rotation: -.11, duration: .04, ease: 'none' },
+            { x: landingX + landingShake * .34, rotation: .06, duration: .04, ease: 'none' },
+            { x: landingX - landingShake * .14, rotation: -.025, duration: .035, ease: 'none' },
+            { x: landingX, rotation: 0, duration: .035, ease: 'power2.out' }
+          ],
+          force3D: true,
+          overwrite: 'auto'
+        });
+      };
+
       const bridgeTrigger = ScrollTrigger.create({
         trigger: worksUxScroll,
         start: 'top bottom',
@@ -3043,7 +3372,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         pinSpacing: true,
         anticipatePin: 0,
         invalidateOnRefresh: true,
-        onEnter: () => worksUxCardTimeline?.restart(),
+        onEnter: () => {
+          renderModeBridge(1);
+          playModeBridgeLandingImpact();
+          worksUxCardTimeline?.restart();
+        },
         onEnterBack: () => {
           if (worksUxCardTimeline?.progress() === 0) worksUxCardTimeline.restart();
         },
@@ -3056,6 +3389,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
 
       return () => {
         bridgeTrigger.kill();
+        worksUxMarkImpactTimeline?.kill();
+        worksUxMarkImpactTimeline = null;
         worksUxPinTrigger?.kill();
         worksUxCardTimeline?.kill();
         worksUxPinTrigger = null;
@@ -3158,10 +3493,11 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       }
     }
 
-    if (isUxFinanceDetailRoute()) {
-      openUxFinanceDetail({ syncRoute: false, focusClose: false });
+    const routedUxDetailProject = getUxDetailProjectByRoute();
+    if (routedUxDetailProject) {
+      openUxDetail(routedUxDetailProject, { syncRoute: false, focusClose: false });
     } else {
-      closeUxFinanceDetail({ restoreFocus: false, syncRoute: false });
+      closeUxDetail({ restoreFocus: false, syncRoute: false });
     }
   };
 
@@ -3169,7 +3505,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   window.addEventListener('scroll', queueWorksMotionUpdate, { passive: true });
   window.addEventListener('resize', queueWorksMotionUpdate, { passive: true });
   window.addEventListener('resize', () => renderPhoneStage(), { passive: true });
-  window.addEventListener('resize', queueUxFinanceMediaEdgeSync, { passive: true });
+  window.addEventListener('resize', queueUxDetailMediaEdgeSync, { passive: true });
   reduceMotion.addEventListener?.('change', () => {
     queueWorksMotionUpdate();
     if (reduceMotion.matches) clearHomeTextCursor();
