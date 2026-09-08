@@ -571,6 +571,107 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
+.class-feedback-heading-cleaner {
+  position: absolute;
+  z-index: 2;
+  left: 57.15cqw;
+  top: 11.1cqw;
+  width: 38.8cqw;
+  height: 8.7cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-feedback-heading {
+  position: absolute;
+  z-index: 4;
+  left: 59.9cqw;
+  top: 13.35cqw;
+  display: flex;
+  align-items: flex-start;
+  color: #55565a;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.class-feedback-heading__index {
+  margin-top: .34cqw;
+  margin-right: .55cqw;
+  color: #d2d2d2;
+  font-size: .94cqw;
+  font-weight: 300;
+}
+
+.class-feedback-heading__line {
+  display: flex;
+  align-items: baseline;
+  font-size: 4.18cqw;
+}
+
+.class-feedback-heading__part {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+.class-feedback-heading__part--bright {
+  color: #f1f1f1;
+}
+
+.class-audience-heading-cleaner {
+  position: absolute;
+  z-index: 2;
+  left: 23.6cqw;
+  top: 17.45cqw;
+  width: 52.8cqw;
+  height: 7.2cqw;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-audience-heading {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  top: 17.85cqw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #55565a;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.class-audience-heading__index {
+  margin-bottom: .62cqw;
+  color: #d2d2d2;
+  font-size: .94cqw;
+  font-weight: 300;
+}
+
+.class-audience-heading__line {
+  display: flex;
+  align-items: baseline;
+  font-size: 4.18cqw;
+}
+
+.class-audience-heading__part {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+.class-audience-heading__part--bright {
+  color: #f1f1f1;
+}
+
 .class-panel {
   position: relative;
   width: 100cqw;
@@ -609,9 +710,14 @@ a { color: inherit; text-decoration: none; }
    independently without changing their final artwork or position. */
 .class-panel--portfolio-reveal {
   z-index: 2;
-  /* Keep this source slice joined to the next slice without letting its
-     animated replicas paint a second copy over the following module. */
-  overflow: hidden;
+  /* The smile crosses this source-slice boundary. Its source image and copy
+     replica are clipped separately below, so only the smile can remain whole
+     while it follows the scroll into the next slice. */
+  overflow: visible;
+}
+
+.class-panel--portfolio-reveal > img {
+  clip-path: inset(104.166cqw 0 52.08cqw 0);
 }
 
 .class-portfolio-reveal {
@@ -621,7 +727,7 @@ a { color: inherit; text-decoration: none; }
   top: 32.1cqw;
   width: 86.7cqw;
   height: 28.8cqw;
-  overflow: hidden;
+  overflow: visible;
   /* The approved source board already supplies this surface. Keeping another
      opaque fill here produced a darker rectangle behind the live title. */
   background: transparent;
@@ -640,12 +746,31 @@ a { color: inherit; text-decoration: none; }
   will-change: transform;
 }
 
-.class-portfolio-piece--smile {
+.class-portfolio-smile-cleaner {
+  position: absolute;
+  z-index: 0;
   left: 0;
+  top: -.25cqw;
+  width: 27cqw;
+  height: 23.3cqw;
+  display: block;
+  background: linear-gradient(
+    to bottom,
+    #202020 0,
+    #202020 4.92cqw,
+    #2f2f2f 4.92cqw,
+    #2f2f2f 100%
+  );
+  pointer-events: none;
+}
+
+.class-page .class-portfolio-piece--smile {
+  left: 3.9cqw;
   top: 0;
-  width: 29.2cqw;
-  height: 28.8cqw;
-  background-position: -6.7cqw -136.266cqw;
+  width: 22.7cqw;
+  height: 22.75cqw;
+  object-fit: contain;
+  background: none;
 }
 
 .class-portfolio-piece--copy {
@@ -656,11 +781,11 @@ a { color: inherit; text-decoration: none; }
   background-position: -34.7cqw -141.016cqw;
   /* This crop also contains the title baked into the approved board. Remove
      that band so the single live heading below is the only rendered title. */
-  clip-path: inset(18cqw 0 0 0);
+  display: none;
 }
 
 .class-portfolio-reveal.is-motion-ready:not(.is-entered) .class-portfolio-piece--smile {
-  transform: translate3d(-31cqw, 0, 0);
+  transform: translate3d(-34cqw, 0, 0) rotate(-16deg);
 }
 
 .class-portfolio-reveal.is-motion-ready:not(.is-entered) .class-portfolio-piece--copy {
@@ -977,6 +1102,31 @@ a { color: inherit; text-decoration: none; }
   clip-path: inset(0 0 156.25cqw 0);
 }
 
+.class-star-copy-reveal {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
+.class-star-copy-reveal > i {
+  position: absolute;
+  left: calc(var(--x) * 1cqw);
+  top: calc(var(--y) * 1cqw);
+  width: calc(var(--w) * 1cqw);
+  height: calc(var(--h) * 1cqw);
+  display: block;
+  background: #202020;
+  opacity: 0;
+  transform: scaleX(1);
+  transform-origin: right center;
+}
+
+.class-star-copy-reveal.is-motion-ready > i {
+  opacity: 1;
+  will-change: transform;
+}
+
 .class-star-cleaner,
 .class-star-sticker {
   position: absolute;
@@ -1063,6 +1213,8 @@ a { color: inherit; text-decoration: none; }
    They now follow ordinary document flow; only local component motion remains. */
 .class-capability-reveal {
   position: relative;
+  z-index: 3;
+  isolation: isolate;
   display: block;
   width: 100cqw;
   padding-bottom: 0;
@@ -1073,6 +1225,7 @@ a { color: inherit; text-decoration: none; }
   z-index: auto;
   width: 100cqw;
   margin-top: 0;
+  will-change: transform, opacity;
 }
 
 .class-gray-pin {
@@ -1111,9 +1264,115 @@ a { color: inherit; text-decoration: none; }
   overflow: visible;
 }
 
-.class-capability-slot .class-panel--sticker {
-  opacity: 0;
-  visibility: visible;
+.class-capability-copy-cleaner {
+  position: absolute;
+  z-index: 2;
+  left: 5.35cqw;
+  top: 20.75cqw;
+  width: 93.1cqw;
+  height: 22.75cqw;
+  display: block;
+  background: #101010;
+  pointer-events: none;
+}
+
+.class-capability-scroll-copy {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  color: #f1f1f1;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-weight: 200;
+  pointer-events: none;
+}
+
+.class-capability-scroll-copy__index {
+  position: absolute;
+  left: 5.55cqw;
+  top: 20.9cqw;
+  color: #909090;
+  font-size: .92cqw;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.class-capability-scroll-copy__title {
+  position: absolute;
+  left: 5.55cqw;
+  top: 22.15cqw;
+  width: 92.2cqw;
+  margin: 0;
+  font-size: 4.05cqw;
+  font-weight: 200;
+  line-height: 1.13;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+.class-capability-scroll-copy__line {
+  display: block;
+}
+
+.class-capability-scroll-copy__line--second {
+  margin-top: .18cqw;
+  margin-left: 28.95cqw;
+}
+
+.class-capability-scroll-copy__body {
+  position: absolute;
+  left: 34.7cqw;
+  top: 35.05cqw;
+  width: 60cqw;
+  margin: 0;
+  color: #f1f1f1;
+  font-size: 1.48cqw;
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: 0;
+  white-space: nowrap;
+  transform-origin: 0 50%;
+  will-change: transform;
+}
+
+.class-capability-scroll-copy__body-line {
+  display: block;
+  min-height: 1.5cqw;
+}
+
+.class-capability-scroll-word {
+  display: inline-block;
+  will-change: opacity, filter;
+}
+
+.class-capability-title-char {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.class-capability-scroll-word--green { color: #28f54d; }
+.class-capability-scroll-word--muted { color: #343434; }
+
+.class-capability-card-reveal {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.class-capability-card-reveal > i {
+  position: absolute;
+  left: calc(var(--x) * 1cqw);
+  top: calc(var(--y) * 1cqw);
+  width: calc(var(--w) * 1cqw);
+  height: calc(var(--h) * 1cqw);
+  display: block;
+  background: #000;
+  opacity: 1;
+  transform: scaleX(1);
+  transform-origin: right center;
+  will-change: transform;
 }
 
 .class-capability-title-cleaner,
@@ -1145,7 +1404,7 @@ a { color: inherit; text-decoration: none; }
 .class-capability-title-layer {
   z-index: 3;
   inset: 0;
-  background: url("./assets/class-page-03.jpg") 0 -52.083cqw / 100cqw auto no-repeat;
+  background: url("./assets/class-page-03.jpg?v=20260908-title-align") 0 -52.083cqw / 100cqw auto no-repeat;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
 }
@@ -1251,7 +1510,7 @@ a { color: inherit; text-decoration: none; }
   display: block;
   overflow: hidden;
   border-radius: 50%;
-  background-image: url("./assets/class-page-03.jpg");
+  background-image: url("./assets/class-page-03.jpg?v=20260908-title-align");
   background-repeat: no-repeat;
   background-size: 142cqw auto;
   background-position: -93.72cqw -84.49cqw;
@@ -1348,6 +1607,31 @@ a { color: inherit; text-decoration: none; }
 
 .class-panel--variable-ux > img {
   z-index: 0;
+}
+
+.class-variable-ux-copy-reveal {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.class-variable-ux-copy-reveal > i {
+  position: absolute;
+  left: calc(var(--x) * 1cqw);
+  top: calc(var(--y) * 1cqw);
+  width: calc(var(--w) * 1cqw);
+  height: calc(var(--h) * 1cqw);
+  display: block;
+  background: #202020;
+  opacity: 0;
+  transform: scaleX(1);
+  transform-origin: right center;
+}
+
+.class-variable-ux-copy-reveal.is-motion-ready > i {
+  opacity: 1;
+  will-change: transform;
 }
 
 /* This UX board no longer uses framing brackets. Erase only the bracket
@@ -1497,17 +1781,61 @@ a { color: inherit; text-decoration: none; }
 }
 
 .class-value-list-mask--left {
-  left: 15.9cqw;
-  top: 8.45cqw;
-  width: 27.2cqw;
-  height: 10cqw;
+  --line-step: 1.42cqw;
+  left: 26cqw;
+  top: 11.1cqw;
+  width: 11.8cqw;
+  height: 4.35cqw;
+  z-index: 6;
 }
 
-/* The left curriculum copy is already present in the source artwork. Keep it
-   visible without the opaque reveal strips that briefly read as a black block
-   underneath the text while this panel scrolls into view. */
-.class-value-list-mask--left > i {
-  background: transparent;
+.class-value-list-background-repair {
+  position: absolute;
+  z-index: 3;
+  left: 15.95cqw;
+  top: 8.15cqw;
+  width: 26.35cqw;
+  height: 10.2cqw;
+  display: block;
+  background: linear-gradient(
+    to right,
+    #111 0 84.63%,
+    #28f64e 84.63% 94.88%,
+    #111 94.88% 100%
+  );
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-value-list-copy--left {
+  position: absolute;
+  z-index: 5;
+  left: 26cqw;
+  top: 11.1cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: #999;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.12cqw;
+  font-weight: 300;
+  line-height: 1.42cqw;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-value-list-copy--left > span {
+  display: flex;
+  align-items: baseline;
+}
+
+.class-value-list-copy--left > span::before {
+  content: "—";
+  flex: 0 0 2cqw;
+  color: #666;
+  font-weight: 300;
 }
 
 .class-value-list-mask > i {
@@ -1521,6 +1849,11 @@ a { color: inherit; text-decoration: none; }
   transform: scaleX(0);
   transform-origin: right center;
   will-change: transform;
+}
+
+.class-value-list-mask--left > i {
+  height: 1.42cqw;
+  background: #101010;
 }
 
 .class-value-list-mask.is-motion-ready > i {
@@ -1566,8 +1899,8 @@ a { color: inherit; text-decoration: none; }
 
 .class-curriculum-copy-mask.is-motion-ready.is-revealed > i {
   transform: scaleX(0);
-  transition: transform 360ms cubic-bezier(.16, 1, .3, 1);
-  transition-delay: calc(var(--line) * 110ms);
+  transition: transform 280ms cubic-bezier(.16, 1, .3, 1);
+  transition-delay: calc(var(--line) * 55ms);
 }
 
 .class-curriculum-mosaic {
@@ -1647,6 +1980,31 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
+.class-portfolio-copy-reveal {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.class-portfolio-copy-reveal > i {
+  position: absolute;
+  left: calc(var(--x) * 1cqw);
+  top: calc(var(--y) * 1cqw);
+  width: calc(var(--w) * 1cqw);
+  height: calc(var(--h) * 1cqw);
+  display: block;
+  background: #202020;
+  opacity: 0;
+  transform: scaleX(1);
+  transform-origin: right center;
+}
+
+.class-portfolio-copy-reveal.is-motion-ready > i {
+  opacity: 1;
+  will-change: transform;
+}
+
 .class-figma-warp {
   position: absolute;
   z-index: 4;
@@ -1688,6 +2046,35 @@ a { color: inherit; text-decoration: none; }
   background: #2f2f2f;
 }
 
+.class-portfolio-detail-copy-reveal {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.class-portfolio-detail-copy-reveal > i {
+  position: absolute;
+  left: calc(var(--x) * 1cqw);
+  top: calc(var(--y) * 1cqw);
+  width: calc(var(--w) * 1cqw);
+  height: calc(var(--h) * 1cqw);
+  display: block;
+  background: #2f2f2f;
+  opacity: 0;
+  transform: scaleX(1);
+  transform-origin: right center;
+}
+
+.class-portfolio-detail-copy-reveal.is-motion-ready > i {
+  opacity: 1;
+  will-change: transform;
+}
+
+.class-portfolio-detail-copy-reveal--heading > i {
+  transform-origin: right center;
+}
+
 .class-portfolio-title-warp {
   position: absolute;
   z-index: 4;
@@ -1708,6 +2095,38 @@ a { color: inherit; text-decoration: none; }
 
 .class-panel--recruiting-scene {
   isolation: isolate;
+}
+
+.class-panel--recruiting-continuation {
+  isolation: isolate;
+}
+
+.class-recruiting-copy-reveal,
+.class-recruiting-continuation-copy-reveal {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.class-recruiting-copy-reveal > i,
+.class-recruiting-continuation-copy-reveal > i {
+  position: absolute;
+  left: calc(var(--x) * 1cqw);
+  top: calc(var(--y) * 1cqw);
+  width: calc(var(--w) * 1cqw);
+  height: calc(var(--h) * 1cqw);
+  display: block;
+  background: #202020;
+  opacity: 0;
+  transform: scaleX(1);
+  transform-origin: right center;
+}
+
+.class-recruiting-copy-reveal.is-motion-ready > i,
+.class-recruiting-continuation-copy-reveal.is-motion-ready > i {
+  opacity: 1;
+  will-change: transform;
 }
 
 .class-recruiting-scene-cleaner {
@@ -1830,22 +2249,164 @@ a { color: inherit; text-decoration: none; }
 }
 
 .class-audience-highlight-fix--zero {
-  left: 26.85cqw;
+  left: 27.65cqw;
   top: 36.8cqw;
   width: 11.25cqw;
   border-inline: max(1px, .08cqw) solid #28F54D;
 }
 
+.class-audience-zero-title {
+  position: absolute;
+  z-index: 4;
+  left: 27.05cqw;
+  top: 36.65cqw;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 3.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.class-audience-zero-title__highlight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 11.25cqw;
+  height: 3.85cqw;
+  color: #28F54D;
+  background: #123d1d;
+  border-inline: max(1px, .08cqw) solid #28F54D;
+  font-weight: 300;
+}
+
+.class-audience-zero-title__copy {
+  display: inline-block;
+  margin-left: .15cqw;
+}
+
 .class-audience-highlight-fix--recruit {
   /* Rebuild this one highlight as a single movable unit so its text,
      background and rules share the same optical spacing on both sides. */
-  left: 45.25cqw;
+  left: 46.15cqw;
   top: 28.28cqw;
   width: 14.5cqw;
   color: #28F54D;
   background: #123d1d;
   border-inline: max(1px, .08cqw) solid #28F54D;
   box-shadow: none;
+}
+
+.class-audience-recruit-title {
+  position: absolute;
+  z-index: 4;
+  left: 27.05cqw;
+  top: 27.7cqw;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 3.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.class-audience-recruit-title__highlight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 14.35cqw;
+  height: 3.85cqw;
+  color: #28F54D;
+  background: #123d1d;
+  border-inline: max(1px, .08cqw) solid #28F54D;
+  font-weight: 300;
+}
+
+.class-audience-recruit-title__copy {
+  display: inline-block;
+}
+
+.class-audience-junior-title {
+  position: absolute;
+  z-index: 4;
+  left: 15.35cqw;
+  top: 18.45cqw;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 3.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.class-audience-junior-title__highlight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 21.1cqw;
+  height: 3.85cqw;
+  color: #28F54D;
+  background: #123d1d;
+  border-inline: max(1px, .08cqw) solid #28F54D;
+  font-weight: 300;
+}
+
+.class-audience-junior-title__copy {
+  display: inline-block;
+}
+
+.class-audience-senior-title {
+  position: absolute;
+  z-index: 4;
+  left: 11.6cqw;
+  top: 8.2cqw;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: #f1f1f1;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 3.05cqw;
+  font-weight: 300;
+  line-height: 1;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.class-audience-senior-title__highlight {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 21.25cqw;
+  height: 3.85cqw;
+  color: #28F54D;
+  background: #123d1d;
+  border-inline: max(1px, .08cqw) solid #28F54D;
+  font-weight: 300;
+}
+
+.class-audience-senior-title__copy {
+  display: inline-block;
+  margin-left: .15cqw;
 }
 
 /* Remove only the baked highlight at its former position. The live unit above
@@ -1877,13 +2438,17 @@ a { color: inherit; text-decoration: none; }
 .class-audience-growth-comma-fix {
   position: absolute;
   z-index: 3;
-  left: 31.42cqw;
+  left: 31.05cqw;
   top: 7.75cqw;
-  display: block;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
   width: 3.1cqw;
   height: 4.15cqw;
-  color: #28F54D;
-  background: transparent;
+  padding-left: .3cqw;
+  color: #f1f1f1;
+  background: #101010;
+  border-left: max(1px, .08cqw) solid #28F54D;
   font-family: inherit;
   font-size: 4.05cqw;
   font-weight: 300;
@@ -1891,23 +2456,6 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: -.04em;
   pointer-events: none;
   user-select: none;
-  isolation: isolate;
-}
-
-/* The source bitmap's comma is white. Cover only that glyph with the native
-   highlight color; the live green comma above remains aligned with the title. */
-.class-audience-growth-comma-fix::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  /* Pixel-aligned to the baked comma in class-page-04.jpg. This covers the
-     complete white glyph without leaving a visible block below the title. */
-  left: .34cqw;
-  top: 3.08cqw;
-  width: .58cqw;
-  height: 1.12cqw;
-  background: #123d1d;
-  pointer-events: none;
 }
 
 .class-audience-summary-cleaner {
@@ -2003,6 +2551,46 @@ a { color: inherit; text-decoration: none; }
   background: #202020;
 }
 
+.class-can-metric-cleaner {
+  position: absolute;
+  z-index: 2;
+  top: 19.9cqw;
+  width: 5.9cqw;
+  height: 5.05cqw;
+  background: #202020;
+  clip-path: polygon(0 0, 87% 0, 87% 24%, 100% 24%, 100% 100%, 0 100%);
+  pointer-events: none;
+}
+
+.class-can-metric-cleaner--live { left: 6.05cqw; }
+.class-can-metric-cleaner--coach { left: 24.05cqw; }
+
+.class-can-metric {
+  position: absolute;
+  z-index: 3;
+  top: 19.75cqw;
+  display: block;
+  width: 5.75cqw;
+  height: 4.85cqw;
+  overflow: hidden;
+  color: #f1f1f1;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 5.35cqw;
+  font-weight: 200;
+  font-variant-numeric: tabular-nums;
+  line-height: .9;
+  letter-spacing: 0;
+  pointer-events: none;
+}
+
+.class-can-metric--live { left: 6.25cqw; }
+.class-can-metric--coach { left: 24.25cqw; }
+
+.class-can-metric > span {
+  display: block;
+  will-change: transform, opacity;
+}
+
 /* Structural rules restored from the approved board. They sit behind every
    animated can layer, with the long rule meeting the base of the green pour. */
 .class-can-guide {
@@ -2013,9 +2601,9 @@ a { color: inherit; text-decoration: none; }
 
 .class-can-guide--title {
   z-index: 3;
-  left: 43.45cqw;
+  left: 45cqw;
   top: 24.3cqw;
-  width: 20.8cqw;
+  width: 19.25cqw;
   height: max(1px, .065cqw);
   background: #aaa;
 }
@@ -2402,7 +2990,7 @@ a { color: inherit; text-decoration: none; }
   --ring-center-x: 50cqw;
   --ring-center-y: 25.69cqw;
   --ring-radius-x: 36.3cqw;
-  --ring-radius-y: 21.4cqw;
+  --ring-radius-y: 16cqw;
   position: absolute;
   /* Keep the complete moving ring in one stacking context below the locked
      public header (z-index: 5), including while cards are hovered. */
@@ -3245,7 +3833,7 @@ a { color: inherit; text-decoration: none; }
 .ui-phone-card__image--selected {
   z-index: 2;
   opacity: 0;
-  transform: translate3d(-50%, -50%, 0) rotateY(180deg);
+  transform: translate3d(-50%, -50%, 0) rotateY(180deg) scale(var(--phone-selected-scale, 1.27));
   transition:
     transform var(--phone-flip-duration, 320ms) cubic-bezier(.16, 1, .3, 1),
     opacity 140ms ease;
@@ -3275,7 +3863,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .ui-phone-card.is-flipped .ui-phone-card__image--selected {
-  transform: translate3d(-50%, -50%, 0) rotateY(0deg);
+  transform: translate3d(-50%, -50%, 0) rotateY(0deg) scale(var(--phone-selected-scale, 1.27));
+}
+
+.ui-phone-gallery.is-phone-focus .ui-phone-card__image--selected {
+  transition-property: opacity;
 }
 
 /* Project 1 prototype: the case stays fixed while the supplied UI screens
@@ -4334,6 +4926,10 @@ html.is-ux-detail-open body {
   stroke-width: 1.4px;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.ux-finance-detail__title-strokes {
+  display: none;
 }
 
 .ux-finance-detail__title-fills text {

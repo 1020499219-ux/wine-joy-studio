@@ -124,17 +124,14 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   const createUxDetailReveal = (bottomInsets = {}, options = {}) => ({
     introInsets: ['inset(0% 0% 0% 100%)', 'inset(4px 4px 4px 100%)'],
     introFinalInsets: ['inset(0% 0% 0% 0%)', 'inset(4px 4px 4px 4px)'],
-    introStart: .46,
-    introDuration: 1.7,
-    titleStrokeStart: .08,
-    titleStrokeDuration: 1.2,
-    titleStrokeStagger: .035,
-    titleFillStart: 1.38,
+    introStart: .08,
+    introDuration: .58,
+    titleFillStart: .08,
     titleFillDuration: .58,
-    copyCnStart: .46,
-    copyCnDuration: 1.7,
-    copyEnStart: .78,
-    copyEnDuration: 1.38,
+    copyCnStart: .08,
+    copyCnDuration: .58,
+    copyEnStart: .08,
+    copyEnDuration: .58,
     scrollStartIndex: 2,
     curtainImageIndex: 1,
     curtainStart: 'bottom 68%',
@@ -233,7 +230,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let worksRouteTransitionTimeline = null;
   let worksRouteTransitionActive = false;
 
-  const homeCursorSpacing = 12.5;
+  const homeCursorSpacing = 10;
   const homeCursorMaxPoints = 70;
   const homeCursorExitDuration = 520;
   const homeCursorRemovalInterval = 28;
@@ -1527,12 +1524,6 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       onComplete: () => { uxDetailTextTimeline = null; }
     });
     uxDetailTextTimeline
-      .to(uxDetailTitleStrokes, {
-        strokeDashoffset: 0,
-        duration: activeUxDetailProject.reveal.titleStrokeDuration,
-        ease: 'power2.out',
-        stagger: activeUxDetailProject.reveal.titleStrokeStagger
-      }, activeUxDetailProject.reveal.titleStrokeStart)
       .to(uxDetailTitleWipe, {
         attr: { width: 1500 },
         duration: activeUxDetailProject.reveal.titleFillDuration,
@@ -2774,6 +2765,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
       const isHovered = card.matches(':hover') && !isMain
         && !phoneFocusActive
         && !uiPhoneGallery?.classList.contains('is-dragging');
+      const selectedPreviewScale = Number(card.dataset.phonePreviewScale) || 1.27;
       const opacity = isHovered ? 1 : baseOpacity;
       const brightness = isHovered ? 1.12 : baseBrightness;
       card.dataset.phoneIndex = String(index);
@@ -2786,6 +2778,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         '--phone-x': `${phoneX.toFixed(3)}cqw`,
         '--phone-y': `${phoneY.toFixed(3)}cqw`,
         '--phone-scale': String(scale),
+        '--phone-selected-scale': phoneFocusActive ? '1' : String(selectedPreviewScale),
         '--phone-rotate': '0deg',
         '--phone-opacity': String(opacity),
         '--phone-brightness': String(brightness),
@@ -3139,6 +3132,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
           '--phone-entrance-x': `${entranceX}px`,
           '--phone-entrance-y': `${entranceY}px`,
           '--phone-entrance-scale': entranceScale,
+          '--phone-selected-scale': Number(card.dataset.phonePreviewScale) || 1.27,
           '--phone-entrance-rotation': '0deg'
         });
       })
@@ -3147,6 +3141,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         '--phone-entrance-x': '0px',
         '--phone-entrance-y': '0px',
         '--phone-entrance-scale': 1,
+        '--phone-selected-scale': 1,
         '--phone-entrance-rotation': '0deg',
         duration: .78,
         ease: 'elastic.out(1, .48)',

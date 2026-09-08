@@ -136,30 +136,23 @@
 
     const timeline = gsap.timeline({
       scrollTrigger: {
-        trigger: panel,
-        /* The copy mask intentionally overflows the 52cqw source slice. Start
-           pinning when that overflowed copy reaches a readable position, not
-           when the panel's hidden top reaches the viewport. This keeps every
-           line in-frame while the reveal is scrubbed. */
-        start: () => {
-          const panelTop = panel.getBoundingClientRect().top + window.scrollY;
-          const copyTop = Number(mask.offsetTop) || 0;
-          const readableTop = Math.min(window.innerHeight * 0.18, 180);
-          return panelTop + copyTop - readableTop;
-        },
-        end: () => `+=${Math.max(window.innerHeight * 1.35, mask.offsetHeight * 2.5)}`,
-        pin: panel,
-        pinSpacing: true,
-        anticipatePin: 1,
-        scrub: 0.85,
-        invalidateOnRefresh: true
+        trigger: mask,
+        start: 'top 78%',
+        toggleActions: 'play none play reverse'
       }
     });
     timeline.to(rows, {
       scaleX: 0,
-      duration: 1,
-      ease: 'none',
-      stagger: { each: 0.12 }
+      duration: 0.28,
+      ease: 'power2.out',
+      stagger: { each: 0.055 }
+    });
+    // Fallback: if already past the trigger on load, hide immediately
+    requestAnimationFrame(() => {
+      const rect = mask.getBoundingClientRect();
+      if (rect.top < window.innerHeight * 0.78) {
+        gsap.to(rows, { scaleX: 0, duration: 0.1, stagger: 0.02 });
+      }
     });
     remember(timeline);
     return timeline;
@@ -167,32 +160,111 @@
 
   const addCapabilityScrollReveal = () => {
     const panel = classPage.querySelector('.class-panel--sticker');
-    const left = panel?.querySelector('.class-capability-title-layer--left');
-    const cleaner = panel?.querySelector('.class-capability-warp-cleaner');
-    const title = panel?.querySelector('.class-capability-warp');
-    const right = panel?.querySelector('.class-capability-title-layer--right');
-    if (!panel || !left || !cleaner || !title || !right) return null;
+    const copy = panel?.querySelector('.class-capability-scroll-copy');
+    const index = copy?.querySelector('.class-capability-scroll-copy__index');
+    const title = copy?.querySelector('.class-capability-scroll-copy__title');
+    const body = copy?.querySelector('.class-capability-scroll-copy__body');
+    const titleWords = title ? [...title.querySelectorAll('.class-capability-scroll-word')] : [];
+    const bodyWords = body ? [...body.querySelectorAll('.class-capability-scroll-word')] : [];
+    if (!panel || !copy || !index || !title || !body || !titleWords.length || !bodyWords.length) return null;
 
-    panel.classList.remove('is-capability-motion-ready', 'is-capability-entered');
-    gsap.set([left, cleaner, title, right], { autoAlpha: 1 });
-    gsap.set(left, { x: '-22cqw', y: '1.2cqw' });
-    gsap.set([cleaner, title], { x: '-10cqw', y: '1.2cqw' });
-    gsap.set(right, { x: '22cqw', y: '-1.2cqw' });
+    titleWords.forEach((word) => {
+      if (word.dataset.splitReady === 'true') return;
 
-    const timeline = gsap.timeline({
+      const fragment = document.createDocumentFragment();
+      [...word.textContent].forEach((character) => {
+        const characterElement = document.createElement('span');
+        characterElement.className = 'class-capability-title-char';
+        characterElement.textContent = character === ' ' ? '\u00a0' : character;
+        fragment.append(characterElement);
+      });
+
+      word.textContent = '';
+      word.append(fragment);
+      word.dataset.splitReady = 'true';
+    });
+
+    const titleCharacters = [...title.querySelectorAll('.class-capability-title-char')];
+    const revealTargets = [index, ...bodyWords];
+
+    gsap.set([index, title, body], { rotation: 0, transformOrigin: '0% 50%' });
+    gsap.set(titleCharacters, { opacity: 0, y: 40 });
+    gsap.set(revealTargets, {
+      opacity: 0,
+      y: '1.65cqw',
+      rotation: 5,
+      filter: 'blur(11px)',
+      transformOrigin: '0% 100%'
+    });
+
+    const titleTimeline = gsap.timeline({
       scrollTrigger: {
-        trigger: panel,
-        start: 'top 86%',
-        end: 'top 36%',
-        scrub: 0.75,
+        trigger: title,
+        start: 'top bottom-=100px',
+        toggleActions: 'play none none reverse',
         invalidateOnRefresh: true
       }
     });
 
-    timeline
-      .to(left, { x: 0, y: 0, duration: 0.8, ease: 'power2.out' }, 0)
-      .to([cleaner, title], { x: 0, y: 0, duration: 0.72, ease: 'power2.out' }, 0.14)
-      .to(right, { x: 0, y: 0, duration: 0.8, ease: 'power2.out' }, 0.26);
+    titleTimeline.to(titleCharacters, {
+      opacity: 1,
+      y: 0,
+      duration: 0.3,
+      stagger: 0.06,
+      ease: 'power3.out'
+    });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: 'top 78%',
+        end: 'top 38%',
+        scrub: 0.38,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline.to(revealTargets, {
+        opacity: 1,
+        y: 0,
+        rotation: 0,
+        filter: 'blur(0px)',
+        duration: 0.62,
+        stagger: { each: 0.055 },
+        ease: 'power2.out'
+      });
+
+    remember(titleTimeline);
+    remember(timeline);
+    return timeline;
+  };
+
+  const addCapabilityCardsReveal = () => {
+    const reveal = classPage.querySelector('.class-capability-card-reveal');
+    const cards = reveal ? [...reveal.children] : [];
+    if (!reveal || !cards.length) return null;
+
+    gsap.set(cards, {
+      autoAlpha: 1,
+      scaleX: 1,
+      transformOrigin: 'right center'
+    });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: reveal,
+        start: '71% 88%',
+        end: '71% 46%',
+        scrub: 0.42,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline.to(cards, {
+      scaleX: 0,
+      duration: 1,
+      ease: 'power2.out'
+    });
 
     remember(timeline);
     return timeline;
@@ -241,23 +313,428 @@
     const timeline = gsap.timeline({
       scrollTrigger: {
         trigger: reveal,
-        start: 'top 88%',
-        toggleActions: 'play none none reverse',
+        start: 'top 96%',
+        end: 'top 52%',
+        scrub: 0.6,
         invalidateOnRefresh: true
       }
     });
 
     timeline.fromTo(
       stage,
-      { y: '8.5cqw', scale: .975, transformOrigin: '50% 100%' },
+      {
+        y: () => Math.min(window.innerHeight * .14, classPage.clientWidth * .085),
+        autoAlpha: .9
+      },
       {
         y: 0,
-        scale: 1,
-        duration: 1.34,
-        ease: 'back.out(2.15)',
-        clearProps: 'transform'
+        autoAlpha: 1,
+        duration: 1,
+        ease: 'power2.out'
       }
     );
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addCanMetricsReveal = () => {
+    const panel = classPage.querySelector('.class-panel--can');
+    const metrics = [...classPage.querySelectorAll('.class-can-metric > span')];
+    const title = classPage.querySelector('.class-variable-title--can');
+    if (!panel || metrics.length !== 2 || !title) return null;
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: 'top 76%',
+        end: 'top 30%',
+        scrub: 0.65,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .fromTo(
+        metrics[0],
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: .52, ease: 'power3.out' },
+        0
+      )
+      .fromTo(
+        metrics[1],
+        { yPercent: 115, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: .52, ease: 'power3.out' },
+        .18
+      )
+      .fromTo(
+        title,
+        { y: '2.2cqw', autoAlpha: 0, clipPath: 'inset(100% 0 0 0)' },
+        {
+          y: 0,
+          autoAlpha: 1,
+          clipPath: 'inset(0% 0 0 0)',
+          duration: .68,
+          ease: 'power3.out'
+        },
+        .38
+      );
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addStarCopyReveal = () => {
+    const panel = classPage.querySelector('.class-panel--star');
+    const reveal = panel?.querySelector('.class-star-copy-reveal');
+    if (!panel || !reveal) return null;
+
+    const groups = [
+      [...reveal.querySelectorAll('[data-copy-group="left-title"]')],
+      [...reveal.querySelectorAll('[data-copy-group="left-pills"]')],
+      [...reveal.querySelectorAll('[data-copy-group="left-detail"]')],
+      [...reveal.querySelectorAll('[data-copy-group="right-pills"]')],
+      [...reveal.querySelectorAll('[data-copy-group="right-title"]')]
+    ].filter((group) => group.length);
+    if (!groups.length) return null;
+
+    const masks = groups.flat();
+    reveal.classList.add('is-motion-ready');
+    gsap.set(masks, { scaleX: 1, transformOrigin: 'right center' });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: 'top bottom',
+        end: 'top 30%',
+        scrub: 0.52,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline.to(masks, {
+      scaleX: 0,
+      duration: 1,
+      ease: 'power2.out'
+    });
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addVariableUxCopyReveal = () => {
+    const panel = classPage.querySelector('.class-panel--variable-ux');
+    const title = panel?.querySelector('.class-variable-title--ux');
+    const reveal = panel?.querySelector('.class-variable-ux-copy-reveal');
+    const masks = reveal ? [...reveal.children] : [];
+    if (!panel || !title || !reveal || !masks.length) return null;
+
+    reveal.classList.add('is-motion-ready');
+    gsap.set(masks, { scaleX: 1, transformOrigin: 'right center' });
+    gsap.set(title, {
+      autoAlpha: 1,
+      y: 0,
+      clipPath: 'inset(0% 100% 0% 0%)',
+      transformOrigin: 'left center'
+    });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: 'top bottom',
+        end: 'top 36%',
+        scrub: 0.45,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .to(masks, { scaleX: 0, duration: 1, ease: 'power2.out' }, 0)
+      .to(title, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1,
+        ease: 'power2.out'
+      }, 0);
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addPortfolioCopyReveal = () => {
+    const panel = classPage.querySelector('.class-panel--portfolio-reveal');
+    const title = panel?.querySelector('.class-figma-warp');
+    const reveal = panel?.querySelector('.class-portfolio-copy-reveal');
+    const masks = reveal ? [...reveal.children] : [];
+    const titleParts = title
+      ? [...title.querySelectorAll(':scope > .class-warp-text__source > span')]
+      : [];
+    if (!panel || !title || !reveal || !masks.length || !titleParts.length) return null;
+
+    reveal.classList.add('is-motion-ready');
+    gsap.set(masks, { scaleX: 1, transformOrigin: 'right center' });
+    gsap.set(title, { autoAlpha: 1, y: 0, clipPath: 'none' });
+    gsap.set(titleParts, { autoAlpha: 0, y: '2.8cqw', filter: 'none' });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: 'top bottom',
+        end: 'top 36%',
+        scrub: 0.45,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .to(masks, { scaleX: 0, duration: 1, ease: 'power2.out' }, 0)
+      .to(titleParts, {
+        autoAlpha: 1,
+        y: 0,
+        filter: 'blur(0cqw)',
+        duration: 0.78,
+        stagger: { each: 0.08 },
+        ease: 'power3.out'
+      }, 0.08);
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addPortfolioSmileScroll = () => {
+    const panel = classPage.querySelector('.class-panel--portfolio-reveal');
+    const module = panel?.querySelector('.class-portfolio-reveal');
+    const smile = module?.querySelector('.class-portfolio-piece--smile');
+    if (!panel || !module || !smile) return null;
+
+    module.classList.add('is-motion-ready');
+    gsap.set(smile, {
+      x: '-34cqw',
+      rotation: -16,
+      transformOrigin: '50% 50%',
+      transition: 'none'
+    });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: module,
+        start: 'top 96%',
+        end: 'top 40%',
+        scrub: 0.75,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline.to(smile, {
+      x: 0,
+      rotation: 0,
+      duration: 1,
+      ease: 'power2.out'
+    });
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addPortfolioDetailCopyReveal = () => {
+    const panel = classPage.querySelector('.class-panel--portfolio-reveal');
+    const module = panel?.querySelector('.class-portfolio-reveal');
+    const title = module?.querySelector('.class-portfolio-title-warp');
+    const reveals = [...classPage.querySelectorAll('.class-portfolio-detail-copy-reveal')];
+    const indexMask = classPage.querySelector('[data-portfolio-detail-copy="index"]');
+    const bodyMasks = [...classPage.querySelectorAll('[data-portfolio-detail-copy="body"]')];
+    if (!panel || !module || !title || !reveals.length || !indexMask || !bodyMasks.length) return null;
+
+    reveals.forEach((reveal) => reveal.classList.add('is-motion-ready'));
+    gsap.set(indexMask, { scaleX: 1, transformOrigin: 'right center' });
+    gsap.set(bodyMasks, { scaleX: 1, transformOrigin: 'right center' });
+    gsap.set(title, {
+      autoAlpha: 1,
+      x: 0,
+      y: 0,
+      clipPath: 'inset(0% 100% 0% 0%)',
+      transformOrigin: 'left center'
+    });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: module,
+        start: 'top bottom',
+        end: 'center center',
+        scrub: 0.45,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .to(indexMask, { scaleX: 0, duration: 0.42, ease: 'power2.out' }, 0)
+      .to(bodyMasks, { scaleX: 0, duration: 1.04, ease: 'power2.inOut' }, 0)
+      .to(title, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1,
+        ease: 'power2.out'
+      }, 0);
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addRecruitingCopyReveal = () => {
+    const scene = classPage.querySelector('.class-panel--recruiting-scene');
+    const continuation = classPage.querySelector('.class-panel--recruiting-continuation');
+    const sceneReveal = scene?.querySelector('.class-recruiting-copy-reveal');
+    const continuationReveal = continuation?.querySelector('.class-recruiting-continuation-copy-reveal');
+    const titleMasks = sceneReveal ? [...sceneReveal.querySelectorAll('[data-recruiting-copy="title"]')] : [];
+    const pillMasks = sceneReveal ? [...sceneReveal.querySelectorAll('[data-recruiting-copy="pills"]')] : [];
+    const continuationPillMasks = continuationReveal
+      ? [...continuationReveal.querySelectorAll('[data-recruiting-copy="pills-continuation"]')]
+      : [];
+    const bodyMasks = continuationReveal
+      ? [...continuationReveal.querySelectorAll('[data-recruiting-copy="body"]')]
+      : [];
+    const masks = [...titleMasks, ...pillMasks, ...continuationPillMasks, ...bodyMasks];
+    if (!scene || !continuation || !sceneReveal || !continuationReveal || !masks.length) return null;
+
+    sceneReveal.classList.add('is-motion-ready');
+    continuationReveal.classList.add('is-motion-ready');
+    gsap.set(masks, { scaleX: 1, transformOrigin: 'right center' });
+
+    const titleTimeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: scene,
+        start: 'top bottom',
+        end: 'top 36%',
+        scrub: 0.45,
+        invalidateOnRefresh: true
+      }
+    });
+
+    titleTimeline.to(titleMasks, {
+      scaleX: 0,
+      duration: 1,
+      ease: 'power2.out'
+    });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: scene,
+        endTrigger: continuation,
+        start: 'top bottom',
+        end: 'top 68%',
+        scrub: 0.28,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .to(pillMasks, { scaleX: 0, duration: 0.78, ease: 'power2.out' }, 0.08)
+      .to(continuationPillMasks, { scaleX: 0, duration: 0.22, ease: 'power2.out' }, 0.72)
+      .to(bodyMasks, { scaleX: 0, duration: 0.34, ease: 'power2.out' }, 0.66);
+
+    remember(titleTimeline);
+    remember(timeline);
+    return timeline;
+  };
+
+  const addInterviewCopyReveal = () => {
+    const panel = classPage.querySelector('.class-panel--recruiting-continuation');
+    const reveal = panel?.querySelector('.class-recruiting-continuation-copy-reveal');
+    const indexMask = reveal?.querySelector('[data-interview-copy="index"]');
+    const titleMask = reveal?.querySelector('[data-interview-copy="title"]');
+    const bodyMasks = reveal ? [...reveal.querySelectorAll('[data-interview-copy="body"]')] : [];
+    const masks = [indexMask, titleMask, ...bodyMasks].filter(Boolean);
+    if (!panel || !reveal || !indexMask || !titleMask || !bodyMasks.length) return null;
+
+    reveal.classList.add('is-motion-ready');
+    gsap.set(masks, { scaleX: 1, transformOrigin: 'right center' });
+
+    const timeline = gsap.timeline({
+      scrollTrigger: {
+        trigger: panel,
+        start: 'top bottom',
+        end: 'top 36%',
+        scrub: 0.45,
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .to(indexMask, { scaleX: 0, duration: 0.4, ease: 'power2.out' }, 0)
+      .to(titleMask, { scaleX: 0, duration: 0.82, ease: 'power2.out' }, 0.08)
+      .to(bodyMasks, { scaleX: 0, duration: 0.62, ease: 'power2.out' }, 0.38);
+
+    remember(timeline);
+    return timeline;
+  };
+
+  const addFeedbackHeadingEntrance = () => {
+    const heading = classPage.querySelector('.class-feedback-heading');
+    const index = heading?.querySelector('.class-feedback-heading__index');
+    const parts = heading ? [...heading.querySelectorAll('.class-feedback-heading__part')] : [];
+    if (!heading || !index || !parts.length) return null;
+
+    gsap.set(heading, { autoAlpha: 1 });
+    const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    timeline
+      .fromTo(
+        index,
+        { autoAlpha: 0, y: '.45cqw' },
+        { autoAlpha: 1, y: 0, duration: .42, clearProps: 'transform,opacity,visibility' },
+        0
+      )
+      .fromTo(
+        parts,
+        { autoAlpha: 0, y: '1.15cqw', filter: 'blur(.18cqw)' },
+        {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'blur(0cqw)',
+          duration: .78,
+          stagger: .13,
+          clearProps: 'transform,opacity,visibility,filter'
+        },
+        .12
+      );
+
+    return timeline;
+  };
+
+  const addAudienceHeadingEntrance = () => {
+    const heading = classPage.querySelector('.class-audience-heading');
+    const index = heading?.querySelector('.class-audience-heading__index');
+    const parts = heading ? [...heading.querySelectorAll('.class-audience-heading__part')] : [];
+    if (!heading || !index || !parts.length) return null;
+
+    gsap.set(heading, { autoAlpha: 1 });
+    const timeline = gsap.timeline({
+      defaults: { ease: 'power3.out' },
+      scrollTrigger: {
+        trigger: heading,
+        start: 'top 78%',
+        toggleActions: 'play none none reverse',
+        invalidateOnRefresh: true
+      }
+    });
+
+    timeline
+      .fromTo(
+        index,
+        { autoAlpha: 0, y: '.45cqw' },
+        { autoAlpha: 1, y: 0, duration: .42, clearProps: 'transform,opacity,visibility' },
+        0
+      )
+      .fromTo(
+        parts,
+        { autoAlpha: 0, y: '1.15cqw', filter: 'blur(.18cqw)' },
+        {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'blur(0cqw)',
+          duration: .78,
+          stagger: .13,
+          clearProps: 'transform,opacity,visibility,filter'
+        },
+        .12
+      );
 
     remember(timeline);
     return timeline;
@@ -270,32 +747,22 @@
     const canCleanup = prepareCanScrollPlayback();
     if (canCleanup) cleanups.push(canCleanup);
 
-    addLayeredEntrance({
-      trigger: classPage.querySelector('.class-panel--can'),
-      title: classPage.querySelector('.class-variable-title--can'),
-      decorations: [{
-        element: classPage.querySelector('.class-can-guide--title'),
-        from: { scaleX: 0 },
-        at: 0.08,
-        duration: 0.66
-      }]
-    });
+    addFeedbackHeadingEntrance();
+    addAudienceHeadingEntrance();
 
-    addLayeredEntrance({
-      trigger: classPage.querySelector('.class-panel--variable-ux'),
-      title: classPage.querySelector('.class-variable-title--ux'),
-      decorations: [
-        {
-          element: classPage.querySelector('.class-variable-ux-mosaic'),
-          from: { y: '1.2cqw', scale: 0.92 },
-          at: 0.2,
-          duration: 0.58
-        }
-      ]
-    });
+    addCanMetricsReveal();
+    addStarCopyReveal();
+
+    addVariableUxCopyReveal();
+    addPortfolioCopyReveal();
+    addPortfolioSmileScroll();
+    addPortfolioDetailCopyReveal();
+    addRecruitingCopyReveal();
+    addInterviewCopyReveal();
 
     addCurriculumLineReveal();
     addCapabilityScrollReveal();
+    addCapabilityCardsReveal();
     addClassDepthParallax();
     addGrayModuleEntrance();
 
@@ -311,9 +778,65 @@
     mediaContext.add('(prefers-reduced-motion: reduce)', () => {
       const stage = classPage.querySelector('.class-can-stage');
       const mask = classPage.querySelector('.class-curriculum-copy-mask');
+      const heading = classPage.querySelector('.class-feedback-heading');
+      const audienceHeading = classPage.querySelector('.class-audience-heading');
+      const starCopyReveal = classPage.querySelector('.class-star-copy-reveal');
+      const variableUxCopyReveal = classPage.querySelector('.class-variable-ux-copy-reveal');
+      const variableUxTitle = classPage.querySelector('.class-variable-title--ux');
+      const portfolioCopyReveal = classPage.querySelector('.class-portfolio-copy-reveal');
+      const portfolioTitle = classPage.querySelector('.class-figma-warp');
+      const portfolioSmile = classPage.querySelector('.class-portfolio-piece--smile');
+      const portfolioDetailCopyReveals = [...classPage.querySelectorAll('.class-portfolio-detail-copy-reveal')];
+      const portfolioDetailTitle = classPage.querySelector('.class-portfolio-title-warp');
+      const recruitingCopyReveals = [...classPage.querySelectorAll('.class-recruiting-copy-reveal, .class-recruiting-continuation-copy-reveal')];
+      const capabilityScrollCopy = classPage.querySelector('.class-capability-scroll-copy');
+      const capabilityCardReveal = classPage.querySelector('.class-capability-card-reveal');
       stage?.classList.remove('is-playing');
       stage?.classList.add('is-complete');
       mask?.classList.add('is-revealed');
+      if (heading) gsap.set(heading, { autoAlpha: 1 });
+      if (audienceHeading) {
+        gsap.set(audienceHeading, { autoAlpha: 1 });
+        gsap.set(audienceHeading.querySelectorAll('.class-audience-heading__index, .class-audience-heading__part'), {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'none'
+        });
+      }
+      if (starCopyReveal) gsap.set(starCopyReveal.children, { scaleX: 0 });
+      if (variableUxCopyReveal) gsap.set(variableUxCopyReveal.children, { scaleX: 0 });
+      if (variableUxTitle) gsap.set(variableUxTitle, { autoAlpha: 1, y: 0, clipPath: 'none' });
+      if (portfolioCopyReveal) gsap.set(portfolioCopyReveal.children, { scaleX: 0 });
+      if (portfolioTitle) gsap.set(portfolioTitle, { autoAlpha: 1, y: 0, clipPath: 'none' });
+      if (portfolioTitle) {
+        gsap.set(portfolioTitle.querySelectorAll(':scope > .class-warp-text__source > span'), {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'none'
+        });
+      }
+      if (portfolioSmile) gsap.set(portfolioSmile, { x: 0, transition: 'none' });
+      portfolioDetailCopyReveals.forEach((reveal) => gsap.set(reveal.children, { scaleX: 0 }));
+      if (portfolioDetailTitle) gsap.set(portfolioDetailTitle, { autoAlpha: 1, y: 0, clipPath: 'none' });
+      if (portfolioDetailTitle) {
+        gsap.set(portfolioDetailTitle.querySelectorAll(':scope > .class-warp-text__source > span'), {
+          autoAlpha: 1,
+          y: 0,
+          filter: 'none'
+        });
+      }
+      recruitingCopyReveals.forEach((reveal) => gsap.set(reveal.children, { scaleX: 0 }));
+      if (capabilityScrollCopy) {
+        gsap.set(capabilityScrollCopy.querySelectorAll('.class-capability-scroll-copy__index, .class-capability-scroll-word, .class-capability-title-char'), {
+          opacity: 1,
+          y: 0,
+          filter: 'none'
+        });
+        gsap.set(capabilityScrollCopy.querySelectorAll('.class-capability-scroll-copy__index, .class-capability-scroll-copy__title, .class-capability-scroll-copy__body'), {
+          rotation: 0
+        });
+      }
+      if (capabilityCardReveal) gsap.set(capabilityCardReveal.children, { autoAlpha: 1, scaleX: 0 });
     });
 
     refreshClassMotion();
