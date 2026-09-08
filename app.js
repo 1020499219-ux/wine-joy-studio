@@ -1300,9 +1300,22 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     }
 
     const reveal = activeUxDetailProject.reveal;
+    // Measure layout height, independent of the reveal's animated scale.
+    const firstImage = uxDetailMediaImages[0];
+    const mediaWidth = uxDetailMedia.clientWidth;
+    const firstHeight = firstImage.naturalWidth
+      ? mediaWidth * firstImage.naturalHeight / firstImage.naturalWidth
+      : firstImage.offsetHeight;
+    const mediaGap = parseFloat(getComputedStyle(uxDetailMedia).rowGap) || 0;
+    const previewHeight = uxDetailMedia.clientHeight - (uxDetailMediaCurtain?.offsetHeight || 0);
+    const secondVisible = uxDetailMediaImages.length > 1
+      && firstHeight + mediaGap < previewHeight - 1;
+    const introCount = 1;
+    uxDetailMedia.dataset.introCount = String(introCount);
+    uxDetailMedia.dataset.secondPreview = String(secondVisible);
     gsap.registerPlugin(ScrollTrigger);
     uxDetailMediaRevealContext = gsap.context(() => {
-      reveal.introInsets.forEach((inset, index) => {
+      reveal.introInsets.slice(0, introCount).forEach((inset, index) => {
         if (!uxDetailMediaImages[index]) return;
         gsap.set(uxDetailMediaImages[index], {
           clipPath: inset,
@@ -1315,43 +1328,101 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         });
       });
 
-      const curtainImage = uxDetailMediaImages[reveal.curtainImageIndex];
-      if (uxDetailMediaCurtain && curtainImage) {
-        gsap.set(uxDetailMediaCurtain, { autoAlpha: 1 });
-        ScrollTrigger.create({
-          trigger: curtainImage,
-          scroller: uxDetailMedia,
-          start: reveal.curtainStart,
-          onEnter: () => gsap.set(uxDetailMediaCurtain, { autoAlpha: 0 }),
-          onLeaveBack: () => gsap.set(uxDetailMediaCurtain, { autoAlpha: 1 })
+      if (uxDetailMediaCurtain) gsap.set(uxDetailMediaCurtain, { autoAlpha: 0 });
+      // One playhead prevents scrub smoothing from overlapping consecutive reveals.
+      const mediaTimeline = gsap.timeline({ paused: true });
+      const buildMediaTimeline = () => {
+        mediaTimeline.pause(0);
+        mediaTimeline.clear();
+        const height = uxDetailMedia.clientHeight;
+        const gap = parseFloat(getComputedStyle(uxDetailMedia).rowGap) || 0;
+        const preview = height - (uxDetailMediaCurtain?.offsetHeight || 0);
+        const maxScroll = Math.max(1, uxDetailMedia.scrollHeight - height);
+        let top = uxDetailMediaImages[0].offsetHeight + gap;
+        let previousEnd = 0;
+        uxDetailMediaImages.slice(1).forEach((image, offset) => {
+          const index = offset + 1;
+          const imageHeight = image.offsetHeight;
+          const partial = index === 1 && top < preview - 1;
+          if (partial) {
+            gsap.set(image, {
+              clipPath: 'inset(4px 4px 4px 4px)',
+              webkitClipPath: 'inset(4px 4px 4px 4px)'
+            });
+            previousEnd = Math.max(0, top + imageHeight - height);
+            top += imageHeight + gap;
+            return;
+          }
+          const bottomInset = reveal.bottomInsets[index] || '0%';
+          const hiddenBottom = Math.max(0, imageHeight - (preview - top));
+          const fromClip = partial
+            ? `inset(4px 4px ${hiddenBottom}px 4px)`
+            : `inset(0% 0% ${bottomInset} 100%)`;
+          const toClip = partial ? 'inset(4px 4px 4px 4px)' : `inset(0% 0% ${bottomInset} 0%)`;
+          const start = Math.min(maxScroll - 1, Math.max(previousEnd, partial ? 0 : top - height * .68));
+          const end = Math.min(maxScroll, Math.max(start + 1,
+            partial
+              ? top + imageHeight - preview
+              : index === uxDetailMediaImages.length - 1
+                ? top + imageHeight - height
+              : top - height * .22));
+          mediaTimeline.fromTo(image, {
+            clipPath: fromClip,
+            webkitClipPath: fromClip,
+            ...(partial ? {} : {
+              scale: reveal.imageRevealScale,
+              transformOrigin: '50% 50%'
+            })
+          }, {
+            clipPath: toClip,
+            webkitClipPath: toClip,
+            ...(partial ? {} : { scale: 1 }),
+            duration: end - start,
+            ease: 'none',
+            immediateRender: true
+          }, start);
+          previousEnd = end;
+          top += imageHeight + gap;
+        });
+        mediaTimeline.to({}, { duration: maxScroll }, 0);
+      };
+      buildMediaTimeline();
+      ScrollTrigger.create({
+        animation: mediaTimeline,
+        scroller: uxDetailMedia,
+        start: 0,
+        end: () => Math.max(1, uxDetailMedia.scrollHeight - uxDetailMedia.clientHeight),
+        scrub: reveal.scrub,
+        onRefreshInit: buildMediaTimeline
+      });
+      if (secondVisible) {
+        if (uxDetailMediaCurtain) {
+          gsap.fromTo(uxDetailMediaCurtain, {
+            autoAlpha: 1,
+            yPercent: 0
+          }, {
+            yPercent: 100,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: uxDetailMediaImages[1],
+              scroller: uxDetailMedia,
+              start: 0,
+              end: 'bottom bottom',
+              scrub: reveal.scrub,
+              invalidateOnRefresh: true
+            }
+          });
+        }
+        // Keep the entrance wipe independent of the lower scroll-reveal clip.
+        gsap.set(uxDetailMediaImages[1], {
+          maskImage: 'linear-gradient(#000, #000)',
+          maskRepeat: 'no-repeat',
+          maskPosition: 'right center',
+          maskSize: '0% 100%',
+          scale: reveal.imageRevealScale,
+          transformOrigin: '100% 50%'
         });
       }
-
-      uxDetailMediaImages.slice(reveal.scrollStartIndex).forEach((image, offset) => {
-        const imageIndex = reveal.scrollStartIndex + offset;
-        const isLastImage = imageIndex === uxDetailMediaImages.length - 1;
-        const bottomInset = reveal.bottomInsets[imageIndex] || '0%';
-        gsap.fromTo(image, {
-          clipPath: `inset(0% 0% ${bottomInset} 100%)`,
-          webkitClipPath: `inset(0% 0% ${bottomInset} 100%)`,
-          scale: reveal.imageRevealScale,
-          transformOrigin: '50% 50%',
-          willChange: reveal.imageRevealScale === 1 ? 'clip-path' : 'clip-path, transform'
-        }, {
-          clipPath: `inset(0% 0% ${bottomInset} 0%)`,
-          webkitClipPath: `inset(0% 0% ${bottomInset} 0%)`,
-          scale: 1,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: image,
-            scroller: uxDetailMedia,
-            start: reveal.imageStart,
-            end: isLastImage ? reveal.lastImageEnd : reveal.imageEnd,
-            scrub: reveal.scrub,
-            invalidateOnRefresh: true
-          }
-        });
-      });
     }, uxDetail);
 
     const revealContext = uxDetailMediaRevealContext;
@@ -1489,7 +1560,8 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         force3D: true
       }, activeUxDetailProject.reveal.copyEnStart);
 
-    activeUxDetailProject.reveal.introFinalInsets.forEach((inset, index) => {
+    const introCount = Number(uxDetailMedia.dataset.introCount) || 1;
+    activeUxDetailProject.reveal.introFinalInsets.slice(0, introCount).forEach((inset, index) => {
       if (!uxDetailMediaImages[index]) return;
       uxDetailTextTimeline.to(uxDetailMediaImages[index], {
         clipPath: inset,
@@ -1499,6 +1571,14 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
         ease: 'power3.inOut'
       }, activeUxDetailProject.reveal.introStart);
     });
+    if (uxDetailMedia.dataset.secondPreview === 'true' && uxDetailMediaImages[1]) {
+      uxDetailTextTimeline.to(uxDetailMediaImages[1], {
+        maskSize: '100% 100%',
+        scale: 1,
+        duration: activeUxDetailProject.reveal.introDuration,
+        ease: 'power3.inOut'
+      }, activeUxDetailProject.reveal.introStart);
+    }
   };
 
   const openUxDetail = (project, { syncRoute = true, focusClose = true } = {}) => {
