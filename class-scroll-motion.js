@@ -138,7 +138,7 @@
       scrollTrigger: {
         trigger: mask,
         start: 'top 78%',
-        toggleActions: 'play none play reverse'
+        toggleActions: 'play none none reverse'
       }
     });
     timeline.to(rows, {
@@ -146,13 +146,6 @@
       duration: 0.28,
       ease: 'power2.out',
       stagger: { each: 0.055 }
-    });
-    // Fallback: if already past the trigger on load, hide immediately
-    requestAnimationFrame(() => {
-      const rect = mask.getBoundingClientRect();
-      if (rect.top < window.innerHeight * 0.78) {
-        gsap.to(rows, { scaleX: 0, duration: 0.1, stagger: 0.02 });
-      }
     });
     remember(timeline);
     return timeline;

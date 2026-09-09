@@ -621,57 +621,6 @@ a { color: inherit; text-decoration: none; }
   color: #f1f1f1;
 }
 
-.class-audience-heading-cleaner {
-  position: absolute;
-  z-index: 2;
-  left: 23.6cqw;
-  top: 17.45cqw;
-  width: 52.8cqw;
-  height: 7.2cqw;
-  background: #101010;
-  pointer-events: none;
-}
-
-.class-audience-heading {
-  position: absolute;
-  z-index: 4;
-  left: 50%;
-  top: 17.85cqw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #55565a;
-  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-  font-weight: 200;
-  line-height: 1;
-  letter-spacing: 0;
-  white-space: nowrap;
-  transform: translateX(-50%);
-  pointer-events: none;
-}
-
-.class-audience-heading__index {
-  margin-bottom: .62cqw;
-  color: #d2d2d2;
-  font-size: .94cqw;
-  font-weight: 300;
-}
-
-.class-audience-heading__line {
-  display: flex;
-  align-items: baseline;
-  font-size: 4.18cqw;
-}
-
-.class-audience-heading__part {
-  display: inline-block;
-  will-change: transform, opacity, filter;
-}
-
-.class-audience-heading__part--bright {
-  color: #f1f1f1;
-}
-
 .class-panel {
   position: relative;
   width: 100cqw;
@@ -1763,8 +1712,49 @@ a { color: inherit; text-decoration: none; }
   isolation: isolate;
 }
 
-/* The two compact capability lists are part of the source artwork. Matching
-   covers reveal those original pixels line by line as each list scrolls in. */
+.class-panel--curriculum-mosaic::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  left: 62.2cqw;
+  top: 50.55cqw;
+  width: 18.1cqw;
+  height: 16.2cqw;
+  background: #101010;
+  box-shadow: 0 0 0 .8cqw #101010;
+  pointer-events: none;
+}
+
+/* 5188 is one responsive artwork canvas spanning the existing source-slice
+   boundary. Its host keeps the original two-panel scroll footprint intact. */
+.class-panel--5188 {
+  z-index: 3;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.class-5188-module {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100cqw;
+  aspect-ratio: 3840 / 3942;
+  overflow: hidden;
+  background: #101010;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-5188-module__background {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  max-width: none;
+}
+
+/* Preserve the confirmed line-by-line reveal over the two live copy blocks. */
 .class-value-list-mask {
   --line-step: 1.42cqw;
   position: absolute;
@@ -1789,22 +1779,8 @@ a { color: inherit; text-decoration: none; }
   z-index: 6;
 }
 
-.class-value-list-background-repair {
-  position: absolute;
-  z-index: 3;
-  left: 15.95cqw;
-  top: 8.15cqw;
-  width: 26.35cqw;
-  height: 10.2cqw;
-  display: block;
-  background: linear-gradient(
-    to right,
-    #111 0 84.63%,
-    #28f64e 84.63% 94.88%,
-    #111 94.88% 100%
-  );
-  pointer-events: none;
-  user-select: none;
+.class-5188-module .class-value-list-mask--left {
+  top: 63.183cqw;
 }
 
 .class-value-list-copy--left {
@@ -1824,6 +1800,41 @@ a { color: inherit; text-decoration: none; }
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+}
+
+.class-5188-module .class-value-list-copy--left {
+  top: 63.183cqw;
+}
+
+.class-5188-module .class-value-list-copy--right {
+  position: absolute;
+  z-index: 3;
+  left: 84.15cqw;
+  top: 40.45cqw;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  color: #999;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.12cqw;
+  font-weight: 300;
+  line-height: 1.42cqw;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.class-5188-module .class-value-list-copy--right > span {
+  display: flex;
+  align-items: baseline;
+}
+
+.class-5188-module .class-value-list-copy--right > span::before {
+  content: "—";
+  flex: 0 0 2cqw;
+  color: #666;
+  font-weight: 300;
 }
 
 .class-value-list-copy--left > span {
@@ -1913,8 +1924,8 @@ a { color: inherit; text-decoration: none; }
   top: 50.55cqw;
   width: 18.1cqw;
   height: 16.2cqw;
-  background: #101010;
-  box-shadow: 0 0 0 .8cqw #101010;
+  background: transparent;
+  box-shadow: none;
   pointer-events: none;
   user-select: none;
 }
@@ -2030,8 +2041,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .class-portfolio-title-cleaner,
-.class-capability-warp-cleaner,
-.class-audience-summary-cleaner {
+.class-capability-warp-cleaner {
   position: absolute;
   display: block;
   pointer-events: none;
@@ -2198,18 +2208,6 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
 }
 
-.class-audience-summary-cleaner::after {
-  content: "";
-  position: absolute;
-  right: -8.2cqw;
-  top: -1.05cqw;
-  width: 15.25cqw;
-  height: 7.45cqw;
-  /* Remove the baked emoji together with its complete green glow footprint. */
-  background: #101010;
-  pointer-events: none;
-}
-
 .class-capability-warp {
   position: absolute;
   z-index: 4;
@@ -2226,262 +2224,162 @@ a { color: inherit; text-decoration: none; }
   pointer-events: auto;
 }
 
-.class-audience-highlight-fix {
+.class-audience-module__canvas {
   position: absolute;
-  z-index: 3;
+  left: 0;
+  top: var(--audience-canvas-top);
+  width: 100%;
+  aspect-ratio: var(--audience-canvas-ratio);
+}
+
+.class-audience-module__canvas--zero {
+  --audience-canvas-ratio: 3434 / 1032;
+  --audience-canvas-top: 22.03cqw;
+  --audience-title-left: 24.2cqw;
+  --audience-title-top: 5.18cqw;
+  --audience-title-height: 5.39cqw;
+  --audience-emphasis-width: 11.91cqw;
+  --audience-punctuation-width: 3.26cqw;
+}
+
+.class-audience-module__canvas--recruit {
+  --audience-canvas-ratio: 3474 / 1016;
+  --audience-canvas-top: 11.42cqw;
+  --audience-title-left: 23.98cqw;
+  --audience-title-top: 8.23cqw;
+  --audience-title-height: 5.33cqw;
+  --audience-prefix-width: 21.45cqw;
+  --audience-emphasis-width: 15.06cqw;
+}
+
+.class-audience-module__canvas--page-only {
+  --audience-canvas-ratio: 3434 / 874;
+  --audience-canvas-top: 13.32cqw;
+  --audience-title-left: 10.69cqw;
+  --audience-title-top: 7.02cqw;
+  --audience-title-height: 5.39cqw;
+  --audience-prefix-width: 32.85cqw;
+  --audience-emphasis-width: 22.63cqw;
+}
+
+.class-audience-module__canvas--senior {
+  --audience-canvas-ratio: 3434 / 1086;
+  --audience-canvas-top: 10.23cqw;
+  --audience-title-left: 6.32cqw;
+  --audience-title-top: 11.07cqw;
+  --audience-title-height: 5.39cqw;
+  --audience-emphasis-width: 22.16cqw;
+  --audience-punctuation-width: 3.55cqw;
+}
+
+.class-audience-module__background {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.class-audience-module__title {
+  position: absolute;
+  z-index: 1;
+  left: var(--audience-title-left);
+  top: var(--audience-title-top);
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  height: 3.85cqw;
-  color: #28F54D;
-  background: #123d1d;
-  border: 0;
-  /* The source artwork already contains the highlight. This narrow cleanup
-     halo removes its residual end-caps without adding another pair of lines. */
-  box-shadow: 0 0 0 .55cqw #101010;
-  font-size: 3.05cqw;
-  font-weight: 350;
+  height: var(--audience-title-height);
+  margin: 0;
+  color: #f1f1f1;
+  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  font-size: 4.18cqw;
+  font-weight: 300;
+  font-synthesis: none;
   line-height: 1;
   letter-spacing: -.04em;
   white-space: nowrap;
   pointer-events: none;
 }
 
-.class-audience-highlight-fix--zero {
-  left: 27.65cqw;
-  top: 36.8cqw;
-  width: 11.25cqw;
-  border-inline: max(1px, .08cqw) solid #28F54D;
-}
-
-.class-audience-zero-title {
-  position: absolute;
-  z-index: 4;
-  left: 27.05cqw;
-  top: 36.65cqw;
-  display: flex;
+.class-audience-module__prefix {
+  display: inline-flex;
   align-items: center;
-  margin: 0;
-  color: #f1f1f1;
-  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-  font-size: 3.05cqw;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: 0;
-  white-space: nowrap;
-  pointer-events: none;
+  flex: 0 0 var(--audience-prefix-width);
 }
 
-.class-audience-zero-title__highlight {
+.class-audience-module__emphasis {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 var(--audience-emphasis-width);
+  height: var(--audience-title-height);
+}
+
+.class-audience-module__emphasis-frame {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
   box-sizing: border-box;
-  width: 11.25cqw;
-  height: 3.85cqw;
-  color: #28F54D;
-  background: #123d1d;
+  background: rgba(22, 128, 42, .4);
   border-inline: max(1px, .08cqw) solid #28F54D;
-  font-weight: 300;
 }
 
-.class-audience-zero-title__copy {
+.class-audience-module__text,
+.class-audience-module__punctuation {
+  position: relative;
+  z-index: 1;
   display: inline-block;
-  margin-left: .15cqw;
 }
 
-.class-audience-highlight-fix--recruit {
-  /* Rebuild this one highlight as a single movable unit so its text,
-     background and rules share the same optical spacing on both sides. */
-  left: 46.15cqw;
-  top: 28.28cqw;
-  width: 14.5cqw;
+.class-audience-module__text--green {
   color: #28F54D;
-  background: #123d1d;
-  border-inline: max(1px, .08cqw) solid #28F54D;
-  box-shadow: none;
 }
 
-.class-audience-recruit-title {
+.class-audience-module__punctuation--after {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 0 0 var(--audience-punctuation-width);
+  color: #f1f1f1;
+}
+
+.class-panel--audience-zero .class-audience-heading {
   position: absolute;
   z-index: 4;
-  left: 27.05cqw;
-  top: 27.7cqw;
+  left: 50%;
+  top: 12.15cqw;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  margin: 0;
-  color: #f1f1f1;
+  color: #55565a;
   font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-  font-size: 3.05cqw;
-  font-weight: 300;
+  font-weight: 200;
   line-height: 1;
   letter-spacing: 0;
   white-space: nowrap;
+  transform: translateX(-50%);
   pointer-events: none;
 }
 
-.class-audience-recruit-title__highlight {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 14.35cqw;
-  height: 3.85cqw;
-  color: #28F54D;
-  background: #123d1d;
-  border-inline: max(1px, .08cqw) solid #28F54D;
+.class-panel--audience-zero .class-audience-heading__index {
+  margin-bottom: .62cqw;
+  color: #d2d2d2;
+  font-size: .94cqw;
   font-weight: 300;
 }
 
-.class-audience-recruit-title__copy {
-  display: inline-block;
-}
-
-.class-audience-junior-title {
-  position: absolute;
-  z-index: 4;
-  left: 15.35cqw;
-  top: 18.45cqw;
+.class-panel--audience-zero .class-audience-heading__line {
   display: flex;
-  align-items: center;
-  margin: 0;
-  color: #f1f1f1;
-  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-  font-size: 3.05cqw;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: 0;
-  white-space: nowrap;
-  pointer-events: none;
+  align-items: baseline;
+  font-size: 4.18cqw;
 }
 
-.class-audience-junior-title__highlight {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 21.1cqw;
-  height: 3.85cqw;
-  color: #28F54D;
-  background: #123d1d;
-  border-inline: max(1px, .08cqw) solid #28F54D;
-  font-weight: 300;
-}
-
-.class-audience-junior-title__copy {
+.class-panel--audience-zero .class-audience-heading__part {
   display: inline-block;
+  will-change: transform, opacity, filter;
 }
 
-.class-audience-senior-title {
-  position: absolute;
-  z-index: 4;
-  left: 11.6cqw;
-  top: 8.2cqw;
-  display: flex;
-  align-items: center;
-  margin: 0;
+.class-panel--audience-zero .class-audience-heading__part--bright {
   color: #f1f1f1;
-  font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
-  font-size: 3.05cqw;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: 0;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-.class-audience-senior-title__highlight {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: 21.25cqw;
-  height: 3.85cqw;
-  color: #28F54D;
-  background: #123d1d;
-  border-inline: max(1px, .08cqw) solid #28F54D;
-  font-weight: 300;
-}
-
-.class-audience-senior-title__copy {
-  display: inline-block;
-  margin-left: .15cqw;
-}
-
-/* Remove only the baked highlight at its former position. The live unit above
-   replaces it slightly to the left without disturbing the surrounding copy. */
-/* Remove the whole baked highlight (source x1789-2336, y3070-3250) including its
-   vertical-line stubs above/below the live overlay span, so the stubs can never
-   leak out at any viewport width. The live span (z3) paints on top of this patch. */
-.class-panel--audience-recruit::before {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  left: 45.1cqw;
-  top: 27.5cqw;
-  width: 16cqw;
-  height: 5.6cqw;
-  background: #101010;
-  pointer-events: none;
-}
-
-.class-panel--audience-recruit::after {
-  content: none;
-}
-
-.class-audience-highlight-fix--recruit::before,
-.class-audience-highlight-fix--recruit::after {
-  content: none;
-}
-
-.class-audience-growth-comma-fix {
-  position: absolute;
-  z-index: 3;
-  left: 31.05cqw;
-  top: 7.75cqw;
-  display: flex;
-  align-items: center;
-  box-sizing: border-box;
-  width: 3.1cqw;
-  height: 4.15cqw;
-  padding-left: .3cqw;
-  color: #f1f1f1;
-  background: #101010;
-  border-left: max(1px, .08cqw) solid #28F54D;
-  font-family: inherit;
-  font-size: 4.05cqw;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -.04em;
-  pointer-events: none;
-  user-select: none;
-}
-
-.class-audience-summary-cleaner {
-  z-index: 3;
-  /* Erase the baked title; the live warp title is rendered above this patch. */
-  left: 60.75cqw;
-  top: 40.55cqw;
-  width: 19.35cqw;
-  height: 5.35cqw;
-  background: #101010;
-}
-
-.class-audience-summary-warp {
-  position: absolute;
-  z-index: 4;
-  left: 61.2cqw;
-  top: 41.05cqw;
-  margin: 0;
-  color: #f1f1f1;
-  font-family: inherit;
-  font-size: 4.05cqw;
-  font-weight: 300;
-  line-height: 1;
-  letter-spacing: -.04em;
-  white-space: nowrap;
-  pointer-events: auto;
 }
 
 .class-variable-title--ux {

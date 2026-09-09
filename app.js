@@ -230,12 +230,13 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
   let worksRouteTransitionTimeline = null;
   let worksRouteTransitionActive = false;
 
-  const homeCursorSpacing = 10;
+  const homeCursorGapRatio = 1 / 3;
   const homeCursorMaxPoints = 70;
   const homeCursorExitDuration = 520;
   const homeCursorRemovalInterval = 28;
   const homeCursorPoints = [];
   let homeCursorLastPoint = null;
+  let homeCursorPointSize = null;
   let homeCursorIdleTimer = 0;
   let homeCursorDrainTimer = 0;
 
@@ -279,6 +280,7 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     homeCursorPoints.splice(0).forEach((point) => point.remove());
     homeTextCursor?.replaceChildren();
     homeCursorLastPoint = null;
+    homeCursorPointSize = null;
   };
 
   const addHomeCursorPoint = (x, y) => {
@@ -286,16 +288,49 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const point = document.createElement('span');
     point.className = 'home-text-cursor__point';
     point.textContent = 'WINE JOY';
-    /* A subtle 2px grid keeps neighbouring labels on clean shared baselines
-       while preserving the shape of the pointer path. */
-    point.style.left = `${Math.round(x / 2) * 2}px`;
-    point.style.top = `${Math.round(y / 2) * 2}px`;
+    point.style.left = `${x.toFixed(2)}px`;
+    point.style.top = `${y.toFixed(2)}px`;
     homeTextCursor.append(point);
+    if (!homeCursorPointSize) {
+      const bounds = point.getBoundingClientRect();
+      homeCursorPointSize = { width: bounds.width, height: bounds.height };
+    }
     homeCursorPoints.push(point);
 
     while (homeCursorPoints.length > homeCursorMaxPoints) {
       retireHomeCursorPoint(homeCursorPoints.shift());
     }
+  };
+
+  const getHomeCursorTrailGeometry = (unitX, unitY) => {
+    const width = homeCursorPointSize?.width || 52;
+    const height = homeCursorPointSize?.height || 11;
+    const gap = height * homeCursorGapRatio;
+    const normalX = -unitY;
+    const normalY = unitX;
+    const distanceThroughLabel = (x, y) => Math.min(
+      Math.abs(x) > .0001 ? width / Math.abs(x) : Infinity,
+      Math.abs(y) > .0001 ? height / Math.abs(y) : Infinity
+    );
+
+    return {
+      step: distanceThroughLabel(unitX, unitY) + gap,
+      laneOffset: (distanceThroughLabel(normalX, normalY) + gap) / 2,
+      normalX,
+      normalY,
+      useTwoLanes: Math.abs(unitX) >= Math.abs(unitY)
+    };
+  };
+
+  const addHomeCursorPair = (x, y, geometry) => {
+    addHomeCursorPoint(
+      x + geometry.normalX * geometry.laneOffset,
+      y + geometry.normalY * geometry.laneOffset
+    );
+    addHomeCursorPoint(
+      x - geometry.normalX * geometry.laneOffset,
+      y - geometry.normalY * geometry.laneOffset
+    );
   };
 
   const renderHomeTextCursor = (event) => {
@@ -327,25 +362,31 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     const dx = current.x - homeCursorLastPoint.x;
     const dy = current.y - homeCursorLastPoint.y;
     const distance = Math.hypot(dx, dy);
-    if (distance < homeCursorSpacing) {
+    if (!distance) {
       queueHomeCursorDrain();
       return;
     }
 
     const unitX = dx / distance;
     const unitY = dy / distance;
-    const count = Math.min(Math.floor(distance / homeCursorSpacing), 16);
+    const geometry = getHomeCursorTrailGeometry(unitX, unitY);
+    if (distance < geometry.step) {
+      queueHomeCursorDrain();
+      return;
+    }
+
+    const count = Math.min(Math.floor(distance / geometry.step), 16);
 
     for (let index = 1; index <= count; index += 1) {
-      addHomeCursorPoint(
-        homeCursorLastPoint.x + unitX * homeCursorSpacing * index,
-        homeCursorLastPoint.y + unitY * homeCursorSpacing * index
-      );
+      const x = homeCursorLastPoint.x + unitX * geometry.step * index;
+      const y = homeCursorLastPoint.y + unitY * geometry.step * index;
+      if (geometry.useTwoLanes) addHomeCursorPair(x, y, geometry);
+      else addHomeCursorPoint(x, y);
     }
 
     homeCursorLastPoint = {
-      x: homeCursorLastPoint.x + unitX * homeCursorSpacing * count,
-      y: homeCursorLastPoint.y + unitY * homeCursorSpacing * count
+      x: homeCursorLastPoint.x + unitX * geometry.step * count,
+      y: homeCursorLastPoint.y + unitY * geometry.step * count
     };
     queueHomeCursorDrain();
   };
