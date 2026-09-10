@@ -951,15 +951,29 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     }
   };
 
+  const queueWorksTileAtPoint = (clientX, clientY) => {
+    worksPointerSample = { clientX, clientY };
+    if (!worksPointerFrame) worksPointerFrame = requestAnimationFrame(renderWorksTileHover);
+  };
+
   const queueWorksTileHover = (event) => {
     if (event.pointerType === 'touch') return;
-    worksPointerSample = { clientX: event.clientX, clientY: event.clientY };
-    if (!worksPointerFrame) worksPointerFrame = requestAnimationFrame(renderWorksTileHover);
+    queueWorksTileAtPoint(event.clientX, event.clientY);
+  };
+
+  const queueWorksTileTouch = (event) => {
+    const touch = event.touches[0];
+    if (!touch) return;
+    queueWorksTileAtPoint(touch.clientX, touch.clientY);
   };
 
   worksPage?.addEventListener('pointerenter', queueWorksTileHover);
   worksPage?.addEventListener('pointermove', queueWorksTileHover);
   worksPage?.addEventListener('pointerleave', releaseWorksTileTrail);
+  worksPage?.addEventListener('touchstart', queueWorksTileTouch, { passive: true });
+  worksPage?.addEventListener('touchmove', queueWorksTileTouch, { passive: true });
+  worksPage?.addEventListener('touchend', releaseWorksTileTrail, { passive: true });
+  worksPage?.addEventListener('touchcancel', releaseWorksTileTrail, { passive: true });
 
   const setWorksMode = (mode) => {
     if (!worksModeTabs) return;
@@ -1445,7 +1459,13 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
               trigger: uxDetailMediaImages[1],
               scroller: uxDetailMedia,
               start: 0,
-              end: 'bottom bottom',
+              // The curtain only hides the second page preview at rest. Move it
+              // fully out during the first short rail scroll so it cannot cover
+              // the second page or any content that follows.
+              end: () => Math.max(1, Math.min(
+                uxDetailMedia.scrollHeight - uxDetailMedia.clientHeight,
+                uxDetailMediaCurtain.offsetHeight
+              )),
               scrub: reveal.scrub,
               invalidateOnRefresh: true
             }
