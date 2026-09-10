@@ -961,19 +961,86 @@ window.addEventListener('pageshow', resetInitialViewport, { once: true });
     queueWorksTileAtPoint(event.clientX, event.clientY);
   };
 
-  const queueWorksTileTouch = (event) => {
+  let worksTouchGesture = null;
+  const getWorksTouchPoint = (event) => event.touches[0] || event.changedTouches[0];
+
+  const startWorksTileTouch = (event) => {
+    const touch = getWorksTouchPoint(event);
+    if (!touch) return;
+    worksTouchGesture = {
+      startX: touch.clientX,
+      startY: touch.clientY,
+      lastX: touch.clientX,
+      lastY: touch.clientY,
+      minX: touch.clientX,
+      maxX: touch.clientX,
+      pathLength: 0,
+      mode: 'pending'
+    };
+    queueWorksTileAtPoint(touch.clientX, touch.clientY);
+  };
+
+  const moveWorksTileTouch = (event) => {
     const touch = event.touches[0];
     if (!touch) return;
-    queueWorksTileAtPoint(touch.clientX, touch.clientY);
+
+    if (!worksTouchGesture) {
+      startWorksTileTouch(event);
+      return;
+    }
+
+    const stepX = touch.clientX - worksTouchGesture.lastX;
+    const stepY = touch.clientY - worksTouchGesture.lastY;
+    worksTouchGesture.pathLength += Math.hypot(stepX, stepY);
+    worksTouchGesture.minX = Math.min(worksTouchGesture.minX, touch.clientX);
+    worksTouchGesture.maxX = Math.max(worksTouchGesture.maxX, touch.clientX);
+    let enteredScrollMode = false;
+
+    if (worksTouchGesture.mode === 'pending') {
+      const deltaX = touch.clientX - worksTouchGesture.startX;
+      const deltaY = touch.clientY - worksTouchGesture.startY;
+      const horizontalExcursion = worksTouchGesture.maxX - worksTouchGesture.minX;
+      const isDeliberateVerticalSwipe = Math.abs(deltaY) >= 48
+        && horizontalExcursion <= 14
+        && Math.abs(deltaY) > Math.abs(deltaX) * 3;
+      const hasTrailIntent = horizontalExcursion > 14
+        || (worksTouchGesture.pathLength >= 54
+          && Math.abs(deltaY) < worksTouchGesture.pathLength * .78);
+
+      if (isDeliberateVerticalSwipe) {
+        worksTouchGesture.mode = 'scroll';
+        enteredScrollMode = true;
+        window.scrollBy({ top: -deltaY, behavior: 'auto' });
+        releaseWorksTileTrail();
+      } else if (hasTrailIntent) {
+        worksTouchGesture.mode = 'trail';
+      }
+    }
+
+    event.preventDefault();
+    if (worksTouchGesture.mode === 'scroll') {
+      if (!enteredScrollMode && Math.abs(stepY) > 0) {
+        window.scrollBy({ top: -stepY, behavior: 'auto' });
+      }
+    } else {
+      queueWorksTileAtPoint(touch.clientX, touch.clientY);
+    }
+    worksTouchGesture.lastX = touch.clientX;
+    worksTouchGesture.lastY = touch.clientY;
+  };
+
+  const endWorksTileTouch = () => {
+    worksTouchGesture = null;
+    releaseWorksTileTrail();
   };
 
   worksPage?.addEventListener('pointerenter', queueWorksTileHover);
   worksPage?.addEventListener('pointermove', queueWorksTileHover);
   worksPage?.addEventListener('pointerleave', releaseWorksTileTrail);
-  worksPage?.addEventListener('touchstart', queueWorksTileTouch, { passive: true });
-  worksPage?.addEventListener('touchmove', queueWorksTileTouch, { passive: true });
-  worksPage?.addEventListener('touchend', releaseWorksTileTrail, { passive: true });
-  worksPage?.addEventListener('touchcancel', releaseWorksTileTrail, { passive: true });
+  worksPage?.addEventListener('touchstart', startWorksTileTouch, { passive: true });
+  worksPage?.addEventListener('touchmove', moveWorksTileTouch, { passive: false });
+  worksPage?.addEventListener('touchend', endWorksTileTouch, { passive: true });
+  worksPage?.addEventListener('touchcancel', endWorksTileTouch, { passive: true });
 
   const setWorksMode = (mode) => {
     if (!worksModeTabs) return;
